@@ -1,0 +1,1243 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>XSLT · Stroom</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.2">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../../../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../../../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../../../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../../../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../../../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="xslt-includes.html" />
+    
+    
+    <link rel="prev" href="../parser/context-data.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        <li class="header">1. Introduction</li>
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../../../">
+            
+                <a href="../../../">
+            
+                    
+                        <b>1.1.</b>
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../../../screenshots.html">
+            
+                <a href="../../../screenshots.html">
+            
+                    
+                        <b>1.2.</b>
+                    
+                    Screenshots
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="../../../quick-start-guide/quick-start.html">
+            
+                <a href="../../../quick-start-guide/quick-start.html">
+            
+                    
+                        <b>1.3.</b>
+                    
+                    Quick-start guide
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="header">2. Installation</li>
+        
+        
+    
+        <li class="chapter " data-level="2.1" data-path="../../../install-guide/stroom-app-install.html">
+            
+                <a href="../../../install-guide/stroom-app-install.html">
+            
+                    
+                        <b>2.1.</b>
+                    
+                    Installing Stroom
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.2" >
+            
+                <span>
+            
+                    
+                        <b>2.2.</b>
+                    
+                    Setup
+            
+                </span>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="2.2.1" data-path="../../../install-guide/setup/apache-forwarding.html">
+            
+                <a href="../../../install-guide/setup/apache-forwarding.html">
+            
+                    
+                        <b>2.2.1.</b>
+                    
+                    Apache forwarding
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.2.2" data-path="../../../install-guide/setup/java-key-store-setup.html">
+            
+                <a href="../../../install-guide/setup/java-key-store-setup.html">
+            
+                    
+                        <b>2.2.2.</b>
+                    
+                    Java key store setup
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.2.3" data-path="../../../install-guide/setup/mysql-server-setup.html">
+            
+                <a href="../../../install-guide/setup/mysql-server-setup.html">
+            
+                    
+                        <b>2.2.3.</b>
+                    
+                    MySQL server setup
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.2.4" data-path="../../../install-guide/setup/processing-user-setup.html">
+            
+                <a href="../../../install-guide/setup/processing-user-setup.html">
+            
+                    
+                        <b>2.2.4.</b>
+                    
+                    Processing user setup
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.2.5" data-path="../../../install-guide/setup/securing-stroom.html">
+            
+                <a href="../../../install-guide/setup/securing-stroom.html">
+            
+                    
+                        <b>2.2.5.</b>
+                    
+                    Securing Stroom
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="2.3" data-path="../../../install-guide/upgrade-patch.html">
+            
+                <a href="../../../install-guide/upgrade-patch.html">
+            
+                    
+                        <b>2.3.</b>
+                    
+                    Upgrading and patching
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="header">4. User Guide</li>
+        
+        
+    
+        <li class="chapter " data-level="3.1" data-path="../../nodes.html">
+            
+                <a href="../../nodes.html">
+            
+                    
+                        <b>3.1.</b>
+                    
+                    Nodes
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.2" data-path="../../volumes.html">
+            
+                <a href="../../volumes.html">
+            
+                    
+                        <b>3.2.</b>
+                    
+                    Volumes
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.3" data-path="../../tasks.html">
+            
+                <a href="../../tasks.html">
+            
+                    
+                        <b>3.3.</b>
+                    
+                    Tasks
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.4" data-path="../../feeds.html">
+            
+                <a href="../../feeds.html">
+            
+                    
+                        <b>3.4.</b>
+                    
+                    Feeds
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.5" data-path="../../roles.html">
+            
+                <a href="../../roles.html">
+            
+                    
+                        <b>3.5.</b>
+                    
+                    Roles and permissions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.6" data-path="../../sending-data/">
+            
+                <a href="../../sending-data/">
+            
+                    
+                        <b>3.6.</b>
+                    
+                    Sending data to Stroom
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="3.6.1" data-path="../../sending-data/header-arguments.html">
+            
+                <a href="../../sending-data/header-arguments.html">
+            
+                    
+                        <b>3.6.1.</b>
+                    
+                    Header Arguments
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.6.2" data-path="../../sending-data/payloads.html">
+            
+                <a href="../../sending-data/payloads.html">
+            
+                    
+                        <b>3.6.2.</b>
+                    
+                    Payloads
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.6.3" data-path="../../sending-data/response-codes.html">
+            
+                <a href="../../sending-data/response-codes.html">
+            
+                    
+                        <b>3.6.3.</b>
+                    
+                    Response codes
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.6.4" data-path="../../sending-data/example-clients.html">
+            
+                <a href="../../sending-data/example-clients.html">
+            
+                    
+                        <b>3.6.4.</b>
+                    
+                    Example clients
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.6.5" data-path="../../sending-data/java-keystores.html">
+            
+                <a href="../../sending-data/java-keystores.html">
+            
+                    
+                        <b>3.6.5.</b>
+                    
+                    SSL Java keystores
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.6.6" data-path="../../sending-data/ssl.html">
+            
+                <a href="../../sending-data/ssl.html">
+            
+                    
+                        <b>3.6.6.</b>
+                    
+                    SSL configuration
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="3.7" data-path="../">
+            
+                <a href="../">
+            
+                    
+                        <b>3.7.</b>
+                    
+                    Pipelines
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="3.7.1" data-path="../parser/">
+            
+                <a href="../parser/">
+            
+                    
+                        <b>3.7.1.</b>
+                    
+                    Parser
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="3.7.1.1" data-path="../parser/xml-fragments.html">
+            
+                <a href="../parser/xml-fragments.html">
+            
+                    
+                        <b>3.7.1.1.</b>
+                    
+                    XML fragments
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.7.1.2" data-path="../parser/context-data.html">
+            
+                <a href="../parser/context-data.html">
+            
+                    
+                        <b>3.7.1.2.</b>
+                    
+                    Context data
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter active" data-level="3.7.2" data-path="./">
+            
+                <a href="./">
+            
+                    
+                        <b>3.7.2.</b>
+                    
+                    XSLT
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="3.7.2.1" data-path="xslt-includes.html">
+            
+                <a href="xslt-includes.html">
+            
+                    
+                        <b>3.7.2.1.</b>
+                    
+                    XSLT includes
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.7.2.2" data-path="xslt-functions.html">
+            
+                <a href="xslt-functions.html">
+            
+                    
+                        <b>3.7.2.2.</b>
+                    
+                    XSLT functions
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="3.7.3" data-path="../file-output.html">
+            
+                <a href="../file-output.html">
+            
+                    
+                        <b>3.7.3.</b>
+                    
+                    File output
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="3.8" data-path="../../search/search.html">
+            
+                <a href="../../search/search.html">
+            
+                    
+                        <b>3.8.</b>
+                    
+                    Search
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.9" data-path="../../search/dictionaries.html">
+            
+                <a href="../../search/dictionaries.html">
+            
+                    
+                        <b>3.9.</b>
+                    
+                    Dictionaries
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.10" data-path="../../security.html">
+            
+                <a href="../../security.html">
+            
+                    
+                        <b>3.10.</b>
+                    
+                    Security
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.11" >
+            
+                <span>
+            
+                    
+                        <b>3.11.</b>
+                    
+                    Data splitter
+            
+                </span>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="3.11.1" data-path="../../../datasplitter/1-0-introduction.html">
+            
+                <a href="../../../datasplitter/1-0-introduction.html">
+            
+                    
+                        <b>3.11.1.</b>
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="3.11.1.1" data-path="../../../datasplitter/1-1-simple-csv-example.html">
+            
+                <a href="../../../datasplitter/1-1-simple-csv-example.html">
+            
+                    
+                        <b>3.11.1.1.</b>
+                    
+                    Simple CSV example
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.11.1.2" data-path="../../../datasplitter/1-2-simple-csv-example-with-heading.html">
+            
+                <a href="../../../datasplitter/1-2-simple-csv-example-with-heading.html">
+            
+                    
+                        <b>3.11.1.2.</b>
+                    
+                    Simple CSV example with heading
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.11.1.3" data-path="../../../datasplitter/1-3-complex-example.html">
+            
+                <a href="../../../datasplitter/1-3-complex-example.html">
+            
+                    
+                        <b>3.11.1.3.</b>
+                    
+                    Complex example with regex and user defined names
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.11.1.4" data-path="../../../datasplitter/1-4-multi-line-example.html">
+            
+                <a href="../../../datasplitter/1-4-multi-line-example.html">
+            
+                    
+                        <b>3.11.1.4.</b>
+                    
+                    Multi-line example
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="3.11.2" data-path="../../../datasplitter/2-0-element-reference.html">
+            
+                <a href="../../../datasplitter/2-0-element-reference.html">
+            
+                    
+                        <b>3.11.2.</b>
+                    
+                    Element reference
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="3.11.2.1" data-path="../../../datasplitter/2-1-content-providers.html">
+            
+                <a href="../../../datasplitter/2-1-content-providers.html">
+            
+                    
+                        <b>3.11.2.1.</b>
+                    
+                    Content providers
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.11.2.2" data-path="../../../datasplitter/2-2-expressions.html">
+            
+                <a href="../../../datasplitter/2-2-expressions.html">
+            
+                    
+                        <b>3.11.2.2.</b>
+                    
+                    Expressions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.11.2.3" data-path="../../../datasplitter/2-3-variables.html">
+            
+                <a href="../../../datasplitter/2-3-variables.html">
+            
+                    
+                        <b>3.11.2.3.</b>
+                    
+                    Variables
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.11.2.4" data-path="../../../datasplitter/2-4-output.html">
+            
+                <a href="../../../datasplitter/2-4-output.html">
+            
+                    
+                        <b>3.11.2.4.</b>
+                    
+                    Output
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="3.11.3" data-path="../../../datasplitter/3-0-match-references.html">
+            
+                <a href="../../../datasplitter/3-0-match-references.html">
+            
+                    
+                        <b>3.11.3.</b>
+                    
+                    Match references, variables and fixed strings
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="3.11.3.1" data-path="../../../datasplitter/3-1-expression-match-references.html">
+            
+                <a href="../../../datasplitter/3-1-expression-match-references.html">
+            
+                    
+                        <b>3.11.3.1.</b>
+                    
+                    Expression match references
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.11.3.2" data-path="../../../datasplitter/3-2-variable-reference.html">
+            
+                <a href="../../../datasplitter/3-2-variable-reference.html">
+            
+                    
+                        <b>3.11.3.2.</b>
+                    
+                    Variable reference
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.11.3.3" data-path="../../../datasplitter/3-3-use-of-fixed-strings.html">
+            
+                <a href="../../../datasplitter/3-3-use-of-fixed-strings.html">
+            
+                    
+                        <b>3.11.3.3.</b>
+                    
+                    Use of fixed strings
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="3.11.3.4" data-path="../../../datasplitter/3-4-concatenation-of-references.html">
+            
+                <a href="../../../datasplitter/3-4-concatenation-of-references.html">
+            
+                    
+                        <b>3.11.3.4.</b>
+                    
+                    Concatenation of references
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+        
+        <li class="header">6. Stroom Proxy</li>
+        
+        
+    
+        <li class="chapter " data-level="4.1" data-path="../../../proxy/install.html">
+            
+                <a href="../../../proxy/install.html">
+            
+                    
+                        <b>4.1.</b>
+                    
+                    Installing Stroom proxy
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.2" data-path="../../../proxy/docker.html">
+            
+                <a href="../../../proxy/docker.html">
+            
+                    
+                        <b>4.2.</b>
+                    
+                    Docker
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="4.3" data-path="../../../proxy/apache-forwarding.html">
+            
+                <a href="../../../proxy/apache-forwarding.html">
+            
+                    
+                        <b>4.3.</b>
+                    
+                    Apache forwarding
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="header">7. Developer Guide</li>
+        
+        
+    
+        <li class="chapter " data-level="5.1" data-path="../../../dev-guide/README.md">
+            
+                <span>
+            
+                    
+                        <b>5.1.</b>
+                    
+                    Developer guide
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="5.1.1" data-path="../../../dev-guide/releasing.html">
+            
+                <a href="../../../dev-guide/releasing.html">
+            
+                    
+                        <b>5.1.1.</b>
+                    
+                    Releasing
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="5.1.2" data-path="../../../dev-guide/stroom-in-an-ide.html">
+            
+                <a href="../../../dev-guide/stroom-in-an-ide.html">
+            
+                    
+                        <b>5.1.2.</b>
+                    
+                    Running Stroom from IntelliJ
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="5.1.3" data-path="../../../dev-guide/docker.html">
+            
+                <a href="../../../dev-guide/docker.html">
+            
+                    
+                        <b>5.1.3.</b>
+                    
+                    Running Stroom using Docker
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="5.1.4" data-path="../../../dev-guide/gitbook.html">
+            
+                <a href="../../../dev-guide/gitbook.html">
+            
+                    
+                        <b>5.1.4.</b>
+                    
+                    Building GitBook documentation
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="../../.." >XSLT</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="xslt-conversion">XSLT Conversion</h1>
+<p>Once the text file has been converted into Intermediary XML (or the feed is already XML), XSLT is used to
+translate the XML into event logging XML format.</p>
+<p>Event Feeds must be translated into the events schema and Reference
+into the reference schema. You can browse documentation relating to the
+schemas within the application.</p>
+<p>Here is an example XSLT:</p>
+<pre><code class="lang-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;xsl:stylesheet
+    xmlns=&quot;event-logging:3&quot;
+    xmlns:s=&quot;stroom&quot;
+    xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+    version=&quot;2.0&quot;&gt;
+
+    &lt;xsl:template match=&quot;SomeData&quot;&gt;
+        &lt;Events
+        xsi:schemaLocation=&quot;event-logging:3 file://event-logging-v3.0.0.xsd&quot;
+        Version=&quot;3.0.0&quot;&gt;
+            &lt;xsl:apply-templates/&gt;
+        &lt;/Events&gt;
+    &lt;/xsl:template&gt;
+    &lt;xsl:template match=&quot;SomeEvent&quot;&gt;
+        &lt;xsl:variable name=&quot;dateTime&quot; select=&quot;SomeTime&quot;/&gt;
+        &lt;xsl:variable name=&quot;formattedDateTime&quot; select=&quot;s:format-date($dateTime, &apos;dd/MM/yyyyhh:mm:ss&apos;)&quot;/&gt;
+
+        &lt;xsl:if test=&quot;SomeAction = &apos;OPEN&apos;&quot;&gt;
+            &lt;Event&gt;
+            &lt;EventTime&gt;
+                &lt;TimeCreated&gt;
+                    &lt;xsl:value-of select=&quot;$formattedDateTime&quot;/&gt;
+                &lt;/TimeCreated&gt;
+            &lt;/EventTime&gt;
+            &lt;EventSource&gt;
+                &lt;System&gt;Example&lt;/System&gt;
+                &lt;Environment&gt;Example&lt;/Environment&gt;
+                &lt;Generator&gt;Very Simple Provider&lt;/Generator&gt;
+                &lt;Device&gt;
+                    &lt;IPAddress&gt;3.3.3.3&lt;/IPAddress&gt;
+                &lt;/Device&gt;
+                &lt;User&gt;
+                    &lt;Id&gt;&lt;xsl:value-of select=&quot;SomeUser&quot;/&gt;&lt;/Id&gt;
+                &lt;/User&gt;
+            &lt;/EventSource&gt;
+            &lt;EventDetail&gt;
+                &lt;View&gt;
+                    &lt;Document&gt;
+                        &lt;Title&gt;UNKNOWN&lt;/Title&gt;
+                        &lt;File&gt;
+                        &lt;Path&gt;&lt;xsl:value-of select=&quot;SomeFile&quot;/&gt;&lt;/Path&gt;
+                        &lt;File&gt;
+                    &lt;/Document&gt;
+                &lt;/View&gt;
+            &lt;/EventDetail&gt;
+            &lt;/Event&gt;
+        &lt;/xsl:if&gt;
+    &lt;/xsl:template&gt;
+&lt;/xsl:stylesheet&gt;
+</code></pre>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="../parser/context-data.html" class="navigation navigation-prev " aria-label="Previous page: Context data">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="xslt-includes.html" class="navigation navigation-next " aria-label="Next page: XSLT includes">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"XSLT","level":"3.7.2","depth":2,"next":{"title":"XSLT includes","level":"3.7.2.1","depth":3,"path":"user-guide/pipelines/xslt/xslt-includes.md","ref":"user-guide/pipelines/xslt/xslt-includes.md","articles":[]},"previous":{"title":"Context data","level":"3.7.1.2","depth":3,"path":"user-guide/pipelines/parser/context-data.md","ref":"user-guide/pipelines/parser/context-data.md","articles":[]},"dir":"ltr"},"config":{"plugins":["-highlight","github","anchorjs"],"styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"github":{"url":"https://github.com/TODO"},"theme-default":{"styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":true},"anchorjs":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Stroom","gitbook":"3.x.x"},"file":{"path":"user-guide/pipelines/xslt/README.md","mtime":"2016-11-02T12:29:33.000Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2016-11-04T11:33:12.378Z"},"basePath":"../../..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../../../gitbook/gitbook.js"></script>
+    <script src="../../../gitbook/theme.js"></script>
+    
+        
+        <script src="../../../gitbook/gitbook-plugin-github/plugin.js"></script>
+        
+    
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/3.1.1/anchor.min.js"></script>
+        
+    
+        
+        <script src="../../../gitbook/gitbook-plugin-anchorjs/anchor-style.js"></script>
+        
+    
+        
+        <script src="../../../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../../../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../../../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../../../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../../../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../../../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

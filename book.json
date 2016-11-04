@@ -1,7 +1,7 @@
 {
   "gitbook": "3.x.x",
   "title": "Stroom",
-  "plugins": ["prism", "-highlight", "github", "anchorjs"],
+  "plugins": ["-highlight", "github", "anchorjs"],
   "pluginsConfig": {
     "github": {
       "url": "https://github.com/TODO"
