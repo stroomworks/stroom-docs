@@ -2,8 +2,8 @@
 
 ## Prerequisites
 
-* Install file 'stroom-app-distribution-X-Y-Z-bin.zip'. All the pre-built binaries are [available on GitHub](http://github.com/gchq/stroom/releases)
-* MySQL Server 5.6
+* Install file 'stroom-app-distribution-X-Y-Z-bin.zip'. All the pre-built binaries are [available on GitHub](https://github.com/gchq/stroom/releases)
+* MySQL Server 5.5
 * JDK8
 * Temporarily allow port 8080, if not relying on Apache Forwarding. 
 
@@ -56,6 +56,6 @@ You might want to configure some of the following:
 
 * [Processing User Setup](setup/processing-user-setup.md)
 * [MySQL Server Setup](setup/mysql-server-setup.md)
-* [Java Key Store Setup](setup/java-key-store-setup.html)
-* [Apache Forwarding](setup/apache-forwarding.html)
-* [Securing Stroom](setup/securing-stroom.html)
+* [Java Key Store Setup](setup/java-key-store-setup.md)
+* [Apache Forwarding](setup/apache-forwarding.md)
+* [Securing Stroom](setup/securing-stroom.md)
