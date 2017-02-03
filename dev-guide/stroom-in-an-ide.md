@@ -71,7 +71,7 @@ stroom-config/src/main/resources/stroom.properties
 Create the your local configuration file and directory:
 
 ```bash
-mkdir -p ~/.stroom.conf.d/
+mkdir -p ~/.stroom/
 touch stroom.conf
 ```
 
@@ -90,6 +90,16 @@ stroom.jdbcDriverPassword=myOtherPassword
 ## Verify the Maven build
 
 Before trying to run Stroom in an IDE it is worth performing a Maven build without all the tests to verify the code is in a sound state.
+
+Stroom is dependant on the _event-logging_ repo for its build. Utill _event-logging_ has been added to maven central you need to clone and build this first. So in your chosen directory for git repositories do:
+
+```bash
+git clone git@github.com:gchq/event-loggin.git
+cd event-logging
+mvn clean install
+```
+
+Once event-logging has built successfully it will exist in you local maven repository so you can now build Stroom, skipping the tests.
 
 ```bash 
 mvn -Pgwt-dev-chrome -Dskip.surefire.tests=true clean install -U

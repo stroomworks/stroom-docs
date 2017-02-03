@@ -7,9 +7,6 @@ id,guid,from_ip,to_ip,application
 2,633aa1a8-04ff-442d-ad9a-03ce9166a63a,210.14.34.58,133.136.48.23,Sub-Ex
 ...
 ```
-
-> **Note:** The data used in _mock_stroom_data.csv_ is randomly generated and any association with any real world IP address or name is entirely coincidental.
-
 To this XML:
 
 ```xml
@@ -43,6 +40,8 @@ We're going to do the following:
 
 All the things we create here are available as a [content pack](https://github.com/gchq/stroom-content/releases/tag/stroom-101-v1.0), so if you just wanted to see it running you could get there quite easily.
 
+> **Note:** The CSV data used in _mock_stroom_data.csv_ (linked to above) is randomly generated and any association with any real world IP address or name is entirely coincidental.
+
 ## Getting and Running Stroom
 
 There are several options to get Stroom running and by far the quickest and easiest is to follow the first option of running the pre-built Docker Hub image of Stroom.
@@ -51,7 +50,7 @@ There are several options to get Stroom running and by far the quickest and easi
 
 Running Stroom options:
 
-* [Run using a Docker Hub image](../install-guide/docker.md#using-a-pre-built-docker-hub-image)
+* [Run using a Docker Hub image](../dev-guide/docker.md#using-a-pre-built-docker-hub-image)
 * [Run using a release](../install-guide/stroom-app-install.md)
 * From source you can:
   * [Build and run from IntelliJ](../dev-guide/stroom-in-an-ide.md)

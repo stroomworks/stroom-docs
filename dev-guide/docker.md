@@ -18,10 +18,10 @@ docker rm stroom-db
 docker rmi stroom
 
 # Run the MySQL docker image
-docker run --name stroom-db -e MYSQL_ROOT_PASSWORD=my-secret-pw -e MYSQL_USER=stroomuser -e MYSQL_PASSWORD=stroompassword1 -e MYSQL_DATABASE=stroom -d mysql:5.5
+docker run --name stroom-db -e MYSQL_ROOT_PASSWORD=my-secret-pw -e MYSQL_USER=stroomuser -e MYSQL_PASSWORD=stroompassword1 -e MYSQL_DATABASE=stroom -d mysql:5.6
 
 # Run the Stroom docker image
-docker run -p 8080:8080 --link stroom-db -v ~/.stroom.conf.d:/root/.stroom.conf.d --name=stroom -e STROOM_JDBC_DRIVER_URL="jdbc:mysql://stroom-db/stroom?useUnicode=yes&characterEncoding=UTF-8" -e STROOM_JDBC_DRIVER_USERNAME="stroomuser" -e STROOM_JDBC_DRIVER_PASSWORD="stroompassword1" gchq/stroom
+docker run -p 8080:8080 --link stroom-db -v ~/.stroom:/root/.stroom --name=stroom -e STROOM_JDBC_DRIVER_URL="jdbc:mysql://stroom-db/stroom?useUnicode=yes&characterEncoding=UTF-8" -e STROOM_JDBC_DRIVER_USERNAME="stroomuser" -e STROOM_JDBC_DRIVER_PASSWORD="stroompassword1" gchq/stroom
 ```
 
 Now open a browser (preferably Chrome) at [localhost:8080/stroom](http://localhost:8080/stroom) to get started with Stroom.
@@ -52,11 +52,11 @@ docker run --name stroom-db -e MYSQL_ROOT_PASSWORD=my-secret-pw -e MYSQL_USER=st
 ### Stroom
 
 #### Create configuration file
-Stroom will look for configuration in `~/.stroom.conf.d/stroom.conf`. You can create a basic configuration file like this:
+Stroom will look for configuration in `~/.stroom/stroom.conf`. You can create a basic configuration file like this:
 
 ```bash
-mkdir ~/.stroom.conf.d
-cd ~/.stroom.conf.d
+mkdir ~/.stroom
+cd ~/.stroom
 wget https://raw.githubusercontent.com/gchq/stroom-docs/master/dev-guide/resources/stroom.conf
 ```
 
@@ -72,7 +72,7 @@ cd ..
 #### Clone and build `stroom`
 
 ```bash
-git clone https://github.com/gchq.git
+git clone https://github.com/gchq/stroom.git
 mvn clean install
 ```
 
@@ -83,7 +83,7 @@ cd stroom-app-distribution
 unzip target/stroom-app-distribution-<version>-bin.zip -d target
 ```
 
-g### Building and running the docker image
+### Building and running the docker image
 
 ```bash
 docker stop stroom
@@ -91,7 +91,22 @@ docker rm stroom
 docker rmi stroom
 
 docker build --tag=stroom:latest target/stroom-app
-docker run -p 8080:8080 --link stroom-db -v ~/.stroom.conf.d:/root/.stroom.conf.d --name=stroom -e STROOM_JDBC_DRIVER_URL="jdbc:mysql://stroom-db/stroom?useUnicode=yes&characterEncoding=UTF-8" -e STROOM_JDBC_DRIVER_USERNAME="stroomuser" -e STROOM_JDBC_DRIVER_PASSWORD="stroompassword1" stroom
+docker run -p 8080:8080 --link stroom-db -v ~/.stroom:/root/.stroom --name=stroom -e STROOM_JDBC_DRIVER_URL="jdbc:mysql://stroom-db/stroom?useUnicode=yes&characterEncoding=UTF-8" -e STROOM_JDBC_DRIVER_USERNAME="stroomuser" -e STROOM_JDBC_DRIVER_PASSWORD="stroompassword1" stroom
 ```
 
 Navigate to [http://localhost:8080/stroom/stroom.jsp](http://localhost:8080/stroom/stroom.jsp) to see Stroom running.
+
+## Releasing the Docker image to Docker Hub (or any other Docker registry)
+
+1. Build an image using the method above, and then test it.
+
+2. Check that the image name is correct. For Docker Hub the Stroom image needs to be called `gchq/stroom` so that it gets pushed to the GCHQ Docker Hub organisation. You can rename it like this: `docker tag stroom:latest gchq/stroom:latest`.
+
+3. Log in to the registry using `docker login` followed by your credentials when prompted. 
+
+4. Push the image up using `docker push gchq/stroom`.
+
+### Docker Hub links
+[The Stroom image](https://hub.docker.com/r/gchq/stroom/)
+
+[The GCHQ organisation](https://hub.docker.com/u/gchq/)
