@@ -1117,10 +1117,7 @@
 1,10990cde-1084-4006-aaf3-7fe52b62ce06,159.161.108.105,217.151.32.69,Tres-Zap
 2,633aa1a8-04ff-442d-ad9a-03ce9166a63a,210.14.34.58,133.136.48.23,Sub-Ex
 ...
-</code></pre><blockquote>
-<p><strong>Note:</strong> The data used in <em>mock_stroom_data.csv</em> is randomly generated and any association with any real world IP address or name is entirely coincidental.</p>
-</blockquote>
-<p>To this XML:</p>
+</code></pre><p>To this XML:</p>
 <pre><code class="lang-xml">&lt;?xml version=&quot;1.1&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;Events xmlns:stroom=&quot;stroom&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&gt;
    &lt;Event&gt;
@@ -1148,14 +1145,19 @@
 <li>Set up a pipeline</li>
 </ol>
 <p>All the things we create here are available as a <a href="https://github.com/gchq/stroom-content/releases/tag/stroom-101-v1.0" target="_blank">content pack</a>, so if you just wanted to see it running you could get there quite easily.</p>
-<h2 id="getting-and-running-stroom">Getting and Running Stroom</h2>
-<p>There are several options to get Stroom running and by far the quickest and easiest is to follow the first option of running the pre-built Docker Hub image of Stroom.</p>
 <blockquote>
-<p>If you&apos;re new to <a href="https://www.docker.com/what-docker" target="_blank">Docker</a> then you might want to follow their <a href="https://www.docker.com/products/docker" target="_blank">getting started guide</a> first.</p>
+<p><strong>Note:</strong> The CSV data used in <em>mock_stroom_data.csv</em> (linked to above) is randomly generated and any association with any real world IP address or name is entirely coincidental.</p>
 </blockquote>
-<p>Running Stroom options:</p>
+<h2 id="getting-and-running-stroom">Getting and Running Stroom</h2>
+<p>There are several options to get Stroom running and by far the quickest and easiest is to use Docker. If you&apos;re new to <a href="https://www.docker.com/what-docker" target="_blank">Docker</a> then you might want to follow their <a href="https://www.docker.com/products/docker" target="_blank">getting started guide</a> first. Otherwise you can run this:</p>
+<pre><code class="lang-bash">docker run --name stroom-db -e MYSQL_ROOT_PASSWORD=my-secret-pw -e MYSQL_USER=stroomuser -e MYSQL_PASSWORD=stroompassword1 -e MYSQL_DATABASE=stroom -d mysql:5.6
+
+# Run the Stroom docker image
+docker run -p 8080:8080 --link stroom-db -v ~/.stroom:/root/.stroom --name=stroom -e STROOM_JDBC_DRIVER_URL=&quot;jdbc:mysql://stroom-db/stroom?useUnicode=yes&amp;characterEncoding=UTF-8&quot; -e STROOM_JDBC_DRIVER_USERNAME=&quot;stroomuser&quot; -e STROOM_JDBC_DRIVER_PASSWORD=&quot;stroompassword1&quot; gchq/stroom
+</code></pre>
+<p>If you&apos;re really interested here are your full options for running Stroom:</p>
 <ul>
-<li><a href="../install-guide/docker.md#using-a-pre-built-docker-hub-image">Run using a Docker Hub image</a></li>
+<li><a href="../dev-guide/docker.html#using-a-pre-built-docker-hub-image">Run using a Docker Hub image</a></li>
 <li><a href="../install-guide/stroom-app-install.html">Run using a release</a></li>
 <li>From source you can:<ul>
 <li><a href="../dev-guide/stroom-in-an-ide.html">Build and run from IntelliJ</a></li>
@@ -1164,19 +1166,6 @@
 </li>
 </ul>
 <h2 id="basic-configuration">Basic configuration</h2>
-<h3 id="somewhere-for-stroom-to-store-data">Somewhere for Stroom to store data</h3>
-<p>In Stroom a <a href="../user-guide/volumes.html"><em>volume</em></a> is a place to store data. When you first load up Stroom there won&apos;t be any volumes configured so that&apos;s the first thing to do. If you don&apos;t then when you try and upload data to a <a href="../user-guide/feeds.html">feed</a> (the next thing we&apos;ll do) it won&apos;t have anywhere to put the data.</p>
-<ol>
-<li>From the menu at the top select Tools -&gt; Volumes:</li>
-</ol>
-<p><img src="resources/go-volumes.png" alt="This is where you open a volume"></p>
-<ol>
-<li><p>Then click the new icon (<img src="../../resources/icons/add.png" alt="The new volume icon">) at the top left.</p>
-</li>
-<li><p>You need to select a <a href="../user-guide/nodes.html">node</a>. There will be one there already - the node you&apos;re currently running on. And add a path, e.g. ~/tmp/1. It should look something like this:</p>
-</li>
-</ol>
-<p><img src="resources/edit-volume.png" alt="This is what the new volume should look like"></p>
 <h3 id="enable-processing-of-data-streams">Enable processing of data streams</h3>
 <p>Automatic processing isn&apos;t enabled by default: you might first want to check other settings (for example  nodes, properties, and volumes). So we need to enable Stream Processing. This is in Tools -&gt; Jobs menu::
 <img src="resources/go-jobs.png" alt="Opening the jobs ment"></p>
@@ -1184,14 +1173,6 @@
 <p><img src="resources/configure-jobs.png" alt="Enabling stream processing"></p>
 <p>Below the list of jobs is the properties pane. The Stream Processor&apos;s properties show the list of nodes. You should have one. You&apos;ll need to enable it by scrolling right:</p>
 <p><img src="resources/configure-jobs-stream.png" alt="Enabling the nodes for the stream processor"></p>
-<h3 id="getting-ready-to-use-the-data-splitter">Getting ready to use the data splitter</h3>
-<p>We&apos;re going to use something called a <a href="../datasplitter/1-0-introduction.html"><em>Data Splitter</em></a> to take apart some CSV. We&apos;ll create an instance of a data splitter and configure it, and this configuration will be in XML. This XML is actually schema-constrained, but vanilla Stroom doesn&apos;t come with that schema - in fact it doesn&apos;t come with anything. So the first thing we need to do is import the schema. </p>
-<p>The schema is stored in what we call <em>content packs</em>. There are <a href="https://github.com/gchq/stroom-content" target="_blank">lots of content packs</a> and there will be more: they add configurable functionality to Stroom. The <a href="https://github.com/gchq/stroom-content/releases/tag/core-xml-schemas-v1.0" target="_blank">XML Schemas</a> pack contains the Data Splitter schema. This is a core content pack and we&apos;re working on a way to have it included by default.</p>
-<p>Go to <em>Tools</em> -&gt; <em>Import</em>:</p>
-<p><img src="resources/go-import.png" alt="Load the import dialog"></p>
-<p>You&apos;ll need to select the data-splitter-schema.zip import pack, then make sure everything is checked:</p>
-<p><img src="resources/import-data-splitter.png" alt="Import all data splitter schema components"></p>
-<p>You&apos;ll see a new folder for XML Schemas, and inside the Data Splitter Schema. Any other content packs you import that have schemas will also go here. It&apos;s not a special folder, just a convention, so you can move them around if you don&apos;t like where the content pack puts it.</p>
 <h2 id="getting-data-into-stroom">Getting data into Stroom</h2>
 <h3 id="create-the-feed">Create the feed</h3>
 <p>In real life you might configure Stroom to watch for new files in a directory. In this tutorial we&apos;ll be uploading data but the result will be the same: raw event data sitting on a feed.</p>
@@ -1410,7 +1391,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Quick-start guide","level":"1.3","depth":1,"next":{"title":"Installing Stroom","level":"2.1","depth":1,"path":"install-guide/stroom-app-install.md","ref":"install-guide/stroom-app-install.md","articles":[]},"previous":{"title":"Screenshots","level":"1.2","depth":1,"path":"screenshots.md","ref":"screenshots.md","articles":[]},"dir":"ltr"},"config":{"plugins":["-highlight","github","anchorjs"],"styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"github":{"url":"https://github.com/gchq/stroom-docs"},"theme-default":{"styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":true},"anchorjs":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Stroom","gitbook":"3.x.x"},"file":{"path":"quick-start-guide/quick-start.md","mtime":"2016-11-22T09:42:09.345Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2016-11-22T09:42:22.615Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Quick-start guide","level":"1.3","depth":1,"next":{"title":"Installing Stroom","level":"2.1","depth":1,"path":"install-guide/stroom-app-install.md","ref":"install-guide/stroom-app-install.md","articles":[]},"previous":{"title":"Screenshots","level":"1.2","depth":1,"path":"screenshots.md","ref":"screenshots.md","articles":[]},"dir":"ltr"},"config":{"plugins":["-highlight","github","anchorjs"],"styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"github":{"url":"https://github.com/gchq/stroom-docs"},"theme-default":{"styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":true},"anchorjs":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Stroom","gitbook":"3.x.x"},"file":{"path":"quick-start-guide/quick-start.md","mtime":"2017-02-03T08:16:26.563Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-02-03T08:17:49.859Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

@@ -1127,10 +1127,10 @@ docker rm stroom-db
 docker rmi stroom
 
 # Run the MySQL docker image
-docker run --name stroom-db -e MYSQL_ROOT_PASSWORD=my-secret-pw -e MYSQL_USER=stroomuser -e MYSQL_PASSWORD=stroompassword1 -e MYSQL_DATABASE=stroom -d mysql:5.5
+docker run --name stroom-db -e MYSQL_ROOT_PASSWORD=my-secret-pw -e MYSQL_USER=stroomuser -e MYSQL_PASSWORD=stroompassword1 -e MYSQL_DATABASE=stroom -d mysql:5.6
 
 # Run the Stroom docker image
-docker run -p 8080:8080 --link stroom-db -v ~/.stroom.conf.d:/root/.stroom.conf.d --name=stroom -e STROOM_JDBC_DRIVER_URL=&quot;jdbc:mysql://stroom-db/stroom?useUnicode=yes&amp;characterEncoding=UTF-8&quot; -e STROOM_JDBC_DRIVER_USERNAME=&quot;stroomuser&quot; -e STROOM_JDBC_DRIVER_PASSWORD=&quot;stroompassword1&quot; gchq/stroom
+docker run -p 8080:8080 --link stroom-db -v ~/.stroom:/root/.stroom --name=stroom -e STROOM_JDBC_DRIVER_URL=&quot;jdbc:mysql://stroom-db/stroom?useUnicode=yes&amp;characterEncoding=UTF-8&quot; -e STROOM_JDBC_DRIVER_USERNAME=&quot;stroomuser&quot; -e STROOM_JDBC_DRIVER_PASSWORD=&quot;stroompassword1&quot; gchq/stroom
 </code></pre>
 <p>Now open a browser (preferably Chrome) at <a href="http://localhost:8080/stroom" target="_blank">localhost:8080/stroom</a> to get started with Stroom.</p>
 <h2 id="building-a-docker-image-from-a-stroom-distribution">Building a Docker image from a Stroom distribution</h2>
@@ -1150,9 +1150,9 @@ docker run --name stroom-db -e MYSQL_ROOT_PASSWORD=my-secret-pw -e MYSQL_USER=st
 <p><code>docker run -it --link stroom-db:mysql --rm mysql sh -c &apos;exec mysql -h&quot;$MYSQL_PORT_3306_TCP_ADDR&quot; -P&quot;$MYSQL_PORT_3306_TCP_PORT&quot; -u&quot;root&quot; -p&quot;my-secret-pw&quot; stroom&apos;</code></p>
 <h3 id="stroom">Stroom</h3>
 <h4 id="create-configuration-file">Create configuration file</h4>
-<p>Stroom will look for configuration in <code>~/.stroom.conf.d/stroom.conf</code>. You can create a basic configuration file like this:</p>
-<pre><code class="lang-bash">mkdir ~/.stroom.conf.d
-cd ~/.stroom.conf.d
+<p>Stroom will look for configuration in <code>~/.stroom/stroom.conf</code>. You can create a basic configuration file like this:</p>
+<pre><code class="lang-bash">mkdir ~/.stroom
+cd ~/.stroom
 wget https://raw.githubusercontent.com/gchq/stroom-docs/master/dev-guide/resources/stroom.conf
 </code></pre>
 <h4 id="clone-and-build-event-logging">Clone and build <code>event-logging</code></h4>
@@ -1162,22 +1162,36 @@ mvn clean install
 cd ..
 </code></pre>
 <h4 id="clone-and-build-stroom">Clone and build <code>stroom</code></h4>
-<pre><code class="lang-bash">git clone https://github.com/gchq.git
+<pre><code class="lang-bash">git clone https://github.com/gchq/stroom.git
 mvn clean install
 </code></pre>
 <h4 id="unpack-the-stroom-distribution-in-preparation-for-building-the-docker-image">Unpack the Stroom distribution in preparation for building the docker image</h4>
 <pre><code class="lang-bash">cd stroom-app-distribution
 unzip target/stroom-app-distribution-&lt;version&gt;-bin.zip -d target
 </code></pre>
-<p>g### Building and running the docker image</p>
+<h3 id="building-and-running-the-docker-image">Building and running the docker image</h3>
 <pre><code class="lang-bash">docker stop stroom
 docker rm stroom
 docker rmi stroom
 
 docker build --tag=stroom:latest target/stroom-app
-docker run -p 8080:8080 --link stroom-db -v ~/.stroom.conf.d:/root/.stroom.conf.d --name=stroom -e STROOM_JDBC_DRIVER_URL=&quot;jdbc:mysql://stroom-db/stroom?useUnicode=yes&amp;characterEncoding=UTF-8&quot; -e STROOM_JDBC_DRIVER_USERNAME=&quot;stroomuser&quot; -e STROOM_JDBC_DRIVER_PASSWORD=&quot;stroompassword1&quot; stroom
+docker run -p 8080:8080 --link stroom-db -v ~/.stroom:/root/.stroom --name=stroom -e STROOM_JDBC_DRIVER_URL=&quot;jdbc:mysql://stroom-db/stroom?useUnicode=yes&amp;characterEncoding=UTF-8&quot; -e STROOM_JDBC_DRIVER_USERNAME=&quot;stroomuser&quot; -e STROOM_JDBC_DRIVER_PASSWORD=&quot;stroompassword1&quot; stroom
 </code></pre>
 <p>Navigate to <a href="http://localhost:8080/stroom/stroom.jsp" target="_blank">http://localhost:8080/stroom/stroom.jsp</a> to see Stroom running.</p>
+<h2 id="releasing-the-docker-image-to-docker-hub-or-any-other-docker-registry">Releasing the Docker image to Docker Hub (or any other Docker registry)</h2>
+<ol>
+<li><p>Build an image using the method above, and then test it.</p>
+</li>
+<li><p>Check that the image name is correct. For Docker Hub the Stroom image needs to be called <code>gchq/stroom</code> so that it gets pushed to the GCHQ Docker Hub organisation. You can rename it like this: <code>docker tag stroom:latest gchq/stroom:latest</code>.</p>
+</li>
+<li><p>Log in to the registry using <code>docker login</code> followed by your credentials when prompted. </p>
+</li>
+<li><p>Push the image up using <code>docker push gchq/stroom</code>.</p>
+</li>
+</ol>
+<h3 id="docker-hub-links">Docker Hub links</h3>
+<p><a href="https://hub.docker.com/r/gchq/stroom/" target="_blank">The Stroom image</a></p>
+<p><a href="https://hub.docker.com/u/gchq/" target="_blank">The GCHQ organisation</a></p>
 
                                 
                                 </section>
@@ -1221,7 +1235,7 @@ docker run -p 8080:8080 --link stroom-db -v ~/.stroom.conf.d:/root/.stroom.conf.
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Running Stroom using Docker","level":"5.1.3","depth":2,"next":{"title":"Building GitBook documentation","level":"5.1.4","depth":2,"path":"dev-guide/gitbook.md","ref":"dev-guide/gitbook.md","articles":[]},"previous":{"title":"Running Stroom from IntelliJ","level":"5.1.2","depth":2,"path":"dev-guide/stroom-in-an-ide.md","ref":"dev-guide/stroom-in-an-ide.md","articles":[]},"dir":"ltr"},"config":{"plugins":["-highlight","github","anchorjs"],"styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"github":{"url":"https://github.com/gchq/stroom-docs"},"theme-default":{"styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":true},"anchorjs":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Stroom","gitbook":"3.x.x"},"file":{"path":"dev-guide/docker.md","mtime":"2016-11-22T09:42:09.341Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2016-11-22T09:42:22.615Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Running Stroom using Docker","level":"5.1.3","depth":2,"next":{"title":"Building GitBook documentation","level":"5.1.4","depth":2,"path":"dev-guide/gitbook.md","ref":"dev-guide/gitbook.md","articles":[]},"previous":{"title":"Running Stroom from IntelliJ","level":"5.1.2","depth":2,"path":"dev-guide/stroom-in-an-ide.md","ref":"dev-guide/stroom-in-an-ide.md","articles":[]},"dir":"ltr"},"config":{"plugins":["-highlight","github","anchorjs"],"styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"github":{"url":"https://github.com/gchq/stroom-docs"},"theme-default":{"styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":true},"anchorjs":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Stroom","gitbook":"3.x.x"},"file":{"path":"dev-guide/docker.md","mtime":"2017-02-03T08:06:20.217Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-02-03T08:17:49.859Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
