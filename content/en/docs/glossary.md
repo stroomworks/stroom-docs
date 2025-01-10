@@ -447,6 +447,12 @@ TLS is typically used in Stroom for communications between Stroom-Proxy and Stro
 A Tracker is associated with a {{< glossary "Processor Filter" >}} and keeps track of the {{< glossary "Stream" "Streams" >}} that the Processor Filter has already processed.
 
 
+## TSV
+
+**T**ab **S**eparated **V**alues is a file format with typically one record per line and fields delimited by a `<TAB>`.
+Field may be optionally enclosed with double quotes, though there is no fixed standard for TSV data, particularly when it comes to escaping of double quotes and/or `<TAB>`.
+
+
 ## User
 
 Refers to a Stroom User that is linked to either an {{< glossary "Account" >}} in Stroom's internal {{< glossary "identity provider idp" "Identity Provider">}} or a user account in an external {{< glossary "identity provider idp" "Identity Provider">}}.
