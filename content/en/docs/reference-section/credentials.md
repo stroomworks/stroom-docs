@@ -1,7 +1,7 @@
 ---
 title: "Credentials"
 linkTitle: "Credentials"
-weight: 10
+weight: 0
 date: 2026-01-16
 tags:
 description: >
@@ -11,7 +11,8 @@ description: >
 Sometimes Stroom needs to connect to other systems:
 
 - Git repositories
-- TBD
+- Stroom AI connections
+- In the future, all credentials for third-party systems will be managed by this user-interface.
 
 The Credentials module is intended to centralise the management of these
 credentials within Stroom.

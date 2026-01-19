@@ -1,7 +1,7 @@
 ---
 title: "Content Store"
 linkTitle: "Content Store"
-weight: 10
+weight: 0
 date: 2026-01-19
 tags:
 description: >
@@ -142,4 +142,16 @@ gitNeedsAuth
 
 ## Adding extra Content Stores
 
+Content Stores are listed in the local.yaml configuration file, under `appConfig/contentStore/urls`. 
+If nothing is specified in the configuration file then the {{< external-link "default Content Store URL" "https://raw.githubusercontent.com/gchq/stroom-content/refs/heads/master/source/content-store.yml" >}} is used.  
+
+Extra URLs can be added to the YAML array of URLs; for example:
+```yaml
+...
+  contentStore:
+    urls:
+    - "https://raw.githubusercontent.com/gchq/stroom-content/refs/heads/master/source/content-store.yml"
+    - "https://intranet.local/stroom/myorg-content-store.yml" 
+...
+```
 

@@ -1,7 +1,7 @@
 ---
 title: "Git Repo"
 linkTitle: "Git Repo"
-weight: 10
+weight: 0
 date: 2026-01-16
 tags:
 description: >
