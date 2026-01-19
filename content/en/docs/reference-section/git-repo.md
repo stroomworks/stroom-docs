@@ -16,7 +16,7 @@ Stroom content can be stored in the Git repository and downloaded to other Stroo
 
 ## Appearance
 
-A Git Repo document appears in the Explorer Tree. 
+A Git Repo document appears in the Explorer Tree with this icon: {{< stroom-icon "document/GitRepo.svg" >}}.
 Any Stroom content can be added below it. 
 All that content will be managed by the Git Repo instance.
 
@@ -91,7 +91,7 @@ If this is checked then the `Git Repo Push` job will automatically push any chan
 
 ### Credentials
 
-See the [Credentials page]({{< relref "Credentials" >}}) for full details. 
+See the [Credentials page]({{< relref "credentials" >}}) for full details. 
 
 Git Repo can use credentials of type:
 
