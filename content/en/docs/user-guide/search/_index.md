@@ -21,3 +21,6 @@ Data in stroom (and in external Elastic indexes) can be searched using a number 
 
 * [Analytic Rule]({{< relref "analytics" >}}) {{< stroom-icon "document/AnalyticRule.svg">}}
   Executes a {{< glossary "StroomQL" >}} search query either against data as it is ingested into Stroom or on a scheduled basis.
+
+* [Floor Map]({{< relref "floor-maps" >}}) {{< stroom-icon "document/FloorMap.svg">}}
+  Plots events onto a plan of a physical space and animates them over time.

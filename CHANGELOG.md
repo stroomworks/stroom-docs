@@ -7,6 +7,8 @@ are not recorded in here. Changes are in chronological order with the most
 recent at the top.
 
 
+* Add `Floor Maps` section to the user guide covering the Floor Map document, its configuration, events query, editor and map.
+
 * Make path to font files relative so they work when the site is served from the sub-directory, e.g. on github.io.
 
 * Add sections on moving/copying documents and folder permissions to the `Document Permissions` page.
