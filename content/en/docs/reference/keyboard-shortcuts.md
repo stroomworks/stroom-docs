@@ -71,7 +71,7 @@ Find in content                    | `shift+ctrl+f`                             
 Recent items                       | `ctrl+e`                                          | Find a [document]({{< relref "glossary.md#document" >}}) in a list of the most recently opened items.
 Locate document                    | `alt+l`                                           | Locate the currently open document in the explorer tree. This is the same as clicking the {{< stroom-icon "locate.svg" >}} icon on the explorer tree.
 Help                               | `f1`                                              | Show the help popup for the currently focused screen control, e.g. a text box. This shortcut will only work if there is a help {{< stroom-icon "help.svg" >}} next to the control.
-Focus the Explorer Tree filter     | `ctrl+/`                                          | Changes focus to the Quick Filter in the [Explorer Tree]({{< relref "../concepts/user-interface.md" >}}) pane.
+Focus the Explorer Tree filter     | `ctrl+/`                                          | Changes focus to the Quick Filter in the [Explorer Tree]({{< relref "../concepts/user-interface/_index.md" >}}) pane.
 Focus the current tab Quick Filter | `/`                                               | If the currently open tab has a Quick Filter bar it will change focus to that so a filter term can be entered.
 
 

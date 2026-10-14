@@ -231,7 +231,7 @@ See [Schema Filter]({{< relref "pipeline-schema-filter.md" >}}).
 To develop a parser or translation, step through real data, as in [Your first translation]({{< relref "../get-started/your-first-translation.md" >}}).
 The **Stepper** {{< stroom-icon "step.svg" >}} shows the input and output of every element, record by record, and you can edit the Text Converter or XSLT and see the effect at once.
 See [Pipeline debugging]({{< relref "pipeline-debugging.md" >}}).
-Once the translation is right, reprocess any data the old version got wrong, as described in [Processor filters and tasks]({{< relref "processing.md" >}}).
+Once the translation is right, reprocess any data the old version got wrong, as described in [Processor filters and tasks]({{< relref "processing/_index.md" >}}).
 
 
 ## Related pages
@@ -241,4 +241,4 @@ Once the translation is right, reprocess any data the old version got wrong, as 
 * [Schema Filter]({{< relref "pipeline-schema-filter.md" >}})
 * [Pipeline debugging]({{< relref "pipeline-debugging.md" >}})
 * [Reference data]({{< relref "pipeline-reference-data.md" >}})
-* [Processor filters and tasks]({{< relref "processing.md" >}})
+* [Processor filters and tasks]({{< relref "processing/_index.md" >}})

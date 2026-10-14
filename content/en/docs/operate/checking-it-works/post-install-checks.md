@@ -31,7 +31,7 @@ Step 5 onwards involves processing, which is asynchronous: allow minutes rather 
    See [Health endpoints]({{< relref "health-endpoints.md" >}}) for why a `501` is a failure and not a pass.
 1. **You can sign in**, with an account that is not the bootstrap admin.
    If you intend to use an [external identity provider]({{< relref "../users-and-permissions.md" >}}), test it now: OIDC misconfiguration is much easier to diagnose before there is data to worry about.
-1. **The [explorer tree]({{< relref "../../concepts/user-interface.md" >}}) loads and you can create a document.**
+1. **The [explorer tree]({{< relref "../../concepts/user-interface/_index.md" >}}) loads and you can create a document.**
    Make a folder.
    This proves the database is writable, not merely reachable.
 1. **[Volumes]({{< relref "../../concepts/volumes.md" >}}) are configured and have space.**
@@ -44,7 +44,7 @@ Step 5 onwards involves processing, which is asynchronous: allow minutes rather 
    The [simplest translation]({{< relref "../../get-started/your-first-translation.md" >}}) that produces output is enough.
    Confirm an `Events` stream appears and no `Error` stream does.
 1. **The data is searchable.**
-   Index the output, then `select count()` against the index.
+   Index the output, then check the index's **Shards** tab shows a non-zero **Doc Count** and search for the event you sent.
    See [Is search working?]({{< relref "is-search-working.md" >}}).
 1. **Jobs are enabled and running.**
    Check the [job list]({{< relref "../nodes-and-jobs.md" >}}).

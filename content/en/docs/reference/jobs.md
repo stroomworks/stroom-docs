@@ -16,7 +16,7 @@ aliases:
 Stroom does most of its work in scheduled background jobs: processing, retention, indexing, statistics and housekeeping are all jobs rather than things that happen by themselves.
 They are listed under **Monitoring** → **Jobs**, where each can be enabled, disabled and rescheduled.
 
-There are **49** jobs you can control, and 7 more that always run.
+There are **48** jobs you can control, and 7 more that always run.
 
 {{% warning %}}
 A disabled job does not report anything.
@@ -31,7 +31,7 @@ Until it is enabled nothing is processed, however many worker nodes are running 
 It is the first thing to check on a system that receives data happily but never processes any.
 {{% /note %}}
 
-{{< image src="reference/jobs/StroomJobs.png" alt="The job list in Stroom, 49 jobs, each with a checkbox showing whether it is enabled and a description of what it does. Enabled jobs include Data Delete, Data Processor, Git Repo Push, Node Status, Processor Task Creator, Query History Clean and Account Maintenance." >}}The Jobs screen. The checkbox is the job's own switch; opening a row shows one like it per node, which is where the decision actually gets made.{{< /image >}}
+{{< image src="reference/jobs/StroomJobs.png" alt="The job list in Stroom, each job with a checkbox showing whether it is enabled and a description of what it does. Enabled jobs include Data Delete, Data Processor, Git Repo Push, Node Status, Processor Task Creator, Query History Clean and Account Maintenance." >}}The Jobs screen. The checkbox is the job's own switch; opening a row shows one like it per node, which is where the decision actually gets made.{{< /image >}}
 
 
 ## How jobs and nodes fit together
@@ -84,6 +84,7 @@ A job that is enabled but whose last-run time does not move is a job that is fai
 
 | Job | What it does | Nodes | On by default |
 |---|---|---|---|
+| **Data Processor** | Runs the processing tasks this node claims. Off on a node, that node processes nothing; off on every node, tasks are created and queue up but no stream is ever processed, and nothing reports an error. | Every node | No |
 | **Pipeline Destination Roll** | Closes and rolls this node's open output files on their schedule. Off, rolling destinations on this node stay open and downstream systems see nothing arrive. | Every node | Yes |
 | **Processor Task Creator** | The source of all pipeline processing. With it off, no new tasks are created and processing stops cluster-wide, however many workers are running. | One at a time | No |
 | **Processor Task Heartbeat** | Marks the tasks this node is working on as alive. Off, this node's running tasks look abandoned and another node will take them back and repeat the work. | Every node | Yes |
@@ -100,7 +101,6 @@ A job that is enabled but whose last-run time does not move is a job that is fai
 | **Annotation Retention** | Removes annotations past their retention. Off, old annotations stay. | One at a time | Yes |
 | **Attribute Value Data Retention** | Trims stored stream attribute values. Off, that table grows and attribute searches slow down. | One at a time | Yes |
 | **Data Delete** | Does the real deletion of data already marked as deleted. Off, nothing is reclaimed and the volumes keep filling. | One at a time | Yes |
-| **Feed Based Data Retention** | Applies retention set on individual feeds. Off only matters if you set retention per feed. | One at a time | Yes |
 | **Policy Based Data Retention** | Applies your retention policy. Off, data is kept past its policy, which is usually a compliance question rather than a disk one. | One at a time | Yes |
 
 
@@ -159,7 +159,6 @@ A job that is enabled but whose last-run time does not move is a job that is fai
 |---|---|---|---|
 | **Analytic Execution History Retention** | Trims the record of past analytic runs. On if you run analytics and want the history bounded. | One node | No |
 | **Analytic Executor: Scheduled Query** | Runs scheduled analytic queries. On only if you use analytics. | One node | No |
-| **Analytic Executor: Streaming** | Runs streaming analytic rules. On only if you use analytics. | One node | No |
 | **Analytic Executor: Table Builder** | Builds the tables scheduled analytics query. On only if you use analytics. | One node | No |
 | **Process Pathways** | Turns trace data into pathways. On only if you use pathways. | One at a time | Yes |
 | **Reports** | Runs scheduled reports. On only if you have reports to run. | One node | No |

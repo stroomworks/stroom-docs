@@ -57,7 +57,7 @@ Give each node a different **Priority** so that it is clear which node will take
 
 A **node group** is a named set of nodes, managed from **Monitoring > Node Groups**.
 Node groups are used by processing profiles to decide which nodes may process which data, and when.
-See [Processing]({{< relref "../concepts/processing.md" >}}).
+See [Processing]({{< relref "../concepts/processing/_index.md" >}}).
 
 
 ## Jobs
@@ -110,7 +110,7 @@ These are the ones you are most likely to adjust:
 | **Account Maintenance** | Frequency (`1d`) | Marks unused accounts as inactive. |
 | **Property Cache Reload** | Frequency (`1m`) | Reloads property values across the cluster. |
 
-[Data retention]({{< relref "../concepts/streams.md#data-retention" >}}) rules themselves are set on **Administration > Data Retention**, which needs the **Manage Policies** permission.
+[Data retention]({{< relref "../concepts/streams/_index.md#data-retention" >}}) rules themselves are set on **Administration > Data Retention**, which needs the **Manage Policies** permission.
 
 The schedules above are the defaults Stroom creates jobs with.
 
@@ -239,7 +239,7 @@ It is an easy state to reach after maintenance, and it is worth checking the job
 
 ## Related pages
 
-* [Processing]({{< relref "../concepts/processing.md" >}}): processor filters, processing profiles and task limits.
+* [Processing]({{< relref "../concepts/processing/_index.md" >}}): processor filters, processing profiles and task limits.
 * [Volumes]({{< relref "../concepts/volumes.md" >}}): where nodes store data and indexes.
 * [Users, groups and permissions]({{< relref "users-and-permissions.md" >}}): the permissions these screens need.
 * [Content management]({{< relref "../guides/content-management.md" >}}): Git Repos, import and export.

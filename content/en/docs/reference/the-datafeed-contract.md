@@ -42,7 +42,7 @@ The endpoint exists on **both** Stroom and [Stroom Proxy]({{< relref "../concept
 | Header | Required | Notes |
 |---|---|---|
 | `Feed` | **Yes**, unless feed name generation is enabled | The routing key, and a security boundary. See [Choosing a feed]({{< relref "../guides/sending-data/choosing-a-feed.md" >}}) |
-| `Type` | No | [Stream type]({{< relref "../concepts/streams.md#stream-types" >}}), e.g. `Events`, `Raw Events` |
+| `Type` | No | [Stream type]({{< relref "../concepts/streams/_index.md#stream-types" >}}), e.g. `Events`, `Raw Events` |
 | `Compression` | No, but **set it explicitly** | `ZIP`, `GZIP` or `NONE`. See below |
 | `EffectiveTime` | No | Event time, as distinct from receipt time |
 | `GUID` | No | Client-supplied identifier, useful for tracing one post |
@@ -52,23 +52,35 @@ Other recognised keys a sender may usefully populate: `System`, `Environment`, `
 
 ## Compression
 
-Stroom selects its decompressor from the **`Compression`** header and nothing else.
+A compressed body can be declared in one of two ways, and **exactly one of them** must be used:
 
-Values are case-insensitive, and anything outside `ZIP`, `GZIP` and `NONE` is rejected outright, so a typo in the value is a hard failure rather than a silent one.
+* **`Compression`**, Stroom's own header, set to `GZIP` or `ZIP`.
+  Stroom decompresses the body itself.
+* **`Content-Encoding: gzip`**, the standard HTTP header.
+  Stroom's embedded web server inflates the body before the datafeed code sees it, so the stream is stored decompressed.
+  This is what most HTTP clients and log shippers send when you turn their compression on.
+
+`Compression` values are case-insensitive, and anything outside `ZIP`, `GZIP` and `NONE` is rejected outright with `406` and `Stroom-Status` `200`, so a typo in the value is a hard failure rather than a silent one.
+
+**Never send both.**
+If a request carries `Content-Encoding: gzip` and `Compression: GZIP`, the body is decompressed twice.
+The second attempt finds plain text where it expects gzip, and the post fails with `500` and `Stroom-Status` `400`, *Compressed stream invalid*.
+That at least is loud, but it fails every post.
+So if your shipper's own compression option is on, leave `Compression` at `NONE` (or leave it out).
+Set `Compression: GZIP` only when the body is compressed by something that does not set `Content-Encoding`, such as a script that gzips a file before posting it.
 
 {{< trap severity="silent" >}}
-**`Content-Encoding` does nothing.
-Stroom does not read it.**
+**A compressed body with neither header is stored as compressed bytes, and nothing ever complains.**
 
-Most HTTP clients and log shippers set `Content-Encoding: gzip` when you enable compression, because that is the standards-compliant thing to do.
-Stroom ignores it entirely.
+If `Compression` is missing, empty or `NONE`, and there is no `Content-Encoding`, the body is treated as uncompressed and stored as-is.
+The post returns `200`, the stream appears on the feed, and the stream's **Data Preview** shows *Unable to display source as text*.
 
-The dangerous case is the **absent** `Compression` header.
-If it is missing or empty the body is treated as uncompressed and stored as-is, so gzip bytes sent without it return `200`, land looking fine, and are unparseable when a pipeline eventually tries to read them.
-Nothing complains until then.
-
-**Set a `Compression` header matching whatever your sender does, in the same request.**
+Processing does not catch it either.
+A text pipeline reading such a stream has been seen to produce an `Events` stream holding a single empty event, with no `Error` stream at all.
+The only reliable check is to open the raw stream and confirm it is readable text.
 {{< /trap >}}
+
+{{< image src="reference/the-datafeed-contract/gzip-without-compression-header.png" alt="The Data Preview tab of a received stream, showing a yellow warning box headed Unable to display source as text. The message says Stroom could not decode a UTF-8 character at byte offset 1 and shows the first ten bytes as hex, starting 8B 08 08, which is a gzip header from its second byte onwards." >}}A gzip body posted with no `Compression` header. The post returned `200`; this preview is the only sign that anything is wrong.{{< /image >}}
 
 
 ## Authentication
@@ -92,13 +104,15 @@ Never hardcode a key into a configuration file that ships in version control or 
 
 ## Responses
 
-On success the response carries a **`ReceiptId`**, formed as `<proxy ID>_<UUID>`, which identifies that one post.
+On success the response returns `200`, and the response **body** is the receipt ID that identifies that one post, for example `1791981748008_0000_S_node1a`.
+It is formed from the receipt time in epoch milliseconds, a sequence number, `S` for Stroom or `P` for Stroom Proxy, and the node name.
+There is no `ReceiptId` response header; the same ID is stored on the stream as its `ReceiptId` attribute.
 
 On failure it carries **`Stroom-Status`** with a numeric code and **`Stroom-Error`** with the reason in words.
 Stroom Proxy reads `Stroom-Error` off its own downstream responses to log forwarding failures, and it is the quickest way to find out why a post was rejected.
 
 **A sender that records none of these cannot tell you why data is missing.**
-Capture all three.
+Capture the response body and both headers.
 The full list is in [Datafeed response codes]({{< relref "response-codes.md" >}}).
 
 
@@ -116,11 +130,12 @@ curl -v -X POST "https://stroom.example.com/<base-path>/datafeed" \
   --data-binary @sample-event.txt
 ```
 
-Expect `200` and a `ReceiptId`.
+Expect `200`, with the receipt ID as the response body.
 If it fails, read `Stroom-Status` and `Stroom-Error` before touching any agent configuration.
 
-To prove the compression path specifically, gzip the file and send it with `Compression: GZIP`, then check in Stroom that the [stored stream]({{< relref "../concepts/streams.md#browsing-data" >}}) is readable text rather than binary.
+To prove the compression path specifically, gzip the file and send it with `Compression: GZIP`, then check in Stroom that the [stored stream]({{< relref "../concepts/streams/_index.md#browsing-data" >}}) is readable text rather than binary.
 Omitting the header there is exactly the silent failure described above, and it is worth reproducing once deliberately so that you recognise it.
+If your shipper will send `Content-Encoding: gzip` instead, test that form with `-H "Content-Encoding: gzip"` and **without** `Compression`.
 
 
 ## Formats

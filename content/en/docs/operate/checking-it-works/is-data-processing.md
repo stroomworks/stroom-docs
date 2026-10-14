@@ -11,7 +11,7 @@ verification: required
 ---
 
 Raw data sitting on a feed does nothing by itself.
-A **[processor filter]({{< relref "../../concepts/processing.md" >}})** has to select it, and a **[pipeline]({{< relref "../../concepts/pipelines.md" >}})** has to run over it, producing new streams: `Events` when it works and `Error` when it does not.
+A **[processor filter]({{< relref "../../concepts/processing/_index.md" >}})** has to select it, and a **[pipeline]({{< relref "../../concepts/pipelines.md" >}})** has to run over it, producing new streams: `Events` when it works and `Error` when it does not.
 
 This is the part of Stroom where silent failure is most common, because every stage of it can look correct while producing nothing.
 
@@ -50,12 +50,13 @@ Open it and look.
 {{< /verify >}}
 
 {{< trap severity="silent" >}}
-**A new processor filter may not pick up data that already existed.**
+**Editing a filter's criteria does not make it revisit streams it has already passed.**
 
-A standing filter processes data as it arrives.
-Streams that were already on the feed when you created it can be skipped entirely, with no error and no indication that anything was missed: you simply get fewer output streams than input streams and no explanation.
+A new filter scans the feed from the beginning, including streams that were there before it existed.
+Its tracker then moves forward and never goes back.
+Change the criteria afterwards and the older streams are never looked at again, with no error: you simply get fewer output streams than input streams and no explanation.
 
-To process existing data, use **[Reprocess data]({{< relref "../resetting/reprocess-data.md" >}})**, or [delete and recreate the filter]({{< relref "../resetting/reset-a-processor-filter.md" >}}) to force a fresh scan from the beginning.
+To process those streams, use **[Reprocess data]({{< relref "../resetting/reprocess-data.md" >}})**, or [delete and recreate the filter]({{< relref "../resetting/reset-a-processor-filter.md" >}}) to force a fresh scan from the beginning.
 {{< /trap >}}
 
 {{< diagnose >}}

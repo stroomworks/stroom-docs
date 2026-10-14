@@ -14,7 +14,7 @@ aliases:
 
 A **stream** is the unit of data in Stroom.
 Each post of data that Stroom accepts becomes a stream, and so does each output a pipeline writes.
-Every stream belongs to one [feed]({{< relref "feed.md" >}}), has a stream type, a status and a set of metadata, and has a numeric ID that is unique across the system.
+Every stream belongs to one [feed]({{< relref "../feed.md" >}}), has a stream type, a status and a set of metadata, and has a numeric ID that is unique across the system.
 
 Streams are never edited in place.
 Processing a stream reads it and writes new streams, so the raw data you received is always kept alongside what was made from it, until a retention rule removes it.
@@ -25,11 +25,11 @@ Processing a stream reads it and writes new streams, so the raw data you receive
 * **Data receipt.**
   When data is posted straight to Stroom, the content of the post is stored as one stream.
   When it comes through Stroom Proxy, many posts are usually aggregated into one stream.
-  See [Stroom Proxy and data receipt]({{< relref "data-receipt.md" >}}).
+  See [Stroom Proxy and data receipt]({{< relref "../data-receipt.md" >}}).
 * **Processing.**
   A pipeline reads a stream and writes its results, such as cooked events or errors, as new streams.
   Each output stream records the stream it came from as its parent.
-  See [Processing]({{< relref "processing.md" >}}).
+  See [Processing]({{< relref "../processing/_index.md" >}}).
 * **Uploading.**
   You can upload a file into a feed from the **Data** tab.
 
@@ -46,12 +46,12 @@ These types are built in:
 | **Events** | Events that a pipeline has translated, normally into XML. |
 | **Reference** | Reference data that a pipeline has translated. |
 | **Error** | The errors, warnings and information messages from processing a stream. |
-| **Detections** | Detections written by [analytic rules]({{< relref "../guides/detection/analytic-rules.md" >}}). |
+| **Detections** | Detections written by [analytic rules]({{< relref "../../guides/detection/analytic-rules.md" >}}). |
 | **Records**, **Test Events**, **Test Reference** | Further built-in types for processed data. |
 
 **Context** and **Meta Data** are also stream types, but they only appear as child parts of another stream (see below).
 
-An administrator can add stream types through the `data.meta.metaTypes` [property]({{< relref "../operate/nodes-and-jobs.md" >}}).
+An administrator can add stream types through the `data.meta.metaTypes` [property]({{< relref "../../operate/nodes-and-jobs.md" >}}).
 A new type used for raw data must also be added to `data.meta.rawMetaTypes`, so Stroom reads it with the feed's encoding.
 A type that clients will send in the `Type` header must also be in `receive.metaTypes`, on Stroom and on any Stroom Proxy in front of it.
 
@@ -99,7 +99,7 @@ Every stream has one of three statuses:
 | **Deleted** | The stream has been logically deleted. Its files are still on disk for now. |
 
 A deleted stream can be restored until it is physically removed.
-The **Data Delete** [job]({{< relref "../reference/jobs.md" >}}) removes the files and records of streams that have been deleted for longer than `data.store.deletePurgeAge`, which defaults to seven days.
+The **Data Delete** [job]({{< relref "../../reference/jobs.md" >}}) removes the files and records of streams that have been deleted for longer than `data.store.deletePurgeAge`, which defaults to seven days.
 
 
 ## Metadata and attributes
@@ -140,8 +140,10 @@ The preview only loads part of a large stream.
 A bar above the data shows how much of the stream is in view and where.
 **View Source** opens the data in its original, unformatted form, where you can page through it or jump to a given line or character range.
 
-The stream lists also have buttons to **Process** (run the selected streams through a pipeline again, see [Reprocess data]({{< relref "../operate/resetting/reprocess-data.md" >}})), **Delete**, **Restore**, **Download** (as a ZIP in Stroom's ZIP format) and **Upload**.
+The stream lists also have buttons to **Process** (run the selected streams through a pipeline again, see [Reprocess data]({{< relref "../../operate/resetting/reprocess-data.md" >}})), **Delete**, **Restore**, **Download** (as a ZIP in Stroom's ZIP format) and **Upload**.
 The buttons you see depend on your permissions.
+They act on the streams whose boxes are **ticked**, not the one you clicked, which is why they stay greyed out until you tick something.
+See [The Data tab]({{< relref "data-tab.md" >}}) for when each button is enabled.
 
 
 ## Data retention
@@ -170,8 +172,8 @@ Retention is based on when a stream was created in Stroom, not on the times of t
 
 ## Related pages
 
-* [Feeds]({{< relref "feed.md" >}}): every stream belongs to a feed.
-* [Stroom Proxy and data receipt]({{< relref "data-receipt.md" >}}): how raw streams are created.
-* [Processing]({{< relref "processing.md" >}}): how processor filters pick streams to process.
-* [Volumes and storage]({{< relref "volumes.md" >}}): where stream files are kept on disk.
-* [Reference data]({{< relref "pipeline-reference-data.md" >}}): how Reference and Context streams are used.
+* [Feeds]({{< relref "../feed.md" >}}): every stream belongs to a feed.
+* [Stroom Proxy and data receipt]({{< relref "../data-receipt.md" >}}): how raw streams are created.
+* [Processing]({{< relref "../processing/_index.md" >}}): how processor filters pick streams to process.
+* [Volumes and storage]({{< relref "../volumes.md" >}}): where stream files are kept on disk.
+* [Reference data]({{< relref "../pipeline-reference-data.md" >}}): how Reference and Context streams are used.

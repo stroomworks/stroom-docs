@@ -5,7 +5,7 @@ weight: 10
 date: 2026-10-14
 tags:
 description: >
-  Pointing Vector at Stroom with its generic HTTP sink, including the batch-shape and compression traps.
+  Pointing Vector at Stroom with its generic HTTP sink, including the batch-shape trap and how to compress without breaking every post.
 pageKind: guide
 verification: required
 thirdParty: "Vector"
@@ -64,19 +64,15 @@ Whichever you choose, tell whoever builds the receiving pipeline.
 
 ## Compression
 
-{{< trap severity="silent" >}}
-**Compression without a matching `Compression` header corrupts the data silently.**
-
-Vector sets `Content-Encoding`, which Stroom ignores entirely.
-The post returns `200`, the data is stored as-is, and nothing complains until a pipeline tries to parse compressed bytes as text.
-
-Set both, together:
+With `compression = "gzip"`, Vector sets `Content-Encoding: gzip`, which Stroom's web server decodes before Stroom reads the body.
+**Leave the `Compression` header at `NONE`.**
 
 ```toml
 compression = "gzip"          # in [sinks.stroom]
-Compression = "GZIP"          # in [sinks.stroom.request.headers]
+Compression = "NONE"          # in [sinks.stroom.request.headers]
 ```
-{{< /trap >}}
+
+Changing `Compression` to `GZIP` as well makes Stroom decompress the body a second time, and every post fails with `500` and `Stroom-Status` `400`.
 
 
 ## Buffering
@@ -121,7 +117,7 @@ Then open the feed's **Data** tab in Stroom and find the stream.
 {{< golden >}}
 **The stream is on the feed in Stroom, and its content is readable text.**
 
-Readable matters as much as present: that is what catches the compression trap, which produces a stream that exists and cannot be parsed.
+Readable matters as much as present: a compressed body that reaches Stroom with neither a `Compression` nor a `Content-Encoding` header produces a stream that exists and cannot be parsed.
 {{< /golden >}}
 
 {{< not-proof >}}
@@ -141,9 +137,9 @@ Readable matters as much as present: that is what catches the compression trap, 
 1. **Is the source producing?**
    `vector tap` on a running instance shows events moving through the topology.
    If nothing is flowing, stop blaming the sink.
-1. **Is the stream present but unreadable?**
-   That is the compression trap.
-   Check that `compression` and the `Compression` header agree.
+1. **Does every post fail with `500` and `Stroom-Status` `400`?**
+   `compression` is on and the `Compression` header says `GZIP`, so the body is decompressed twice.
+   Set it back to `NONE`.
 1. **Is the token reaching the process?**
    `${STROOM_TOKEN}` is interpolated from the environment at config load, so a token set in your shell but not in the service's environment resolves to nothing.
 1. **Are there more feeds than you expected?**

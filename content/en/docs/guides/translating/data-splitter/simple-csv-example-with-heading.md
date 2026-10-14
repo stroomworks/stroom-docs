@@ -76,7 +76,7 @@ Date,Time,IPAddress,HostName,User,EventType,Detail
     xmlns="records:2"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="records:2 file://records-v2.0.xsd"
-    version="3.0">
+    version="2.0">
   <record>
     <data name="Date" value="01/01/2010" />
     <data name="Time" value="00:00:00" />
@@ -97,7 +97,7 @@ Date,Time,IPAddress,HostName,User,EventType,Detail
   <record>
     <data name="Date" value="01/01/2010" />
     <data name="Time" value="00:02:00" />
-    <data name="IPAdress" value="192.168.1.100" />
+    <data name="IPAddress" value="192.168.1.100" />
     <data name="HostName" value="SOMEHOST.SOMEWHERE.COM" />
     <data name="User" value="user1" />
     <data name="EventType" value="logoff" />

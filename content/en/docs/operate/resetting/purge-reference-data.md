@@ -58,7 +58,7 @@ The optional `nodeName` query parameter restricts the purge to one node.
 Changing a reference loader's XSLT does not change data already in the store, and purging alone is not enough either: Stroom caches the compiled stylesheet.
 
 1. **Purge the stream**, as above.
-1. **Clear the `XsltPool` cache** under **Monitoring** → **Cache**, or the reload will re-run the *old* compiled stylesheet and appear to change nothing.
+1. **Clear the `XsltPool` cache** under **Monitoring** → **Caches**, or the reload will re-run the *old* compiled stylesheet and appear to change nothing.
    Clearing `ReferenceDataCache` as well makes Stroom re-evaluate which streams are available.
    See [Clear caches]({{< relref "clear-caches.md" >}}).
 1. **Perform a lookup.**
@@ -97,7 +97,7 @@ The one that wins is the latest whose effective time is not after the event.
 **Purging deletes entries that may be the only loaded copy of data you still need.**
 
 The store rebuilds from reference streams.
-If the reference stream a purged entry came from has itself been deleted by [data retention]({{< relref "../../concepts/streams.md#data-retention" >}}), the entry does not come back and lookups for that period fail quietly, returning nothing rather than an error.
+If the reference stream a purged entry came from has itself been deleted by [data retention]({{< relref "../../concepts/streams/_index.md#data-retention" >}}), the entry does not come back and lookups for that period fail quietly, returning nothing rather than an error.
 
 Check that the reference streams still exist before purging aggressively, and treat reference feeds as data to retain for at least as long as the events that look them up.
 {{< /trap >}}

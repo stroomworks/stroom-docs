@@ -88,7 +88,8 @@ Note also that the block is hyphenated, `disk-buffer()`, not `disk_buffer()`.
 ## Compression
 
 The `http()` destination exposes the underlying cURL transport's compression options.
-If you enable request compression, change the `Compression` header to `GZIP` to match: syslog-ng sets `Content-Encoding`, which Stroom ignores, and the failure is silent.
+If you enable request compression, leave the `Compression` header at `NONE`: syslog-ng sets `Content-Encoding: gzip`, which Stroom's web server decodes before Stroom reads the body.
+Changing `Compression` to `GZIP` as well makes Stroom decompress the body a second time, and every post fails with `500` and `Stroom-Status` `400`.
 
 
 ## Batching

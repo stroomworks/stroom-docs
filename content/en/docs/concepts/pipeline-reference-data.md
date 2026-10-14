@@ -22,8 +22,9 @@ For example, if an event contains a `userId`, you might use reference data to lo
 ### Characteristics
 
 Reference data is:
-* **Time-sensitive**: Lookups (for Off-Heap data) use the event's timestamp to find the "effective" version of the reference data at that point in time.
-* **Reusable**: A single reference [stream]({{< relref "streams.md" >}}) can be used by many different pipelines.
+* **Time-sensitive**: Lookups (for Off-Heap data) use a lookup time to find the "effective" version of the reference data at that point in time.
+  Unless the XSLT passes the event's time, the lookup time is when the stream being processed was received.
+* **Reusable**: A single reference [stream]({{< relref "streams/_index.md" >}}) can be used by many different pipelines.
 
 
 ## The reference data pipeline
@@ -52,7 +53,7 @@ Consequently, reference pipelines do not require (and typically do not have) a *
 
 ### Processor filters and lazy loading
 
-You typically **do not** need to create a [Processor Filter]({{< relref "processing.md" >}}) for a reference data pipeline.
+You typically **do not** need to create a [Processor Filter]({{< relref "processing/_index.md" >}}) for a reference data pipeline.
 Stroom uses **Lazy Loading**.
 When a pipeline performs a lookup, Stroom automatically identifies the required reference stream and triggers a background task to load it if it is not already in the store.
 
@@ -145,7 +146,8 @@ stroom:lookup(mapName, key, [time], [ignoreWarnings], [trace])
 * **mapName**: The name of the map defined in the reference pipeline (e.g., 'UserToDepartment').
 * **key**: The key to look up.
 * **time** (Optional): The ISO 8601 string or epoch ms.
-  Defaults to the event time.
+  Defaults to the received time of the stream being processed, not the event's own time.
+  Pass the event's time here when the value in effect when the event happened matters.
 * **ignoreWarnings** (Optional): Boolean.
   If true, suppresses warnings if the key is not found.
 * **trace** (Optional): Boolean.

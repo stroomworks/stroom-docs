@@ -93,7 +93,7 @@ manifest-for-id(String streamId)
 
 ## meta()
 
-Lookup a [meta data]({{< relref "../../concepts/streams.md#metadata-and-attributes" >}}) value for the current stream using the specified key.
+Lookup a [meta data]({{< relref "../../concepts/streams/_index.md#metadata-and-attributes" >}}) value for the current stream using the specified key.
 The key can be `Feed`, `StreamType`, `CreatedTime`, `EffectiveTime`, `Pipeline` or any other attribute supplied when the stream was sent to Stroom, e.g. meta('System').
 
 ```text

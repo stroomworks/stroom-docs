@@ -120,7 +120,7 @@ The contextual information (such as hostname, FQDN, physical location, etc.) can
 **See also:**
 
 * [Context data]({{< relref "../concepts/pipelines-source.md#context-data" >}})
-* [Streams]({{< relref "../concepts/streams.md" >}})
+* [Streams]({{< relref "../concepts/streams/_index.md" >}})
 * [`stroom:lookup()`]({{< relref "xslt-functions/reference-data.md#lookup" >}})
 
 
@@ -311,7 +311,7 @@ Typically in Stroom an _Events_ stream will contain data conforming to the {{< e
 
 ## Explorer tree
 
-The left hand navigation tree, described in [User interface]({{< relref "../concepts/user-interface.md" >}}).
+The left hand navigation tree, described in [User interface]({{< relref "../concepts/user-interface/_index.md" >}}).
 The Explorer Tree is used for finding, opening, creating, renaming, copying, moving and deleting _Documents_.
 
 It can also be used to control the access permissions of entities and folders.
@@ -507,7 +507,7 @@ It is sometimes referred to as just _Meta_.
 **See also:**
 
 * [Stream]({{< relref "#stream" >}})
-* [Metadata and attributes]({{< relref "../concepts/streams.md#metadata-and-attributes" >}})
+* [Metadata and attributes]({{< relref "../concepts/streams/_index.md#metadata-and-attributes" >}})
 
 
 ## Namespace
@@ -595,7 +595,7 @@ Filters can be enabled/disabled independently of their parent Processor to contr
 
 **See also:**
 
-* [Processor filters and tasks]({{< relref "../concepts/processing.md" >}})
+* [Processor filters and tasks]({{< relref "../concepts/processing/_index.md" >}})
 * [Expression Tree]({{< relref "#expression-tree" >}})
 * [Feed]({{< relref "#feed" >}})
 * [Pipeline]({{< relref "#pipeline" >}})
@@ -723,7 +723,7 @@ A Stream is the unit of data that Stroom works with and will typically contain m
 
 **See also:**
 
-* [Streams]({{< relref "../concepts/streams.md" >}})
+* [Streams]({{< relref "../concepts/streams/_index.md" >}})
 * [Events]({{< relref "#events" >}})
 * [Stream Type]({{< relref "#stream-type" >}})
 
@@ -747,7 +747,7 @@ Some Stream Types, such as `Meta` and `Context` only exist as child streams with
 
 **See also:**
 
-* [Stream types]({{< relref "../concepts/streams.md#stream-types" >}})
+* [Stream types]({{< relref "../concepts/streams/_index.md#stream-types" >}})
 * [Stream]({{< relref "#stream" >}})
 * [Events]({{< relref "#events" >}})
 * [Raw Events]({{< relref "#raw-events" >}})

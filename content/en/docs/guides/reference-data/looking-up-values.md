@@ -17,10 +17,17 @@ Two things have to be in place: the pipeline must know where to load reference d
 ## Point the pipeline at the loader
 
 On the event pipeline's {{< pipe-elm "XSLTFilter" >}}, the `pipelineReference` property lists where reference data may be loaded from.
-Each entry names a feed, a stream type and the loader pipeline that reads it.
+Each entry has three settings in the dialog: **Pipeline**, **Feed** and **Type**.
+
+* **Pipeline** is the loader pipeline that reads the reference data.
+  The picker opens pre-filtered to `tag:reference-loader`, so a loader without that tag is hidden until you clear the filter.
+* **Feed** is the reference feed.
+* **Type** is the stream type to load from, and defaults to `Reference`.
+  It must match the type the reference data was sent as: if the feed holds `Raw Reference` streams and **Type** is left at `Reference`, every lookup warns `No effective streams found in any of the reference loaders` and returns nothing.
 
 This is a property of the *consuming* pipeline.
-A reference feed that loads perfectly is still invisible to a translation that has not named it here, and nothing warns you: the lookup simply returns nothing.
+A reference feed that loads perfectly is still invisible to a translation that has not named it here.
+With no entry at all, each lookup is an error on the XSLT step: `No reference loaders have been added to this XSLT step to perform a lookup`.
 
 
 ## Call it from the XSLT
@@ -29,7 +36,8 @@ A reference feed that loads perfectly is still invisible to a translation that h
 <xsl:value-of select="stroom:lookup('hostToLocation', Host)"/>
 ```
 
-The two-argument form resolves against the event's time.
+The two-argument form resolves against the time the stream being processed was received, not against the event's own time.
+Every event in a stream is looked up at the same moment, so an event timed before a change in the reference data can still get the value from after it, if its stream arrived later.
 The longer forms let you be explicit:
 
 ```text
@@ -39,9 +47,14 @@ lookup(map, key, time, ignoreWarnings)
 lookup(map, key, time, ignoreWarnings, trace)
 ```
 
-* **`time`** overrides the event time.
-  Passing a literal here is a common way to make a lookup appear to work while the real data still resolves differently.
-  Use it to investigate, not in finished translations.
+* **`time`** sets the lookup time.
+  Pass the event's own time here whenever the value that applied *when the event happened* matters, which for most enrichment it does:
+
+  ```xml
+  <xsl:value-of select="stroom:lookup('hostToLocation', Host, EventTime)"/>
+  ```
+
+  Passing a literal is a way to investigate a particular moment, not something to leave in a finished translation.
 * **`ignoreWarnings`** turns a failed lookup from a warning into silence.
 * **`trace`** records how the lookup was resolved, which is the fastest way to see *which* reference stream answered.
 
@@ -62,10 +75,13 @@ Hosts get decommissioned, users appear before the directory export catches up, a
 Decide deliberately which you want:
 
 * **A warning per miss**, the default, which makes gaps visible on the processing screens and noisy when gaps are expected.
+  The warning reads `Key not found`, with the map, key and lookup time.
 * **Silence**, with `ignoreWarnings` set to true, which is right when misses are routine and wrong when they indicate a broken load.
 * **A fallback**, by testing the result in the XSLT and emitting a placeholder, which keeps the output shape consistent for whatever searches it later.
 
 The third is usually the best of the three, because a field that is sometimes absent is harder to search than one that is sometimes `unknown`.
+
+{{< image src="guides/reference-data/looking-up-values/missing-key-warning.png" alt="A feed's Data tab listing its streams. The selected processed stream has an Events stream and an Error stream beside the Raw Events stream it came from. The Error tab below shows one warning from the XSLT Filter: Lookup - Key not found, with the map name, the key and the lookup time." >}}A missed lookup during processing. The warning is written as an `Error` stream next to the `Events` stream, so the event still comes out, just without the value.{{< /image >}}
 
 {{< verify >}}
 Step the event pipeline over one record whose key you know is present and one whose key you know is absent, and confirm the first enriches and the second behaves the way you chose.
@@ -78,8 +94,12 @@ Testing only the present key leaves the miss behaviour untested, and miss behavi
 {{< /golden >}}
 
 {{< not-proof >}}
-**A lookup that works with an explicit `time` argument is not proof it works in production** , where the event's own time is used.
-If you passed a time to make it work, you have found the bug rather than fixed it.
+**A lookup that works on a stepped stream without a `time` argument is not proof it resolves per event.**
+Without it every event uses the stream's received time, so data sent soon after it happened looks right, and late or back-filled data quietly gets the value in effect when its stream arrived.
+Step a record whose time falls before a change in the reference data to tell the two apart.
+
+**A lookup that works with a literal `time` argument is not proof either.**
+It shows the value at that moment, not at the time of each event.
 
 **No warnings is not proof every lookup resolved.**
 With `ignoreWarnings` set, a translation in which every single lookup missed is indistinguishable from one in which they all matched.
@@ -88,23 +108,29 @@ With `ignoreWarnings` set, a translation in which every single lookup missed is 
 {{< /verify >}}
 
 {{< trap severity="silent" >}}
-**A pipeline that does not name the loader in `pipelineReference` returns nothing, not an error.**
+**Without a `time` argument, every lookup uses the stream's received time, and nothing says so.**
 
-The XSLT is valid, the translation succeeds, the field is just missing from every event.
-It looks exactly like a reference feed that failed to load, which is why this is worth checking first: it costs a glance at one property.
+The lookup succeeds and returns a real value, just the one in effect when the stream arrived rather than when the event happened.
+Nothing warns, because nothing failed.
+Pass the event's time as the third argument wherever the history of the reference data matters.
 {{< /trap >}}
 
 {{< diagnose >}}
 1. **Is the loader listed in `pipelineReference` on this XSLTFilter?**
-   The commonest cause, and the quickest to rule out.
+   Without it the step reports `No reference loaders have been added to this XSLT step`.
+1. **Does the entry's Type match the reference streams' type?**
+   A warning naming `stream type 'Reference'` when the feed holds `Raw Reference` streams means it does not.
 1. **Turn on `trace` for one stepped record.**
    It names the reference stream that answered, which settles map-name, effective-time and stream-type questions at once.
 1. **Does the map name match the loader's `<map>` exactly?**
    Including case.
+   A mismatch warns `Map not found in effective streams`.
 1. **Is the key what you think?**
    Step the pipeline and look at the value being passed in, not at the source data.
    Trimming and case normalisation in earlier steps change it.
-1. **Is the event's time inside the reference data's range?**
+1. **Is the lookup time the one you meant, and inside the reference data's range?**
+   Without a `time` argument it is the stream's received time, not the event's.
+   A time before the earliest reference stream warns `No effective stream can be found`.
    See [Effective times]({{< relref "effective-times.md" >}}).
 1. **Does it behave the same on every node?**
    The reference store is per node, so a node that failed to load a stream answers differently.

@@ -95,7 +95,7 @@ Also shown is that any match can be divided into further fields with additional 
     xmlns="records:2"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="records:2 file://records-v2.0.xsd"
-    version="3.0">
+    version="2.0">
   <record>
     <data name="host" value="192.168.1.100" />
     <data name="log" value="-" />

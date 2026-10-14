@@ -9,7 +9,7 @@ description: >
 pageKind: concept
 ---
 
-Stroom moves data through several components, so a symptom often shows up a long way from its cause: a [dashboard]({{< relref "../../concepts/dashboards.md" >}}) with no rows can be an [index]({{< relref "../../concepts/lucene-index.md" >}}) question, a [translation]({{< relref "../../concepts/translation.md" >}}) question, a [processor]({{< relref "../../concepts/processing.md" >}}) question, or simply a [feed]({{< relref "../../concepts/feed.md" >}}) not yet set to receive.
+Stroom moves data through several components, so a symptom often shows up a long way from its cause: a [dashboard]({{< relref "../../concepts/dashboards.md" >}}) with no rows can be an [index]({{< relref "../../concepts/lucene-index.md" >}}) question, a [translation]({{< relref "../../concepts/translation.md" >}}) question, a [processor]({{< relref "../../concepts/processing/_index.md" >}}) question, or simply a [feed]({{< relref "../../concepts/feed.md" >}}) not yet set to receive.
 Once you know which component to look at, the answer is usually quick.
 
 So start here and follow the symptom.

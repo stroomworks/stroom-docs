@@ -330,7 +330,7 @@ If there is no time zone in `inputDate` and no `inputTimeZone` argument has been
 If any of the date parts are not present, e.g. an input of `28 Oct` then Stroom will use a reference date to fill in the gaps.
 The reference date is the first of these values that is non-null
 
-1. The create time of the [stream]({{< relref "../../concepts/streams.md" >}}) being processed by the XSLT.
+1. The create time of the [stream]({{< relref "../../concepts/streams/_index.md" >}}) being processed by the XSLT.
 1. The current time, i.e. now().
 
 For example for a call of `stroom:format-date('28 Oct', 'dd MMM')` and a stream create time of `2024`, it will return `2024-10-28T00:00:00.000Z`.

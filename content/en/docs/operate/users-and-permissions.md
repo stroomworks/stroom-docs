@@ -115,7 +115,7 @@ There are five levels, and each includes every level below it:
 | **View** | Seeing it in the explorer tree, opening it read-only, copying and exporting it. |
 | **Use** | Using it without seeing it, for example querying an index from a [dashboard]({{< relref "../concepts/dashboards.md" >}}). |
 
-A user with no permissions and no groups sees an empty [explorer tree]({{< relref "../concepts/user-interface.md" >}}) and can't create anything.
+A user with no permissions and no groups sees an empty [explorer tree]({{< relref "../concepts/user-interface/_index.md" >}}) and can't create anything.
 Holders of **Administrator** have every permission on every document.
 
 To change a document's permissions you need **Owner** on it (or **Administrator**).
@@ -200,4 +200,4 @@ If one is presented twice, which suggests it has been copied, Stroom withdraws i
 
 * [Content management]({{< relref "../guides/content-management.md" >}}): the documents these permissions apply to.
 * [Nodes, jobs and properties]({{< relref "nodes-and-jobs.md" >}}): where the properties named on this page are set.
-* [User interface]({{< relref "../concepts/user-interface.md" >}}): the explorer tree and menus.
+* [User interface]({{< relref "../concepts/user-interface/_index.md" >}}): the explorer tree and menus.

@@ -64,15 +64,20 @@ A key range is written with `<from>` and `<to>` instead of `<key>`, which is how
 1. **Create the loader pipeline.**
    It is a normal translation pipeline whose last element is {{< pipe-elm "ReferenceDataFilter" >}} rather than a writer.
    Parse, then {{< pipe-elm "XSLTFilter" >}} producing `reference-data:2`, then the filter.
-1. **Set the stream type.**
-   Reference streams must be stored as **Reference** rather than Events, so that effective-time selection applies to them.
-1. **Process the feed** with that pipeline, as for any other.
+   Tag it `reference-loader`: the pipeline picker in `pipelineReference` is pre-filtered to that tag, and an untagged loader is hidden until the filter is cleared.
+1. **Name it from the event pipeline**, in the `pipelineReference` property of the {{< pipe-elm "XSLTFilter" >}} that does the lookup: the loader, the reference feed, and the stream type the reference data was sent as.
+   **Type** defaults to `Reference`.
+   If the reference feed holds `Raw Reference` streams, set **Type** to `Raw Reference`.
+   See [Looking up values]({{< relref "looking-up-values.md" >}}).
+
+The reference feed does not need a processor filter.
+The loader runs on demand, inside the event pipeline's lookup, against streams of the type named in `pipelineReference`.
 
 {{< timing mode="async" >}}
 Loading is lazy.
-Creating the loader pipeline and processing the feed does not populate the store; the store is filled when a lookup first asks for a map, and only with the stream that lookup needs.
+Creating the loader pipeline does not populate the store; the store is filled when a lookup first asks for a map, and only with the stream that lookup needs.
 
-So a successfully processed reference stream and an empty store are a normal, healthy combination.
+So a reference stream on the feed and an empty store are a normal, healthy combination.
 The check below triggers a load rather than waiting for one.
 {{< /timing >}}
 
@@ -87,7 +92,7 @@ Stepping over an arbitrary record and seeing a value prove only that some lookup
 {{< /golden >}}
 
 {{< not-proof >}}
-**A reference stream that processed without errors is not proof it loaded anything.**
+**A loader that steps without errors is not proof it loaded anything.**
 It proves the translation ran.
 A translation that emits a well-formed `<referenceData>` document containing no `<reference>` elements processes perfectly and loads nothing.
 
@@ -98,18 +103,19 @@ Check the map name, not the size.
 {{< /verify >}}
 
 {{< trap severity="silent" >}}
-**A map name mismatch is silent.**
+**A map name mismatch is silent if the lookup sets `ignoreWarnings`.**
 The loader writes into whatever `<map>` the XSLT produced, and the lookup asks for whatever name the event XSLT passed.
-If they differ by a character or by case, the load succeeds, the lookup succeeds in the sense of not throwing, and the value is simply absent from the output.
+If they differ by a character or by case, the load succeeds and the value is simply absent from the output.
 
-Nothing in the UI compares the two names.
+By default each such lookup warns `Map not found in effective streams`, so the mismatch shows up on the stepped XSLT and in the `Error` streams of the processed feed.
+With `ignoreWarnings` set to true that warning is suppressed, and nothing in the UI compares the two names.
 Copy the name between the two XSLTs rather than typing it twice.
 {{< /trap >}}
 
 {{< diagnose >}}
-1. **Did the stream store as type Reference?**
-   Look at the stream's type on the Data screen.
-   An events-typed stream is never considered by a lookup.
+1. **Does the stream's type match the Type in `pipelineReference`?**
+   Look at the stream's type on the reference feed's Data screen, typically `Raw Reference` or `Reference`.
+   A lookup only considers streams of the type named, so a mismatch warns `No effective streams found in any of the reference loaders` and finds nothing.
 1. **Did the translation emit any `<reference>` elements?**
    Step the loader pipeline and look at the XSLTFilter output, not the final result.
    An empty `<referenceData>` document is the most common cause of "nothing was loaded".
@@ -118,6 +124,7 @@ Copy the name between the two XSLTs rather than typing it twice.
    A document in no namespace, or in an older one, is not loaded.
 1. **Does the map name match the lookup exactly?**
    Compare the two strings character by character.
+   A mismatch warns `Map not found in effective streams` unless `ignoreWarnings` is set.
 1. **Is the effective time what you expect?**
    See [Effective times]({{< relref "effective-times.md" >}}).
    A stream effective from today enriches nothing from last week.

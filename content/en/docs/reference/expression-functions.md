@@ -58,12 +58,12 @@ There are **148** functions in **14** categories.
 
 | Function | Does | Returns |
 |---|---|---|
-| `toBoolean` | Converts the supplied value to a boolean (if it can be). For example if the value is | The value as the boolean type. |
-| `toDouble` | Converts the supplied value to a double (if it can be). For example, converting | The value as the double type. |
-| `toFloat` | Converts the supplied value to a float (if it can be). For example, converting | The value as the float type. |
-| `toInteger` | Converts the supplied value to an integer (if it can be). For example, converting | The value as the integer type. |
-| `toLong` | Converts the supplied value to an long (if it can be). For example, converting | The value as the long type. |
-| `toString` | Converts the supplied value to a string, | The value as the string type. |
+| `toBoolean` | Converts the supplied value to a boolean (if it can be). For example if the value is numeric then any non-zero value is considered true. For a text value, any value (ignoring case) equal to "true" is considered true. | The value as the boolean type. |
+| `toDouble` | Converts the supplied value to a double (if it can be). For example, converting the text "1.2" to the number 1.2 | The value as the double type. |
+| `toFloat` | Converts the supplied value to a float (if it can be). For example, converting the text "1.2" to the number 1.2 | The value as the float type. |
+| `toInteger` | Converts the supplied value to an integer (if it can be). For example, converting the text "12" to the number 12 | The value as the integer type. |
+| `toLong` | Converts the supplied value to an long (if it can be). For example, converting the text "12" to the number 12. If the value looks like the default date format then this function will parse the date string and return the number of milliseconds since the epoch (1 Jan 1970). | The value as the long type. |
+| `toString` | Converts the supplied value to a string, e.g. 1.23 becomes "1.23" and true() becomes "true". | The value as the string type. |
 
 
 ## Date
@@ -115,8 +115,8 @@ There are **148** functions in **14** categories.
 
 | Function | Does | Returns |
 |---|---|---|
-| `annotation` | Creates a hyperlink that will open the annotation edit screen showing | - |
-| `createAnnotation` | Creates a hyperlink that will open the annotation edit screen pre-populated | - |
+| `annotation` | Creates a hyperlink that will open the annotation edit screen showing the existing annotation with the supplied annotationId. | - |
+| `createAnnotation` | Creates a hyperlink that will open the annotation edit screen pre-populated with the supplied values ready to create a new annotation. | - |
 | `dashboard` | The text that the hyperlink will display. | A hyperlink that will open a dashboard. |
 | `data` | Produces a hyperlink for showing data within stroom. | - |
 | `link` | Creates a stroom syntax hyperlink string using the supplied URL. | A Stroom syntax hyperlink string. |
@@ -127,49 +127,49 @@ There are **148** functions in **14** categories.
 
 | Function | Does | Returns |
 |---|---|---|
-| `!=` | Tests the non equality of two values. It will attempt to convert the parameters | True if the two values are not equal. |
-| `<` | Tests if arg1 is less than than arg2. It will attempt to convert the type of the | True if arg1 is less than than arg2. |
-| `<=` | Tests if arg1 is less than or equal to arg2. It will attempt to convert the | True if arg1 is less than or equal arg2. |
-| `=` | Tests the equality of two values. It will attempt to convert the parameters | True if the two values are equal even if the types are not. |
-| `>` | Tests if arg1 is greater than arg2. It will attempt to convert the type of the | True if arg1 is greater than arg2. |
-| `>=` | Tests if arg1 is greater than or equal to arg2. It will attempt to convert the | True if arg1 is greater than or equal to arg2. |
+| `!=` | Tests the non equality of two values. It will attempt to convert the parameters to the type of the first parameter, e.g. ne(123, "123") returns true. | True if the two values are not equal. |
+| `<` | Tests if arg1 is less than than arg2. It will attempt to convert the type of the second parameter to that of the first. Can be expressed as '${field1}>${field2}. | True if arg1 is less than than arg2. |
+| `<=` | Tests if arg1 is less than or equal to arg2. It will attempt to convert the type of the second parameter to that of the first. Can be expressed as '${field1}>${field2}. | True if arg1 is less than or equal arg2. |
+| `=` | Tests the equality of two values. It will attempt to convert the parameters to the type of the first parameter, e.g. equals(123, "123") returns true. | True if the two values are equal even if the types are not. |
+| `>` | Tests if arg1 is greater than arg2. It will attempt to convert the type of the second parameter to that of the first. Can be expressed as '${field1}>${field2}'. | True if arg1 is greater than arg2. |
+| `>=` | Tests if arg1 is greater than or equal to arg2. It will attempt to convert the type of the second parameter to that of the first. Can be expressed as '${field1}>${field2}. | True if arg1 is greater than or equal to arg2. |
 | `and` | Logical 'and' operator. | If all supplied arguments evaluate to true then return true, else false. |
-| `case` | Similar to a switch statement. The arguments are split into 3 parts: | One of the result arguments, if matched, or the value of the otherwise |
-| `if` | Tests if the 1st parameter is true and if so returns parameter 2 else it returns | If condition is true, the value of the 2nd parameter else the value of the 3rd |
-| `inRange` | Returns true if the value is between lower and upper (inclusive). | - |
-| `not` | Inverts boolean values making true, false etc. The value provided will be implicitly | The inverse of the supplied value. |
-| `or` | Logical 'or' operator. | If one or more of the supplied arguments evaluate to true then return true, |
+| `case` | Similar to a switch statement. The arguments are split into 3 parts: the input value to compare, pairs of test values with their respective output values and a default result if no matches are found. It must always have an even number of arguments and can have any number of test/result pairs. | One of the result arguments, if matched, or the value of the otherwise argument if no match is found. |
+| `if` | Tests if the 1st parameter is true and if so returns parameter 2 else it returns parameter 3. | If condition is true, the value of the 2nd parameter else the value of the 3rd parameter. The type will match that of the selected parameter. |
+| `inRange` | Returns true if the value is between lower and upper (inclusive). All parameters must be either numbers or ISO date strings. | - |
+| `not` | Inverts boolean values making true, false etc. The value provided will be implicitly cast to a boolean, e.g 'not("true")' returns false | The inverse of the supplied value. |
+| `or` | Logical 'or' operator. | If one or more of the supplied arguments evaluate to true then return true, else false. |
 
 
 ## Lookup
 
 | Function | Does | Returns |
 |---|---|---|
-| `getState` | Lookup a value from a state map using a key and optional effective time for | The state value if found else null. |
+| `getState` | Lookup a value from a state map using a key and optional effective time for temporally sensitive states. | The state value if found else null. |
 
 
 ## Mathematics
 
 | Function | Does | Returns |
 |---|---|---|
-| `-`, `subtract` | Field, the result of another function or a constant. | The result of subtracting each argument from the last argument or result of the |
+| `-`, `subtract` | Field, the result of another function or a constant. | The result of subtracting each argument from the last argument or result of the last subtraction. |
 | `*`, `multiply` | Field, the result of another function or a constant. | The value of arg1 multiplied by arg2. |
 | `/`, `divide` | Field, the result of another function or a constant. | The value of arg1 divided by arg2. |
-| `%` | Calculates the modulus after dividing the dividend by the divisor. If more than one | - |
+| `%` | Calculates the modulus after dividing the dividend by the divisor. If more than one divisor is provided then the each subsequent divisor will be used to calculate the modulus using the previous result as the dividend, e.g. modulo(100, 30, 4) returns 2, i.e. (100 % 30) % 4. | - |
 | `^`, `power` | Field, the result of another function or a constant. | The value of arg1 raised to the power of arg2. |
 | `add`, `+` | Field, the result of another function or a constant. | The sum of all values |
-| `ceiling` | Rounds the supplied value up to the next whole number. e.g. ceiling(1.2) | The rounded value. |
-| `floor` | Rounds the supplied value down to the next whole number. e.g. ceiling(1.8) | The rounded value. |
+| `ceiling` | Rounds the supplied value up to the next whole number. e.g. ceiling(1.2) returns 2. | The rounded value. |
+| `floor` | Rounds the supplied value down to the next whole number. e.g. ceiling(1.8) returns 1. | The rounded value. |
 | `negate` | Multiplies the supplied value by -1 | The result of multiplying the supplied number by -1 |
-| `random` | Returns a double value with a positive sign, greater than or equal to 0.0 and | A random number between 0.0 (inc.) and 1.0 (excl.) |
-| `round` | Rounds the supplied value to the nearest whole number. e.g. ceiling(1.8) | The rounded value. |
+| `random` | Returns a double value with a positive sign, greater than or equal to 0.0 and less than 1.0. Returned values are chosen pseudorandomly with (approximately) uniform distribution from that range. | A random number between 0.0 (inc.) and 1.0 (excl.) |
+| `round` | Rounds the supplied value to the nearest whole number. e.g. ceiling(1.8) returns 2. | The rounded value. |
 
 
 ## Param
 
 | Function | Does | Returns |
 |---|---|---|
-| `currentUser` | Returns the display name (or subjectId if there isn't one) of the current | Display name (or subjectId if there isn't one) of the logged in user. |
+| `currentUser` | Returns the display name (or subjectId if there isn't one) of the current logged in user. | Display name (or subjectId if there isn't one) of the logged in user. |
 | `currentUserDisplayName` | Returns the display name of the current logged in user. | The display name of the logged in user. |
 | `currentUserFullName` | Returns the full name of the current logged in user. | The full name of the logged in user. |
 | `currentUserSubjectId` | Returns the subject id of the current logged in user. | Subject id of the logged in user. |
@@ -180,12 +180,12 @@ There are **148** functions in **14** categories.
 
 | Function | Does | Returns |
 |---|---|---|
-| `any` | Selects the first value found in the group that is not | - |
-| `bottom` | Selects the bottom N values and returns them as a delimited string in the order they | - |
-| `first` | Selects the first value found in the group even if it is | - |
-| `last` | Selects the last value found in the group even if it is | - |
-| `nth` | Selects the Nth value in a set of grouped values. If there is no explicit ordering | - |
-| `top` | Selects the top N values and returns them as a delimited string in the order they | - |
+| `any` | Selects the first value found in the group that is not null() or err(). If no explicit ordering is set then the value selected is indeterminate. | - |
+| `bottom` | Selects the bottom N values and returns them as a delimited string in the order they are read. E.g. for values [1, 2, 3, 4, 5], bottom(${field}, ',', 2) returns '4,5'. | - |
+| `first` | Selects the first value found in the group even if it is null() or err(). If no explicit ordering is set then the value selected is indeterminate. | - |
+| `last` | Selects the last value found in the group even if it is null() or err(). If no explicit ordering is set then the value selected is indeterminate. | - |
+| `nth` | Selects the Nth value in a set of grouped values. If there is no explicit ordering on the field selected then the value returned is indeterminate. E.g. for values [20, 40, 10, 30, 50], nth(${field}, 2) returns 40. | - |
+| `top` | Selects the top N values and returns them as a delimited string in the order they are read. E.g. for values [1, 2, 3, 4, 5], top(${field}, ',', 2) returns '1,2'. | - |
 
 
 ## String
@@ -194,28 +194,28 @@ There are **148** functions in **14** categories.
 |---|---|---|
 | `concat` | Appends all the arguments end to end in a single string. | A string containing all the arguments concatenated together. |
 | `contains` | Tests if inputString contains subString. | True if string contains substring |
-| `decode` | Similar to a switch/case statement. The arguments are split into 3 parts: | One of the result arguments, if matched, or the value of the otherwise |
-| `decodeUrl` | Decodes a URL or other string that is the product of standard URL encoding, e.g. | The input value with all URL encoding converted back to its plain text form. |
-| `encodeUrl` | Encodes a URL or other string using standard URL encoding, e.g. replacing a space | The input value in URL encoded form. |
-| `exclude` | If the supplied string matches one of the supplied regex patterns then return | Null if the input matches one of the patterns, otherwise the input value. |
-| `hash` | Generate a | The hash string. |
+| `decode` | Similar to a switch/case statement. The arguments are split into 3 parts: the input value to test, pairs of regex patterns with their respective output values and a default result if no matches are found. It must always have an even number of arguments and can have any number of pattern/result pairs. Result values in the format '$n' can be used to return the appropriate capture group values from the regex. | One of the result arguments, if matched, or the value of the otherwise argument if no match is found. |
+| `decodeUrl` | Decodes a URL or other string that is the product of standard URL encoding, e.g. replacing '%20' with a space. | The input value with all URL encoding converted back to its plain text form. |
+| `encodeUrl` | Encodes a URL or other string using standard URL encoding, e.g. replacing a space with '%20'. | The input value in URL encoded form. |
+| `exclude` | If the supplied string matches one of the supplied regex patterns then return null, otherwise return the supplied string. | Null if the input matches one of the patterns, otherwise the input value. |
+| `hash` | Generate a SHA-256 hash of the input string. | The hash string. |
 | `hostAddress` | Returns the host address (IP) for the given host string. | - |
 | `hostName` | Returns the host name for the given host string. | - |
-| `include` | If the supplied input string matches one of the supplied regex patterns then return | The input value if one of the patterns matches it, otherwise null. |
-| `indexOf` | Finds the first position (zero based) of subString in inputString or `-1` if it | The first position of subString. |
-| `jq` | Extracts values from a JSON string using a JQ expression. Where the expression | The string value of the matched JSON element(s). |
-| `lastIndexOf` | Finds the last position (zero based) of subString in inputString or `-1` if it | The last position of subString. |
+| `include` | If the supplied input string matches one of the supplied regex patterns then return the input string, otherwise return null. | The input value if one of the patterns matches it, otherwise null. |
+| `indexOf` | Finds the first position (zero based) of subString in inputString or `-1` if it cannot be found. Uses a simple literal match. | The first position of subString. |
+| `jq` | Extracts values from a JSON string using a JQ expression. Where the expression matches more than one element the string values of all the matched elements are concatenated. | The string value of the matched JSON element(s). |
+| `lastIndexOf` | Finds the last position (zero based) of subString in inputString or `-1` if it cannot be found. Uses a simple literal match. | The last position of subString. |
 | `lowerCase` | Convert the supplied string to lower case. | The string in lower case. |
 | `match` | Tests an input string using a regular expression pattern. | True if pattern matches input |
-| `param` | Fetches the value of named query parameter or | - |
+| `param` | Fetches the value of named query parameter or null() if the key cannot be found. | - |
 | `params` | Returns all the query parameters for the current query, e.g. 'user=jbloggs site=HQ'. | - |
-| `replace` | Perform text replacement on an input string using a regular expression to match part | - |
+| `replace` | Perform text replacement on an input string using a regular expression to match part (or all) of the input string and a replacement string to insert in place of all matches. | - |
 | `stringLength` | Return the length of the provided string. | The length of the string in characters. |
 | `substring` | Extract a sub-string based on the start/end index values. | The requested sub-string. |
-| `substringAfter` | Extract a sub-string from input after the first occurrence of delimiter. | The requested sub-string. |
-| `substringBefore` | Extract a sub-string from input before the first occurrence of delimiter. | The requested sub-string. |
+| `substringAfter` | Extract a sub-string from input after the first occurrence of delimiter. e.g. substringAfter('key=>value', '=>') returns 'value'. | The requested sub-string. |
+| `substringBefore` | Extract a sub-string from input before the first occurrence of delimiter. e.g. substringBefore('key=>value', '=>') returns 'key'. | The requested sub-string. |
 | `upperCase` | Convert the supplied string to upper case. | The string in upper case. |
-| `xpath` | Extracts values from an XML string using an XPath 3.1 expression. The string values | The concatenated string values of all the items matched by the expression. |
+| `xpath` | Extracts values from an XML string using an XPath 3.1 expression. The string values of all matched items are concatenated in document order. If no namespace prefix mappings are supplied then the XML is treated as being namespace unaware, i.e. element and attribute names are matched on their local name only. | The concatenated string values of all the items matched by the expression. |
 
 
 ## Type checking
@@ -238,15 +238,15 @@ There are **148** functions in **14** categories.
 
 | Function | Does | Returns |
 |---|---|---|
-| `extractAuthorityFromUri` | Extract the authority component from a URI. | The authority from the URI or null if not found or the URI is mall-formed. e.g. |
-| `extractFragmentFromUri` | Extract the fragment component from a URI. | The fragment from the URI or null if not found or the URI is mall-formed. e.g. |
-| `extractHostFromUri` | Extract the host component from a URI. | The host from the URI or null if not found or the URI is mall-formed. e.g. |
-| `extractPathFromUri` | Extract the path component from a URI. | The path from the URI or null if not found or the URI is mall-formed. e.g. |
-| `extractPortFromUri` | Extract the port component from a URI. | The port from the URI or null if not found or the URI is mall-formed. e.g. |
-| `extractQueryFromUri` | Extract the query component from a URI. | The query from the URI or null if not found or the URI is mall-formed. e.g. |
-| `extractSchemeFromUri` | Extract the scheme component from a URI. | The scheme from the URI or null if not found or the URI is mall-formed. e.g. |
-| `extractSchemeSpecificPartFromUri` | Extract the scheme specific part component from a URI. | The scheme specific part from the URI or null if not found or the URI is mall-formed. e.g. |
-| `extractUserInfoFromUri` | Extract the user info component from a URI. | The user info from the URI or null if not found or the URI is mall-formed. e.g. |
+| `extractAuthorityFromUri` | Extract the authority component from a URI. | The authority from the URI or null if not found or the URI is mall-formed. e.g. extractAuthorityFromUri('http://foo:bar@w1.superman.com:8080/very/long/path.html?p1=v1&p2=v2#more-details') returns 'foo:bar@w1.superman.com:8080'. |
+| `extractFragmentFromUri` | Extract the fragment component from a URI. | The fragment from the URI or null if not found or the URI is mall-formed. e.g. extractFragmentFromUri('http://foo:bar@w1.superman.com:8080/very/long/path.html?p1=v1&p2=v2#more-details') returns 'more-details'. |
+| `extractHostFromUri` | Extract the host component from a URI. | The host from the URI or null if not found or the URI is mall-formed. e.g. extractHostFromUri('http://foo:bar@w1.superman.com:8080/very/long/path.html?p1=v1&p2=v2#more-details') returns 'w1.superman.com'. |
+| `extractPathFromUri` | Extract the path component from a URI. | The path from the URI or null if not found or the URI is mall-formed. e.g. extractPathFromUri('http://foo:bar@w1.superman.com:8080/very/long/path.html?p1=v1&p2=v2#more-details') returns 'very/long/path.html'. |
+| `extractPortFromUri` | Extract the port component from a URI. | The port from the URI or null if not found or the URI is mall-formed. e.g. extractPortFromUri('http://foo:bar@w1.superman.com:8080/very/long/path.html?p1=v1&p2=v2#more-details') returns '8080'. |
+| `extractQueryFromUri` | Extract the query component from a URI. | The query from the URI or null if not found or the URI is mall-formed. e.g. extractQueryFromUri('http://foo:bar@w1.superman.com:8080/very/long/path.html?p1=v1&p2=v2#more-details') returns 'p1=v1&p2=v2'. |
+| `extractSchemeFromUri` | Extract the scheme component from a URI. | The scheme from the URI or null if not found or the URI is mall-formed. e.g. extractSchemeFromUri('http://foo:bar@w1.superman.com:8080/very/long/path.html?p1=v1&p2=v2#more-details') returns 'http'. |
+| `extractSchemeSpecificPartFromUri` | Extract the scheme specific part component from a URI. | The scheme specific part from the URI or null if not found or the URI is mall-formed. e.g. extractSchemeSpecificPartFromUri('http://foo:bar@w1.superman.com:8080/very/long/path.html?p1=v1&p2=v2#more-details') returns '//foo:bar@w1.superman.com:8080/very/long/path.html?p1=v1&p2=v2'. |
+| `extractUserInfoFromUri` | Extract the user info component from a URI. | The user info from the URI or null if not found or the URI is mall-formed. e.g. extractUserInfoFromUri('http://foo:bar@w1.superman.com:8080/very/long/path.html?p1=v1&p2=v2#more-details') returns 'foo:bar'. |
 
 
 ## Value

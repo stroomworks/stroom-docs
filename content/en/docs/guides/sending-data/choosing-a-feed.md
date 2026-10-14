@@ -29,17 +29,24 @@ Resist deriving a name per host, per pod or per container.
 **Decide the name deliberately, not from an available field.**
 A field that happens to be present is not the same as a field that means what you want the feed to mean.
 
+A feed name must match `^[A-Z0-9_-]{3,}$`: upper case letters, digits, hyphens and underscores, at least three characters.
+Stroom does not convert a name to fit.
+The **New > Data Processing > Feed** dialog rejects one that does not match, and on receipt the `Feed` header is matched exactly, so `test-events` does not reach `TEST-EVENTS`.
+
 A common convention is a hierarchical upper-case pattern, such as `SYSTEM-SUBSYSTEM-DATATYPE`: `FIREWALL-CISCO-TRAFFIC`, `WINDOWS-OS-SECURITY`.
-Consistency pays off later, when [processor filters]({{< relref "../../concepts/processing.md" >}}) can select whole families with a wildcard.
+Consistency pays off later, when [processor filters]({{< relref "../../concepts/processing/_index.md" >}}) can select whole families with a wildcard.
 
 {{< trap severity="silent" >}}
-**Feed names normalise, and unrelated sources can silently merge.**
+**Generated feed names normalise, and unrelated sources can silently merge.**
 
-Names are uppercased and disallowed characters are replaced with underscores.
-So `app.auth-prod` and `app_auth_prod` converge on the same feed, with no error and no warning.
-Two unrelated sources end up in one feed, sharing its [permissions]({{< relref "../../operate/users-and-permissions.md" >}}) and [retention]({{< relref "../../concepts/streams.md#data-retention" >}}), and the only symptom is data you did not expect.
+This applies only when [feed name generation](#letting-stroom-generate-the-name) is switched on, which it is not by default.
+A name the sender gives in the `Feed` header is used exactly as sent.
 
-Check for collisions when you choose names, particularly if any part is derived.
+When Stroom generates the name from other headers, it upper-cases each header value and replaces any character other than a letter, digit or underscore with an underscore.
+So header values `app.auth-prod` and `app_auth_prod` converge on the same feed, with no error and no warning.
+Two unrelated sources end up in one feed, sharing its [permissions]({{< relref "../../operate/users-and-permissions.md" >}}) and [retention]({{< relref "../../concepts/streams/_index.md#data-retention" >}}), and the only symptom is data you did not expect.
+
+Check for collisions when you choose the template and the values senders put in its headers.
 {{< /trap >}}
 
 {{< trap severity="destructive" >}}
@@ -82,18 +89,21 @@ A collision puts data on a real feed, so the only way to notice is to look at wh
 **A `200` does not tell you which feed the data landed on**, only that something accepted it.
 
 **A feed existing with roughly the right name is not proof it is the one you created.**
-Normalisation may have merged it with another.
+With name generation on, normalisation may have merged it with another.
 {{< /not-proof >}}
 
 {{< /verify >}}
 
 {{< diagnose >}}
 1. **Did the post name a feed at all?**
-   A missing `Feed` header is rejected unless name generation is enabled.
+   A missing `Feed` header is rejected with `406` and a `Stroom-Status` of `100`, `Feed must be specified`, unless name generation is enabled.
 1. **Does the feed exist, and is it set to receive?**
+   A name that matches no feed is rejected with `406` and a status of `110`, the same as a feed set to `Reject`.
+   Check the case: a lower-case `Feed` header does not match an upper-case feed.
    A feed [set to drop]({{< relref "../../concepts/data-receipt.md#feed-status" >}}) returns `200` and discards.
 1. **Did the name normalise into another feed?**
-   Compare the name you sent against the feeds that exist, allowing for uppercasing and character replacement.
+   Only if you rely on name generation.
+   Compare the header values you sent against the feeds that exist, allowing for uppercasing and character replacement.
 1. **Are the template's mandatory headers all present?**
    Only if you rely on name generation.
    Missing one is rejected with a specific status code.

@@ -86,7 +86,8 @@ Decide this before the pipeline is built, not after.
 ## Compression
 
 `http_compression => true` enables gzip.
-If you set it, change the `Compression` header to `"GZIP"`: Logstash sets `Content-Encoding`, which Stroom ignores entirely, and the failure is silent.
+If you set it, leave the `Compression` header at `"NONE"`: Logstash sets `Content-Encoding: gzip`, which Stroom's web server decodes before Stroom reads the body.
+Changing `Compression` to `"GZIP"` as well makes Stroom decompress the body a second time, and every post fails with `500` and `Stroom-Status` `400`.
 
 
 ## Several feeds
@@ -145,8 +146,9 @@ The monitoring API reports per-output error and retry counts, which is good supp
    This is the one to check when data is intermittently missing rather than entirely absent.
 1. **What do the pipeline stats say?**
    `GET /_node/stats/pipelines` reports per-output error and retry counts.
-1. **Is the stream present but unreadable?**
-   Check `http_compression` against the `Compression` header.
+1. **Does every post fail with `500` and `Stroom-Status` `400`?**
+   `http_compression` is on and the `Compression` header says `GZIP`, so the body is decompressed twice.
+   Set it back to `NONE`.
 1. **Does the pipeline expect the wrong shape?**
    `json_batch` sends an array; `json` sends an object.
    The parser has to match.

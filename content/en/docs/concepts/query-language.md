@@ -131,8 +131,8 @@ The internal data sources are:
 
 | Data source | Each row is |
 |---|---|
-| **Stream Store** | A [stream]({{< relref "streams.md" >}}), with its feed, type, status, sizes and processing counts. |
-| **Processor Tasks** | A [processing task]({{< relref "processing.md" >}}), with its status, node and timings. |
+| **Stream Store** | A [stream]({{< relref "streams/_index.md" >}}), with its feed, type, status, sizes and processing counts. |
+| **Processor Tasks** | A [processing task]({{< relref "processing/_index.md" >}}), with its status, node and timings. |
 | **Annotations** | An [annotation]({{< relref "../guides/detection/annotations.md" >}}). |
 | **Index Shards** | A Lucene index shard, with its size, document count and status. |
 | **Plan B Shards** | A Plan B shard. |

@@ -12,7 +12,9 @@ pageKind: reference
 Every post to the datafeed endpoint returns an HTTP status.
 When something is wrong it also returns a **`Stroom-Status`** header carrying the more specific code below, and a **`Stroom-Error`** header carrying the reason in words.
 
-On success the response carries a **`ReceiptId`**, which identifies that one post and is what lets you trace a delivery through a chain of proxies.
+On success the response body is the post's receipt id, such as `1791981748008_0000_S_node1a`: the receive time, a sequence number, `S` for Stroom or `P` for Stroom Proxy, and the node.
+It is not a header.
+The same id is stored on the stream as its `ReceiptId` attribute, which is what lets you trace a delivery through a chain of proxies.
 
 **A sender that records none of these cannot tell you why data is missing.**
 Capture all three.

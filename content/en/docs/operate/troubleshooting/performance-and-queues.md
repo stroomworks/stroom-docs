@@ -29,7 +29,7 @@ A single observation tells you almost nothing about whether something is moving.
 {{< /timing >}}
 
 {{< verify >}}
-Take the same measurement twice, several minutes apart: the [processor filter's]({{< relref "../../concepts/processing.md" >}}) tracker position, or the count of unprocessed streams.
+Take the same measurement twice, several minutes apart: the [processor filter's]({{< relref "../../concepts/processing/_index.md" >}}) tracker position, or the count of unprocessed streams.
 
 {{< golden >}}
 **The tracker position has advanced between two readings.**

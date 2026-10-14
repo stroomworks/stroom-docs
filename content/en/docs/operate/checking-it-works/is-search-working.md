@@ -27,22 +27,30 @@ The `Index Writer Flush` [job]({{< relref "../../reference/jobs.md" >}}) does th
 {{< /timing >}}
 
 {{< verify >}}
-Query the index for a count with [StroomQL]({{< relref "../../reference/stroom-query-language.md" >}}).
-Nothing else answers the question:
+Open the index, go to its **Shards** tab and select refresh.
+The list is empty until you do.
+Each shard has a **Doc Count**, the number of documents committed to it.
+A total greater than zero means documents were written.
+
+Then query the index with [StroomQL]({{< relref "../../reference/stroom-query-language.md" >}}) to prove the search path can read them back:
 
 ```text
-from "MY_INDEX" select count()
+from "MY_INDEX"
+eval events = count()
+group by StreamId
+select StreamId, events
 ```
 
-A number greater than zero means documents are in there and the search path can read them.
-That is the whole claim.
+This returns one row per indexed stream, with the number of documents from it.
+It needs a `StreamId` field in the index, which an `IdEnrichmentFilter` normally provides; group by any other field the index holds if it has none.
+The totals should agree with the **Doc Count**.
 
 {{< golden >}}
-**`select count()` returns a non-zero number, and the feed has no `Error` streams.**
+**A non-zero Doc Count, rows from the grouped query, and no `Error` streams on the feed.**
 
-The two together.
-The count proves documents exist and are queryable; the absence of error streams proves the indexing filter did not fail on the way.
-Either alone can mislead.
+All three together.
+The **Doc Count** proves documents were written, the query proves they can be searched, and the absence of error streams proves the indexing filter did not fail on the way.
+Any one alone can mislead.
 {{< /golden >}}
 
 {{< not-proof >}}
@@ -53,10 +61,15 @@ This is the single most common way people conclude indexing worked when it did n
 
 **A shard existing does not mean it holds your data.**
 Shards are created ahead of the documents that go in them.
+Read its **Doc Count**.
+
+**A column of `1`s from `select count()` is not a count.**
+Without a `group by`, `from "MY_INDEX" select count()` returns one row per document, each holding `1`.
+Group by a field, as above, to get a total.
 
 **A [dashboard]({{< relref "../../concepts/dashboards.md" >}}) showing rows does not prove the index is complete.**
 It proves the rows it found exist.
-Compare the count against the number of events you expect.
+Compare the **Doc Count** against the number of events you expect.
 {{< /not-proof >}}
 
 {{< /verify >}}
@@ -83,7 +96,7 @@ Decide field types before you load data, not after.
 {{< /trap >}}
 
 {{< diagnose >}}
-1. **Does `select count()` return zero, or does the query fail?**
+1. **Does the query return no rows, or does it fail?**
    A failure is a different problem: the data source cannot be resolved, or the query is invalid.
    Validate the query first and fix that before going further.
 1. **Are there `Error` streams on the feed?**
@@ -105,7 +118,7 @@ Decide field types before you load data, not after.
    The index needs a **Default Extraction Pipeline** to fetch anything beyond its stored fields, and extraction needs `StreamId` and `EventId` in the index to find its way back to the source event.
    Those are normally added for you, by an [`IdEnrichmentFilter`]({{< relref "../../reference/pipeline-elements.md#idenrichmentfilter" >}}) running before the indexing filter.
 1. **Is it just not flushed yet?**
-   If the count is zero moments after processing finished, wait for `Index Writer Flush` and ask again.
+   If the **Doc Count** is zero moments after processing finished, wait for `Index Writer Flush`, then refresh the **Shards** tab and query again.
 {{< /diagnose >}}
 
 

@@ -19,14 +19,15 @@ Nothing is lost by clearing one: everything in a cache is a copy of something th
 
 ## The procedure
 
-Caches are listed under **Monitoring**, with their size and hit rate, and each can be cleared individually.
+Caches are listed under **Monitoring** → **Caches**.
+The upper list names every cache; selecting one shows, in the lower list, its size and hit rate on each node.
 
 1. **Find the cache that holds the thing you changed.**
-   Clear that one.
    The names are reasonably descriptive, and clearing a single cache is less disruptive than clearing everything.
-1. **Clear it on every node.**
-   A cache is per node, not per cluster.
-   Clearing it where you happen to be signed in leaves the other nodes serving the old copy, which is a particularly confusing state to debug.
+   For example, the **Index Field Cache** holds the field definitions that indexing writes with, for up to 10 hours after it reads them, so a changed field definition is not used for new data until it is cleared or expires.
+1. **Clear it with the clear button on its row in the upper list.**
+   A cache is held per node, but this button clears it on every enabled node at once.
+   The clear button on a row of the lower list clears that one node only.
 1. **Retry whatever was wrong.**
 
 {{< timing mode="immediate" >}}
@@ -44,7 +45,7 @@ It should now reflect the change.
 **The behaviour that was stale is now correct, on every node.**
 
 Check more than one node if you have them.
-A cache cleared on one node is a cache still warm on the others.
+The lower list on the **Caches** screen shows the cache on each node; straight after clearing, it should be at or near empty on all of them, not just one.
 {{< /golden >}}
 
 {{< not-proof >}}
@@ -53,18 +54,20 @@ It proves the cache is empty.
 If the underlying document is still wrong, it will be fetched, cached and wrong again within moments.
 
 **It working for you is not proof it works for everyone.**
-You may be on the node you cleared.
+If you cleared one node from the lower list, you may be on the node you cleared.
 {{< /not-proof >}}
 
 {{< /verify >}}
 
 {{< trap severity="silent" >}}
-**Caches are per node, so clearing one node fixes one node.**
+**Disabled nodes are skipped, and the per-node button clears one node only.**
 
+The clear button in the upper list clears the cache on every node that is enabled on the **Nodes** screen.
+A node that is disabled but still running keeps its old copy, and so does every node except the one you chose if you clear from the lower list.
 In a cluster this produces a system that is correct or stale depending on which node answers.
 Users report that the problem "comes and goes", which is true, and which sends everyone looking in the wrong place.
 
-Clear on every node, every time.
+Clear from the upper list, and clear any disabled node that is still serving requests from the lower list.
 {{< /trap >}}
 
 {{< diagnose >}}
@@ -74,9 +77,10 @@ Clear on every node, every time.
 1. **Did you clear the cache that matters?**
    If you are unsure which one holds it, clear the obvious candidate first, then widen.
 1. **Did you clear it everywhere?**
+   Clearing from the lower list clears one node, and a disabled node is never cleared from the upper list.
    See the trap.
 1. **Is it a cache at all?**
-   Some staleness is not cached but stored: a [processor filter]({{< relref "../../concepts/processing.md" >}}) holds a reference to a specific version of a pipeline, and reference data is loaded into a store rather than a cache.
+   Some staleness is not cached but stored: a [processor filter]({{< relref "../../concepts/processing/_index.md" >}}) holds a reference to a specific version of a pipeline, and reference data is loaded into a store rather than a cache.
    If clearing caches changes nothing, see [Purge reference data]({{< relref "purge-reference-data.md" >}}).
 1. **Is it the browser?**
    The UI caches too.

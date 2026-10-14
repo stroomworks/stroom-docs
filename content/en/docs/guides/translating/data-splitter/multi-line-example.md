@@ -14,27 +14,30 @@ aliases:
 Example multi line file where records are split over many lines.
 There are various ways this data could be treated but this example forms a record from data created when some fictitious query starts plus the subsequent query results.
 
+Each line holds a date, a time and the rest of the line, separated by tab characters.
+The configuration splits on `\t`, so the input must contain real tabs: with spaces in their place, the output has empty `query` and `results` elements and no error.
+
 
 ## Input
 
 ```text
-09/07/2016    14:49:36    User = user1
-09/07/2016    14:49:36    Query = some query
+09/07/2016	14:49:36	User = user1
+09/07/2016	14:49:36	Query = some query
 
-09/07/2016    16:34:40    Results:
-09/07/2016    16:34:40    Line 1:   result1
-09/07/2016    16:34:40    Line 2:   result2
-09/07/2016    16:34:40    Line 3:   result3
-09/07/2016    16:34:40    Line 4:   result4
+09/07/2016	16:34:40	Results:
+09/07/2016	16:34:40	Line 1:   result1
+09/07/2016	16:34:40	Line 2:   result2
+09/07/2016	16:34:40	Line 3:   result3
+09/07/2016	16:34:40	Line 4:   result4
 
-09/07/2009    16:35:21    User = user2
-09/07/2009    16:35:21    Query = some other query
+09/07/2009	16:35:21	User = user2
+09/07/2009	16:35:21	Query = some other query
 
-09/07/2009    16:45:36    Results:
-09/07/2009    16:45:36    Line 1:   result1
-09/07/2009    16:45:36    Line 2:   result2
-09/07/2009    16:45:36    Line 3:   result3
-09/07/2009    16:45:36    Line 4:   result4
+09/07/2009	16:45:36	Results:
+09/07/2009	16:45:36	Line 1:   result1
+09/07/2009	16:45:36	Line 2:   result2
+09/07/2009	16:45:36	Line 3:   result3
+09/07/2009	16:45:36	Line 4:   result4
 ```
 
 
@@ -125,13 +128,13 @@ There are various ways this data could be treated but this example forms a recor
   </record>
   <record>
     <data name="query">
-      <data name="date" value="09/07/2016" />
+      <data name="date" value="09/07/2009" />
       <data name="time" value="16:35:21" />
       <data name="User" value="user2" />
       <data name="Query" value="some other query" />
     </data>
     <data name="results">
-      <data name="date" value="09/07/2016" />
+      <data name="date" value="09/07/2009" />
       <data name="time" value="16:45:36" />
       <data name="Results" />
       <data name="Line 1" value="result1" />

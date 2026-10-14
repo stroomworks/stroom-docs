@@ -25,7 +25,7 @@ This page covers how content is organised, how its history is kept, and how it m
 
 The explorer tree on the left of the screen holds every document you can see.
 Its layout is up to you: group content by data source, by team or by project.
-See [User interface]({{< relref "../concepts/user-interface.md" >}}) for a tour of the tree and the folder views.
+See [User interface]({{< relref "../concepts/user-interface/_index.md" >}}) for a tour of the tree and the folder views.
 
 Create a document by right-clicking a folder and choosing **New**.
 The new-document menu groups [document types]({{< relref "../reference/documents.md" >}}) like this:
@@ -68,7 +68,7 @@ Earlier changes were never recorded.
 ## Deleting content
 
 Content in Stroom is heavily linked.
-A pipeline uses translations and schemas, a [processor filter]({{< relref "../concepts/processing.md" >}}) uses a feed, and a dashboard queries an index.
+A pipeline uses translations and schemas, a [processor filter]({{< relref "../concepts/processing/_index.md" >}}) uses a feed, and a dashboard queries an index.
 Stroom records these links in both directions, and you can see them from a document's context menu:
 
 * **Dependencies** lists the documents this one needs.
@@ -198,7 +198,7 @@ A few habits help:
 
 ## Related pages
 
-* [User interface]({{< relref "../concepts/user-interface.md" >}}): the explorer tree and folder views.
+* [User interface]({{< relref "../concepts/user-interface/_index.md" >}}): the explorer tree and folder views.
 * [Users, groups and permissions]({{< relref "../operate/users-and-permissions.md" >}}): who can see, edit and create content.
 * [Feeds]({{< relref "../concepts/feed.md" >}}): the documents most other content hangs from.
 * [Nodes, jobs and properties]({{< relref "../operate/nodes-and-jobs.md" >}}): the jobs that clean up deleted content and push to Git.

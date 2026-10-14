@@ -10,7 +10,7 @@ pageKind: operate
 verification: required
 ---
 
-Reprocessing re-runs a [pipeline]({{< relref "../../concepts/pipelines.md" >}}) over [streams]({{< relref "../../concepts/streams.md" >}}) that have already been through it.
+Reprocessing re-runs a [pipeline]({{< relref "../../concepts/pipelines.md" >}}) over [streams]({{< relref "../../concepts/streams/_index.md" >}}) that have already been through it.
 You need it whenever the pipeline was wrong and the output it produced is wrong with it: a translation that dropped a field, an XSLT that matched nothing, a schema that has since changed.
 
 The raw data is untouched by any of this.
@@ -30,7 +30,36 @@ Processing never consumes its input, it only produces new streams alongside it, 
    Old output streams are replaced for you, but index documents, statistics and anything sent to another system are not.
    See the trap below.
 1. **Reprocess the selection.**
-   Stroom builds a temporary [processor filter]({{< relref "../../concepts/processing.md" >}}) for those streams and queues them.
+   Tick the streams, then click **Process** {{< stroom-icon "process.svg" >}}, the first icon on the data list toolbar.
+   In the **Create Processors** dialog, tick **Reprocess data**, then select **OK**.
+   Stroom builds a temporary [processor filter]({{< relref "../../concepts/processing/_index.md" >}}) for those streams and queues them.
+1. **Check the summary.**
+   The **Confirm Reprocess** dialog says how many streams the selection covers, of which types, from which feeds and pipelines, and over what range of create times.
+   Confirm it, and Stroom reports `Added reprocess filter to` each pipeline it found.
+
+{{< image src="operate/resetting/reprocess-data/create-processors.png" alt="The data list of a feed with three Error streams ticked, and the Create Processors dialog open over it. The dialog has a priority for new filters set to 10, Attempt to automatically set priority ticked, Reprocess data unticked, Enable new filters ticked, an empty Min Create Time and a Max Create Time of now." >}}The **Create Processors** dialog. **Reprocess data** is unticked by default, and it is the box that makes this a reprocess.{{< /image >}}
+
+The dialog's other settings:
+
+**Priority of new filters** and **Attempt to automatically set priority**
+: The priority of the temporary filter.
+  With automatic priority, it takes the priority of the processor's existing filter.
+
+**Enable new filters**
+: Ticked by default.
+  Untick it to create the filters disabled and enable them yourself later.
+
+**Min Create Time** and **Max Create Time**
+: Limit the source streams by when they were created.
+  **Max Create Time** defaults to now.
+
+{{< trap severity="silent" >}}
+**With Reprocess data unticked, the selected streams are not reprocessed: they become the input.**
+
+Stroom asks you to choose a pipeline and runs the streams you ticked through it, so selecting `Events` or `Error` streams processes the output, not the source it came from.
+Tick **Reprocess data** to work back from the selection to the source streams and re-run the pipelines that made it.
+This is the box to tick for any stream that has already been processed.
+{{< /trap >}}
 
 {{< timing mode="async" >}}
 Reprocessing is ordinary processing and inherits its latency: the task creator polls, the tasks queue, and the work competes with live ingest for the same capacity.
@@ -95,5 +124,5 @@ For exports, pause or redirect the destination while the reprocessing runs.
 
 ## When reprocessing is not the answer
 
-If **new** data is processing and only **old** data was missed, the pipeline is probably fine and the processor filter never looked at those streams.
+If **new** data is processing and only **old** data was missed after a processor filter's criteria were changed, the pipeline is probably fine and the filter's tracker had already moved past those streams.
 That is a different fix: see [Reset a processor filter]({{< relref "reset-a-processor-filter.md" >}}).

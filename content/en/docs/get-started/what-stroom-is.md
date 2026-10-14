@@ -16,7 +16,7 @@ Most of its users are doing security monitoring, audit or investigation, where t
 ## The shape of it
 
 Data arrives on a **[feed]({{< relref "../concepts/feed.md" >}})**, which is a named channel and a security boundary.
-It is stored exactly as it was sent, as a **[stream]({{< relref "../concepts/streams.md" >}})**, and that original is never altered.
+It is stored exactly as it was sent, as a **[stream]({{< relref "../concepts/streams/_index.md" >}})**, and that original is never altered.
 
 A **[pipeline]({{< relref "../concepts/pipelines.md" >}})** reads a stream and turns it into something structured: a [parser]({{< relref "../concepts/translation.md" >}}) makes XML events out of whatever the source sent, an XSLT reshapes those events into a common schema, and the result is written to a new stream.
 Nothing is overwritten, so a translation can be fixed and the data re-run.

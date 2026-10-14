@@ -11,5 +11,5 @@ aliases:
   - /docs/user-guide/concepts/
 ---
 
-Stroom is built out of a few ideas that recur everywhere: data arrives on a [**feed**]({{< relref "feed.md" >}}), a [**pipeline**]({{< relref "pipelines.md" >}}) turns it into something structured, and the result is written to a [**stream**]({{< relref "streams.md" >}}), an [**index**]({{< relref "lucene-index.md" >}}) or a [**state store**]({{< relref "planb.md" >}}).
+Stroom is built out of a few ideas that recur everywhere: data arrives on a [**feed**]({{< relref "feed.md" >}}), a [**pipeline**]({{< relref "pipelines.md" >}}) turns it into something structured, and the result is written to a [**stream**]({{< relref "streams/_index.md" >}}), an [**index**]({{< relref "lucene-index.md" >}}) or a [**state store**]({{< relref "planb.md" >}}).
 Learn these and the rest of the product reads as variations on them.

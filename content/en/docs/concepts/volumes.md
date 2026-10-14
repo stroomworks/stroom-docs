@@ -15,7 +15,7 @@ A **volume** is a place Stroom writes data to.
 Most volumes are a directory on a file system, either local to a node or on shared storage.
 Stroom has two kinds:
 
-* **Data volumes** hold the stream store: every [stream]({{< relref "streams.md" >}}) Stroom receives or creates, with its child streams.
+* **Data volumes** hold the stream store: every [stream]({{< relref "streams/_index.md" >}}) Stroom receives or creates, with its child streams.
 * **Index volumes** hold the shards of [Lucene indexes]({{< relref "lucene-index.md" >}}).
 
 The database holds the metadata about streams and shards.
@@ -126,7 +126,7 @@ Small uncompressed `.dat` files sit beside them: a manifest (`.mf.dat`), and for
 You shouldn't need to work with these files directly.
 Use the **Data** tab to view streams and **Download** to get a copy.
 Never delete files from a volume by hand: the database would still list the streams.
-Use [data retention]({{< relref "streams.md" >}}) instead, which marks streams as deleted and lets the **Data Delete** job remove the files.
+Use [data retention]({{< relref "streams/_index.md" >}}) instead, which marks streams as deleted and lets the **Data Delete** job remove the files.
 
 
 ## S3 storage
@@ -147,7 +147,7 @@ These are not in a stable release, and S3 v2 is not for production use.
 
 ## Related pages
 
-* [Streams]({{< relref "streams.md" >}}): what the stream store holds, and data retention.
+* [Streams]({{< relref "streams/_index.md" >}}): what the stream store holds, and data retention.
 * [Lucene indexes]({{< relref "lucene-index.md" >}}): what is written to index volumes.
 * [Feeds]({{< relref "feed.md" >}}): where a feed's volume group is set.
 * [Nodes and jobs]({{< relref "../operate/nodes-and-jobs.md" >}}): the volume status jobs.

@@ -11,7 +11,7 @@ pageKind: concept
 
 Client systems send data to Stroom with a plain HTTP POST to its `/datafeed` endpoint.
 The body of the request is the data, and HTTP headers describe it.
-Stroom stores each accepted request as a [stream]({{< relref "streams.md" >}}) in the [feed]({{< relref "feed.md" >}}) the headers name, ready for [processing]({{< relref "processing.md" >}}).
+Stroom stores each accepted request as a [stream]({{< relref "streams/_index.md" >}}) in the [feed]({{< relref "feed.md" >}}) the headers name, ready for [processing]({{< relref "processing/_index.md" >}}).
 
 Clients can post straight to Stroom, or to Stroom Proxy, which sits at the edge of the network and passes data on.
 Both present the same `/datafeed` API, so a client sends data the same way to either.
@@ -33,7 +33,7 @@ The payload must be text once it is uncompressed.
 It can be sent in one of three forms:
 
 * **Uncompressed**: plain text, with no compression header.
-* **GZIP**: gzip-compressed text, with `Compression:GZIP`.
+* **GZIP**: gzip-compressed text, with `Compression:GZIP` or the standard `Content-Encoding: gzip`, but never both.
 * **ZIP**: a ZIP archive, with `Compression:ZIP`.
   This is the only form that can carry more than one file, and the only one that can carry context data alongside the events.
 
@@ -90,7 +90,7 @@ A client should capture all three.
 |---|---|---|
 | 200 | 0 | The data was received. |
 | 406 | 100 | No `Feed` header was supplied. |
-| 406 | 101 | The feed does not exist. |
+| 406 | 101 | The feed does not exist. A direct post to Stroom for an unknown feed returns `110` instead. |
 | 406 | 102 | The `Type` header is not a valid stream type. |
 | 406 | 103 | A mandatory header is missing. |
 | 406 | 110 | The feed is not set to receive data. |
@@ -216,7 +216,7 @@ Both are off by default.
 ## Related pages
 
 * [Feeds]({{< relref "feed.md" >}}): the feed settings that receipt depends on.
-* [Streams]({{< relref "streams.md" >}}): what a post becomes once it is stored.
-* [Processing]({{< relref "processing.md" >}}): how received data is picked up by pipelines.
+* [Streams]({{< relref "streams/_index.md" >}}): what a post becomes once it is stored.
+* [Processing]({{< relref "processing/_index.md" >}}): how received data is picked up by pipelines.
 * [Volumes and storage]({{< relref "volumes.md" >}}): where received streams are written.
 * [Is data arriving?]({{< relref "../operate/checking-it-works/is-data-arriving.md" >}}) and [Proxy problems]({{< relref "../operate/troubleshooting/proxy-problems.md" >}}): if data is not getting through.

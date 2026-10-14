@@ -31,10 +31,11 @@ A reference feed is loaded into a store, and an XSLT translating event data call
 ## The part that catches people
 
 Reference data is not a single current value.
-Every reference stream has an **effective time**, and a lookup is resolved against the time of the *event being processed*, not the time you run the lookup.
+Every reference stream has an **effective time**, and a lookup is resolved against a lookup time.
+Unless the XSLT passes the event's own time, that lookup time is when the stream being processed was received, not when the event happened.
 
-That is the right behaviour: an event from March should be enriched with what was true in March, not with what is true today.
-It is also the source of most reference data confusion, because a lookup that is plainly correct when you test it by hand can be plainly wrong for the data you actually process.
+Passing the event's time is usually what you want: an event from March should be enriched with what was true in March, not with what was true when its stream arrived.
+The default is also the source of most reference data confusion, because a lookup that is plainly correct for data sent today can be plainly wrong for late or back-filled data.
 
 [Effective times]({{< relref "effective-times.md" >}}) is the page to read before debugging a lookup that "returns the wrong value".
 

@@ -17,7 +17,7 @@ Everything else is doing it properly.
 ## If you are evaluating
 
 Read [Concepts]({{< relref "../concepts/_index.md" >}}).
-It explains the model rather than the mechanics: what a [stream]({{< relref "../concepts/streams.md" >}}) really is, how [pipelines inherit]({{< relref "../concepts/pipelines.md" >}}) from each other, what [Plan B]({{< relref "../concepts/planb.md" >}}) is for, and why [reference data]({{< relref "../concepts/pipeline-reference-data.md" >}}) has an effective time.
+It explains the model rather than the mechanics: what a [stream]({{< relref "../concepts/streams/_index.md" >}}) really is, how [pipelines inherit]({{< relref "../concepts/pipelines.md" >}}) from each other, what [Plan B]({{< relref "../concepts/planb.md" >}}) is for, and why [reference data]({{< relref "../concepts/pipeline-reference-data.md" >}}) has an effective time.
 
 
 ## If you are connecting a real source

@@ -18,51 +18,55 @@ It acts as the "label" that follows data from the moment it is received until it
 
 ## What is a feed?
 
-A feed is not a physical storage location (that is the [Stream Store]({{< relref "streams.md" >}})), but a logical grouping.
+A feed is not a physical storage location (that is the [Stream Store]({{< relref "streams/_index.md" >}})), but a logical grouping.
 Every piece of data that enters Stroom must be assigned to exactly one feed.
 This assignment allows Stroom to:
 
-1. **Route data**: [Processor filters]({{< relref "processing.md" >}}) use feed names to decide which pipelines should process which data.
+1. **Route data**: [Processor filters]({{< relref "processing/_index.md" >}}) use feed names to decide which pipelines should process which data.
 1. **Manage security**: [Permissions]({{< relref "../operate/users-and-permissions.md" >}}) can be set at the feed level to control who can view or process specific datasets.
 1. **Define retention**: You can set different data retention policies for different feeds.
 
 
 ## The feed UI page
 
-When you open a Feed document, the UI displays several tabs providing different views of the data and its configuration:
+When you open a Feed document it shows these tabs:
+
+* **Data**: the feed's streams, what was received and what pipelines wrote back to it.
+  It is the stream browser described in [The Data tab]({{< relref "streams/data-tab.md" >}}), which also explains when its toolbar buttons are enabled.
+* **Active Tasks**: the processing tasks for the feed's streams, finished ones included.
+  See [The Active Tasks tab]({{< relref "processing/active-tasks-tab.md" >}}).
+* **Settings**: described below.
+* **Documentation** and **Permissions**: as on every document.
+
+**Data** needs the `Data - View` application permission and **Active Tasks** needs `Manage Processors`; without them the tab is not shown.
 
 
 ### Settings tab
 
-Contains the metadata and behavioural configuration for the feed:
+The **Settings** tab holds what Stroom needs to know about the data arriving on the feed.
+Unlike the tick boxes on a [Processors tab]({{< relref "processing/processors-tab.md" >}}), changes here take effect only when the feed is saved: the tab title shows `*` until you click **Save** {{< stroom-icon "save.svg" "Save" >}}.
 
-* **Classification**: The protective marking or classification of the data (e.g., OFFICIAL-SENSITIVE).
-* **Reference feed**: If checked, this feed is intended to be used as [reference data]({{< relref "pipeline-reference-data.md" >}}) (e.g., IP to Host mappings).
-* **Received type**: The default stream type assigned to data as it arrives (usually `Raw Events`).
-* **Encoding**: The character encoding of the incoming data (e.g., UTF-8).
-* **Data format**: The structure of the main data part (e.g., XML, JSON, CSV).
-* **Context format**: The structure of the "context" part of the stream.
-  Context data is supplementary information (like environment details) sent alongside the main events.
-* **Data schema / version**: The name and version of the XML schema (XSD) that the data is expected to conform to.
-  This is often used by pipelines to perform automated validation with a [schema filter]({{< relref "pipeline-schema-filter.md" >}}).
-* **Volume group**: Determines the group of physical disk [volumes]({{< relref "volumes.md" >}}) where this feed's data will be stored.
-  This allows administrators to place high-priority feeds on faster storage.
+{{< image src="concepts/feed/settings.png" alt="A new feed's Settings tab: an empty Classification box, an unticked Reference Feed box, Feed Status set to Receive, Received Type set to Raw Events, Data Encoding and Context Encoding both UTF-8, empty Data Format and Context Format drop-downs, empty Data Schema and Data Schema Version boxes, and an empty Volume Group drop-down." >}}A new feed's settings. Most feeds only ever need Feed Status, Received Type and, for reference data, Reference Feed.{{< /image >}}
 
-
-### Data tab
-
-This is the primary diagnostic view for the feed.
-It is divided into three horizontal sections:
-
-1. **Stream list (top)**: Shows all data streams belonging to this feed that match your current filter.
-1. **Stream relation list (middle)**: Shows the lineage (ancestry) of the selected stream.
-   If you select an "Events" stream, this list will show the "Raw Events" it was created from.
-1. **Data pane (bottom)**: Displays the actual content of the selected stream (Hex, Text, or XML).
+| Field | Means |
+|---|---|
+| **Classification** | The classification or protective marking of the feed's data, such as `OFFICIAL-SENSITIVE`, shown on screens that display it. |
+| **Reference Feed** | Marks the feed as holding [reference data]({{< relref "pipeline-reference-data.md" >}}) for lookups. It also stops data on it being split into several sub-streams. |
+| **Feed Status** | What happens to data sent to the feed: **Receive**, **Reject** (refused with a `406`) or **Drop** (accepted with a `200` and thrown away). See [Controlling what is accepted]({{< relref "../guides/receiving-and-routing/controlling-what-is-accepted.md" >}}). |
+| **Received Type** | The stream type given to received data, usually `Raw Events`, or `Raw Reference` on a reference feed. |
+| **Data Encoding**, **Context Encoding** | The character encoding of the data and context parts of received streams. Context data is supplementary information, such as environment details, sent alongside the events. |
+| **Data Format**, **Context Format** | The format of the data and context, such as XML, JSON or CSV. Descriptive: setting it does not change how the data is parsed. |
+| **Data Schema**, **Data Schema Version** | The XML schema the data conforms to, if it has one. A pipeline can check it with a [schema filter]({{< relref "pipeline-schema-filter.md" >}}). |
+| **Volume Group** | The group of [volumes]({{< relref "volumes.md" >}}) the feed's data is stored in, which lets administrators put busy feeds on faster storage. |
 
 
-### Active tasks tab
+#### Why Feed Status is greyed out
 
-Shows a real-time list of all background **Processor Tasks** currently running for this feed.
+**Feed Status** only has an effect when Stroom checks feed status on receipt, which is when the property `stroom.receive.receiptCheckMode` is `FEED_STATUS`, the default.
+If it is set to anything else, for example `RECEIPT_POLICY` to use [data receipt rules]({{< relref "data-receipt.md" >}}), the box is greyed out and its value is ignored.
+
+So a greyed-out Feed Status is not a permission problem.
+It means receipt is being decided somewhere else.
 
 
 ## Naming conventions

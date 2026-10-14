@@ -40,18 +40,22 @@ Data can be indexed and not yet findable, briefly.
 {{< /timing >}}
 
 {{< verify >}}
+Open the index, go to its **Shards** tab and select refresh, since the list is empty until you do.
+Add up the **Doc Count** column, which counts the documents committed to each shard.
+Then confirm a search reads them back, with one row per indexed stream:
 
 ```text
-from "MY_INDEX" select count()
+from "MY_INDEX"
+eval events = count()
+group by StreamId
+select StreamId, events
 ```
 
-A non-zero count, and no `Error` streams on the feed.
-
 {{< golden >}}
-**A count greater than zero, with no `Error` streams.**
+**A non-zero Doc Count, rows from the query, and no `Error` streams.**
 
-The count proves documents are readable; the absence of errors proves the indexing filter did not fail on the way.
-Either alone can mislead.
+The **Doc Count** proves documents were written, the query proves they are readable, and the absence of errors proves the indexing filter did not fail on the way.
+Any one alone can mislead.
 {{< /golden >}}
 
 {{< not-proof >}}
@@ -61,6 +65,10 @@ This is the most common way people conclude indexing worked when it did not.
 
 **Shards existing proves nothing either.**
 They are created before documents go into them.
+Read the **Doc Count**.
+
+**`from "MY_INDEX" select count()` is not a count.**
+Without a `group by`, it returns one row per document, each holding `1`.
 {{< /not-proof >}}
 
 {{< /verify >}}
@@ -87,7 +95,7 @@ Either define every field you intend to search, or use a dynamic index, which cr
 {{< /trap >}}
 
 {{< diagnose >}}
-1. **Is the count zero, or does the query fail outright?**
+1. **Is the Doc Count zero, or does the query fail outright?**
    A failure means the data source cannot be resolved or the query is invalid: a different problem, and one to fix first.
 1. **Are there `Error` streams?**
    Read one.

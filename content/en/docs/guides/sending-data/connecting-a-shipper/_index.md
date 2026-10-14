@@ -60,8 +60,9 @@ Four decisions, whichever tool you use:
   See [Choosing a feed]({{< relref "../choosing-a-feed.md" >}}).
   Decide it before you configure anything.
 * **Compression.**
-  If you turn it on in the shipper, set the `Compression` header to match in the same request.
-  Nothing else will tell you that you got this wrong.
+  A shipper's own compression option sends `Content-Encoding: gzip`, which Stroom accepts as it is, so leave the `Compression` header at `NONE`.
+  Setting `Compression: GZIP` as well decompresses the body twice and fails every post with `500`.
+  Set `Compression: GZIP` only when the body was compressed by something that does not set `Content-Encoding`.
 * **Batch shape.**
   One event per post, newline-delimited, or a JSON array.
   The receiving pipeline's [parser]({{< relref "../../../concepts/translation.md" >}}) has to match, so tell whoever builds it which you chose.

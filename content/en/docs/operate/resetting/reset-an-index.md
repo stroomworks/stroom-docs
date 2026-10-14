@@ -14,7 +14,7 @@ An [index]({{< relref "../../concepts/lucene-index.md" >}}) is **derived data**.
 Everything in it came from streams in the data store, which means it can be rebuilt as long as those streams are still there.
 That is what makes resetting an index a recoverable operation rather than a loss.
 
-It is also why [data retention]({{< relref "../../concepts/streams.md#data-retention" >}}) policy and index resets are the same conversation.
+It is also why [data retention]({{< relref "../../concepts/streams/_index.md#data-retention" >}}) policy and index resets are the same conversation.
 If the source streams have been deleted, the index is the only copy, and this page does not apply: you are not resetting it, you are destroying it.
 
 
@@ -58,13 +58,12 @@ Plan it like a batch job, not a fix.
 {{< /timing >}}
 
 {{< verify >}}
-After reprocessing, query the index for a count and compare it against what you expect:
-
-```text
-from "MY_INDEX" select count()
-```
+After reprocessing, open the index, go to its **Shards** tab and select refresh.
+The list is empty until you do.
+Add up the **Doc Count** of the shards and compare it against what you expect.
 
 The number should be close to the number of events in the source streams.
+**Doc Count** only includes documents that have been committed, so a shard still being written to can lag behind.
 Not exactly equal, necessarily, since a translation may drop or combine records, but of the right order.
 Then run a real query that was wrong before and confirm it is now right.
 
@@ -108,7 +107,7 @@ Delete the shards first, as in step 3.
 {{< /trap >}}
 
 {{< diagnose >}}
-1. **Is the count still zero well after reprocessing started?**
+1. **Is the shards' document count still zero well after reprocessing started?**
    Check for `Error` streams on the feed before anything else.
    A missing volume group fails here, and only here.
 1. **Did reprocessing actually run?**

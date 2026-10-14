@@ -68,7 +68,9 @@ Whichever you choose, the receiving pipeline's [parser]({{< relref "../../../con
 **Only `gzip` is usable here.**
 Stroom's `Compression` header accepts `ZIP`, `GZIP` and `NONE` only, so `snappy` and `zstd` have no valid counterpart: the data is stored as unparseable bytes and the post still returns `200`.
 
-And as everywhere else, Fluent Bit sets `Content-Encoding`, which Stroom ignores, so the `Compression` header has to be set explicitly whatever you choose.
+With `compress gzip`, Fluent Bit sets `Content-Encoding: gzip`, which Stroom's web server decodes before Stroom reads the body.
+**Leave the `Compression` header at `NONE`.**
+Setting it to `GZIP` as well decompresses the body twice, and every post fails with `500` and `Stroom-Status` `400`.
 {{< /trap >}}
 
 ```text
@@ -82,7 +84,7 @@ And as everywhere else, Fluent Bit sets `Content-Encoding`, which Stroom ignores
     Format   json_lines
     compress gzip
     Header   Feed APP_LOGS
-    Header   Compression GZIP
+    Header   Compression NONE
     Header   Authorization Bearer ${STROOM_TOKEN}
 ```
 
@@ -141,7 +143,7 @@ Then open the feed's **Data** tab in Stroom and find the stream.
 {{< golden >}}
 **The stream is on the feed in Stroom, and its content is readable text.**
 
-Readable matters as much as present: that is what catches the compression trap, which produces a stream that exists and cannot be parsed.
+Readable matters as much as present: a compressed body that reaches Stroom with neither a `Compression` nor a `Content-Encoding` header produces a stream that exists and cannot be parsed.
 {{< /golden >}}
 
 {{< not-proof >}}
@@ -160,8 +162,11 @@ Readable matters as much as present: that is what catches the compression trap, 
    `--dry-run` is available in current releases; check your build's `--help` if it is rejected.
 1. **Is the input producing?**
    Add a temporary `[OUTPUT] Name stdout` with the same `Match` to see what the records actually look like before they are sent.
+1. **Does every post fail with `500` and `Stroom-Status` `400`?**
+   `compress gzip` is on and the `Compression` header says `GZIP`.
+   Set the header back to `NONE`.
 1. **Is the stream present but unreadable?**
-   Check `compress` against the `Compression` header, and check you did not choose `snappy` or `zstd`.
+   Check you did not choose `snappy` or `zstd`.
 1. **Is the token reaching the process?**
    `${STROOM_TOKEN}` is expanded from the environment at config load, so a value set in your shell but not in the service environment resolves to nothing.
 1. **Is data lost across restarts?**

@@ -20,7 +20,7 @@ They share a shape, because the same three questions apply every time:
 * **What does it actually clear?**
   Rarely only the thing you had in mind.
 * **What is lost, and can it be rebuilt?**
-  Most of Stroom's derived data can be rebuilt from the [stream store]({{< relref "../../concepts/streams.md" >}}), which is the strongest argument for keeping raw data.
+  Most of Stroom's derived data can be rebuilt from the [stream store]({{< relref "../../concepts/streams/_index.md" >}}), which is the strongest argument for keeping raw data.
   Some things cannot.
 * **What has to happen afterwards?**
   A reset usually leaves work to redo, and a system that has been reset but not reprocessed looks like a system that has lost data.

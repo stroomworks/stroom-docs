@@ -65,9 +65,13 @@ if (!statSync(SRC, { throwIfNoEntry: false })?.isDirectory())
 /** Every .java file under a directory, for the brute-force scans below. */
 function javaFiles(dir, out = []) {
   for (const entry of readdirSync(dir)) {
-    if (entry === 'build' || entry === '.git' || entry === 'node_modules') continue
+    // .claude holds agent worktrees, whole second copies of the tree; content-cache holds
+    // downloaded content packs. Neither is the source these docs describe.
+    if (['build', '.git', 'node_modules', '.claude', 'content-cache'].includes(entry)) continue
     const full = join(dir, entry)
-    const st = statSync(full)
+    // A dangling symlink has nothing to read.
+    const st = statSync(full, { throwIfNoEntry: false })
+    if (!st) continue
     if (st.isDirectory()) javaFiles(full, out)
     else if (entry.endsWith('.java') && !full.includes('/test/')) out.push(full)
   }
@@ -281,6 +285,10 @@ const JOB_NOTES = {
   'Processor Task Creator': ['Processing', 'cluster',
     'The source of all pipeline processing. With it off, no new tasks are created and ' +
     'processing stops cluster-wide, however many workers are running.'],
+  'Data Processor': ['Processing', 'every',
+    'Runs the processing tasks this node claims. Off on a node, that node processes ' +
+    'nothing; off on every node, tasks are created and queue up but no stream is ever ' +
+    'processed, and nothing reports an error.'],
   'Processor Task Heartbeat': ['Processing', 'every',
     'Marks the tasks this node is working on as alive. Off, this node\'s running tasks ' +
     'look abandoned and another node will take them back and repeat the work.'],
@@ -307,8 +315,6 @@ const JOB_NOTES = {
   'Policy Based Data Retention': ['Data lifecycle', 'cluster',
     'Applies your retention policy. Off, data is kept past its policy, which is usually a ' +
     'compliance question rather than a disk one.'],
-  'Feed Based Data Retention': ['Data lifecycle', 'cluster',
-    'Applies retention set on individual feeds. Off only matters if you set retention per feed.'],
   'Annotation Retention': ['Data lifecycle', 'cluster',
     'Removes annotations past their retention. Off, old annotations stay.'],
   'Attribute Value Data Retention': ['Data lifecycle', 'cluster',
@@ -374,8 +380,6 @@ const JOB_NOTES = {
     'grow quickly and statistic queries slow down.'],
 
   // ---- analytics and reporting
-  'Analytic Executor: Streaming': ['Analytics', 'one',
-    'Runs streaming analytic rules. On only if you use analytics.'],
   'Analytic Executor: Table Builder': ['Analytics', 'one',
     'Builds the tables scheduled analytics query. On only if you use analytics.'],
   'Analytic Executor: Scheduled Query': ['Analytics', 'one',
@@ -450,6 +454,12 @@ function jobs() {
     if (!src.includes('bindJobTo')) continue
 
     for (const m of src.matchAll(/\.bindJobTo\(\s*(\w+)\.class/g)) {
+      // Skip a commented-out binding. Analytic Executor: Streaming is one, and listing it
+      // sent readers looking for a job the Jobs screen does not have.
+      const lineStart = src.lastIndexOf('\n', m.index) + 1
+      if (src.slice(lineStart, m.index).trim().startsWith('//')) continue
+      if (src.lastIndexOf('/*', m.index) > src.lastIndexOf('*/', m.index)) continue
+
       const seg = balanced(src, src.indexOf('(', m.index))
 
       // The name is a literal on most jobs and a constant on about a dozen. Reading only
@@ -483,6 +493,30 @@ function jobs() {
         lock,
       })
     }
+  }
+
+  // Distributed jobs are declared on their task factory rather than bound, and JobBootstrap
+  // creates them disabled unless enableJobsOnBootstrap is set. Data Processor is one: the
+  // first version of this page left out the job that does all pipeline processing.
+  for (const file of files) {
+    const src = readFileSync(file, 'utf8')
+    const at = src.indexOf('@DistributedTaskFactoryDescription(')
+    if (at === -1) continue
+    const body = balanced(src, at + '@DistributedTaskFactoryDescription'.length)
+    const ref = /jobName\s*=\s*([\w.]+)/.exec(body)?.[1]
+    const name =
+      /jobName\s*=\s*"((?:[^"\\]|\\.)*)"/.exec(body)?.[1] ??
+      (ref ? consts.get(ref) ?? consts.get(ref.split('.').slice(-2).join('.')) : undefined)
+    if (!name) throw new Error(`${file}: a distributed job's name could not be resolved (${ref ?? '?'})`)
+    found.push({
+      name,
+      description: annotationString(body, 'description', consts),
+      cron: false,
+      every: null,
+      enabled: false,
+      managed: true,
+      lock: /ClusterLockService/.test(src),
+    })
   }
 
   // Managed jobs are the ones the Jobs screen shows and a user can switch. The rest run
@@ -568,7 +602,7 @@ function jobs() {
     `correct the pipelines are, and nothing says so. It is the first thing to check on a ` +
     `system that receives data happily but never processes any.\n` +
     `{% /callout %}\n\n` +
-    `{% figure capture="StroomJobs.png" alt="The job list in Stroom, 49 jobs, each with a ` +
+    `{% figure capture="StroomJobs.png" alt="The job list in Stroom, each job with a ` +
     `checkbox showing whether it is enabled and a description of what it does. Enabled ` +
     `jobs include Data Delete, Data Processor, Git Repo Push, Node Status, Processor Task ` +
     `Creator, Query History Clean and Account Maintenance." caption="The Jobs screen. The ` +
@@ -1109,8 +1143,11 @@ function responseCodes() {
     `\nEvery post to the datafeed endpoint returns an HTTP status. When something is wrong ` +
     `it also returns a **\`Stroom-Status\`** header carrying the more specific code below, ` +
     `and a **\`Stroom-Error\`** header carrying the reason in words.\n\n` +
-    `On success the response carries a **\`ReceiptId\`**, which identifies that one post ` +
-    `and is what lets you trace a delivery through a chain of proxies.\n\n` +
+    `On success the response body is the post's receipt id, such as ` +
+    `\`1791981748008_0000_S_node1a\`: the receive time, a sequence number, \`S\` for Stroom ` +
+    `or \`P\` for Stroom Proxy, and the node. It is not a header. The same id is stored on ` +
+    `the stream as its \`ReceiptId\` attribute, which is what lets you trace a delivery ` +
+    `through a chain of proxies.\n\n` +
     `**A sender that records none of these cannot tell you why data is missing.** Capture ` +
     `all three.\n\nThere are **${entries.length}** codes.\n` +
     body
@@ -1206,6 +1243,27 @@ const JAVA_TYPES = {
   DocRef: 'Document',
 }
 
+/**
+ * The value of a string attribute of a Java annotation, e.g. `description = ...`.
+ *
+ * A description is a text block, a single literal, or a concatenation of literals and
+ * constants split across lines. Reading only the first literal of a concatenation
+ * silently truncated 53 pipeline element property descriptions and many function
+ * descriptions ("...to connect to, e.g." with the example lost), so the whole
+ * expression, up to the next attribute, is tokenised and its constants resolved.
+ */
+function annotationString(body, key, constants) {
+  const textBlock = new RegExp(`\\b${key}\\s*=\\s*"""([\\s\\S]*?)"""`).exec(body)?.[1]
+  if (textBlock !== undefined) return textBlock
+  const expr = new RegExp(`\\b${key}\\s*=\\s*([\\s\\S]*?)(?=,\\s*\\w+\\s*=|\\n\\s*\\w+\\s*=|\\n?\\s*\\)\\s*$)`).exec(body)?.[1]
+  if (!expr) return undefined
+  const unescape = (t) => t.replace(/\\(["'\\nrt])/g, (_, c) => ({ n: '\n', r: '\r', t: '\t' })[c] ?? c)
+  let joined = ''
+  for (const tok of expr.matchAll(/"((?:[^"\\\n]|\\.)*)"|([A-Za-z_][\w.]*)/g))
+    joined += tok[1] !== undefined ? unescape(tok[1]) : (constants.get(tok[2]) ?? constants.get(tok[2].split('.').slice(-2).join('.')) ?? '')
+  return joined || undefined
+}
+
 function parseElements(files) {
   const constants = stringConstants(files)
   const elements = []
@@ -1227,26 +1285,7 @@ function parseElements(files) {
       // Test-only elements exist in the main source tree but are not for users.
       if (/^Test/.test(type)) continue
 
-      // Most elements put their description in a """ text block, but some use an ordinary
-      // string literal, sometimes concatenated across lines. Reading only text blocks
-      // reported SafeXMLFilter and SqlStoreFilter as undescribed when both describe
-      // themselves perfectly well.
-      const textBlock = /description\s*=\s*"""([\s\S]*?)"""/.exec(body)?.[1]
-      // The expression runs to the next annotation attribute. Taking only the leading run
-      // of string literals truncates SafeXMLFilter, whose description concatenates a
-      // constant between two of them.
-      // The expression runs to the next annotation attribute. Taking only the leading run
-      // of string literals truncates SafeXMLFilter, whose description concatenates a
-      // constant between two of them, so the whole expression is tokenised into string
-      // literals and constant references and those are resolved.
-      const expr = /description\s*=\s*([\s\S]*?)(?=\n\s*\w+\s*=|\n\s*\))/.exec(body)?.[1]
-      const unescape = (t) =>
-        t.replace(/\\(["'\\nrt])/g, (_, c) => ({ n: '\n', r: '\r', t: '\t' })[c] ?? c)
-      let joined = ''
-      if (expr)
-        for (const tok of expr.matchAll(/"((?:[^"\\\n]|\\.)*)"|([A-Za-z_][\w.]*)/g))
-          joined += tok[1] !== undefined ? unescape(tok[1]) : constants.get(tok[2]) ?? ''
-      const description = textBlock ?? (joined || undefined)
+      const description = annotationString(body, 'description', constants)
       const category = /category\s*=\s*(?:\w+\.)*Category\.(\w+)/.exec(body)?.[1] ?? 'INTERNAL'
 
       // Properties live on the setters of the same class.
@@ -1272,7 +1311,7 @@ function parseElements(files) {
 
         properties.push({
           name: setter[1][0].toLowerCase() + setter[1].slice(1),
-          description: prose(/description\s*=\s*"((?:[^"\\]|\\.)*)"/.exec(pBody)?.[1] ?? ''),
+          description: prose(annotationString(pBody, 'description', constants) ?? ''),
           defaultValue,
           valueType: JAVA_TYPES[setter[2]] ?? setter[2],
         })
@@ -1437,8 +1476,8 @@ function expressionFunctions(files) {
         name,
         aliases,
         category,
-        description: prose(/description\s*=\s*"((?:[^"\\]|\\.)*)"/.exec(body)?.[1] ?? ''),
-        returns: prose(/commonReturnDescription\s*=\s*"((?:[^"\\]|\\.)*)"/.exec(body)?.[1] ?? ''),
+        description: prose(annotationString(body, 'description', constants) ?? ''),
+        returns: prose(annotationString(body, 'commonReturnDescription', constants) ?? ''),
       })
     }
   }

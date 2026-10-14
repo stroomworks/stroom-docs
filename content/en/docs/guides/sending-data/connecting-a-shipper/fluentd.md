@@ -87,8 +87,9 @@ Set it explicitly, and make sure the receiving pipeline's [parser]({{< relref ".
 `out_http` gained a `compress` parameter in **v1.17.1**, taking `text` or `gzip`.
 On anything older the option does not exist, so check your version before relying on it.
 
-If you set `compress gzip`, add `"Compression":"GZIP"` to the headers hash.
-Fluentd sets `Content-Encoding`, which Stroom ignores, and the failure is silent.
+If you set `compress gzip`, leave `"Compression":"NONE"` in the headers hash.
+Fluentd sets `Content-Encoding: gzip`, which Stroom's web server decodes before Stroom reads the body.
+Changing `Compression` to `GZIP` as well makes Stroom decompress the body a second time, and every post fails with `500` and `Stroom-Status` `400`.
 
 
 ## Several feeds
@@ -137,8 +138,9 @@ Read what it printed.
    Temporarily add a `@type stdout` match with the same pattern to inspect them.
 1. **Is the buffer growing?**
    The monitor agent exposes queue length and retry counts, which are the signals that matter once this is live.
-1. **Is the stream present but unreadable?**
-   Check `compress` against the `Compression` header, and check your version actually has `compress`.
+1. **Does every post fail with `500` and `Stroom-Status` `400`?**
+   `compress gzip` is set and the headers hash says `"Compression":"GZIP"`.
+   Set it back to `NONE`.
 1. **Does the pipeline expect the wrong shape?**
    Set `json_array` explicitly rather than relying on the default.
 1. **Check parameter names against your installed version**, since this page is written from the plugin documentation rather than from a run.

@@ -5,17 +5,20 @@ weight: 20
 date: 2026-10-14
 tags:
 description: >
-  What to do when new data processes but existing data was never picked up.
+  What to do when a filter's criteria were changed and the older streams they now match are never picked up.
 pageKind: operate
 verification: required
 ---
 
-A [processor filter]({{< relref "../../concepts/processing.md" >}}) scans for data matching its criteria and tracks how far it has got.
-It is that tracker, not the filter itself, that usually needs resetting: a filter can be enabled, correct, and happily processing new arrivals while having never looked at the data that was already there when you created it.
+A [processor filter]({{< relref "../../concepts/processing/_index.md" >}}) scans for data matching its criteria and tracks how far it has got.
+A new filter starts with an empty tracker, so it does pick up streams that were already in the data store when you created it.
+The tracker only moves forward, though, and editing the filter does not reset it.
+If you change a filter's criteria after its tracker has moved past older streams, it never goes back to them: a filter can be enabled, correct, and happily processing new arrivals while never revisiting the streams its new criteria match.
 
 The symptom is specific.
-**New data processes.
-Old data does not.
+**The filter's criteria were changed.
+New data processes.
+Older data that the new criteria match does not.
 Nothing reports an error.**
 
 
@@ -24,7 +27,7 @@ Nothing reports an error.**
 There is no "rewind" control.
 Resetting the tracker means replacing the filter:
 
-1. **Confirm the criteria are right.**
+1. **Confirm the criteria are right now.**
    If the filter's feed or stream type is wrong, it is not a tracker problem and recreating it will change nothing.
 1. **Note what the filter is**: its pipeline, criteria and priority.
    You are about to recreate it by hand.
@@ -45,9 +48,9 @@ After the recreate it should show a position early in the data and advance.
 Then look for output streams whose parents are the old raw streams.
 
 {{< golden >}}
-**Output streams appear with parent streams that predate the filter.**
+**Output streams appear with parent streams that the old tracker had already passed.**
 
-That is the whole point of the reset: processing data older than the filter.
+That is the whole point of the reset: processing data the edited filter would never go back to.
 New output from new data proves nothing, because that was already working.
 {{< /golden >}}
 

@@ -88,14 +88,9 @@ Trying to inject the value alone will not work, and the failure mode is a config
 
 ## Compression
 
-{{< trap severity="silent" >}}
-**`compress="on"` makes omhttp do the standards-compliant thing, which is wrong here.**
-
-It adds `Content-Encoding: gzip`, which Stroom ignores entirely.
-You must also change the `Compression` header in the `httpheaders` array to `GZIP`, or the data lands as unparseable bytes with a `200` response.
-
-This is the clearest example of the mismatch anywhere in these guides: the module is behaving correctly, and it is still wrong for Stroom unless you say so twice.
-{{< /trap >}}
+`compress="on"` makes omhttp add `Content-Encoding: gzip`, which Stroom's web server decodes before Stroom reads the body.
+**Leave the `Compression` header in the `httpheaders` array at `NONE`.**
+Changing it to `GZIP` as well makes Stroom decompress the body a second time, and every post fails with `500` and `Stroom-Status` `400`.
 
 `compress.level` takes `0` to `9`, defaulting to `-1`.
 
@@ -133,7 +128,7 @@ Then open the feed's **Data** tab in Stroom and find the stream.
 {{< golden >}}
 **The stream is on the feed in Stroom, and its content is readable text.**
 
-Readable matters as much as present: that is what catches the compression trap, which produces a stream that exists and cannot be parsed.
+Readable matters as much as present: a compressed body that reaches Stroom with neither a `Compression` nor a `Content-Encoding` header produces a stream that exists and cannot be parsed.
 {{< /golden >}}
 
 {{< not-proof >}}
@@ -155,8 +150,9 @@ Check the destination.
    That is where the `Stroom-Status` ends up.
 1. **Is there a double slash in the URL?**
    A leading slash on `restpath` causes it.
-1. **Is the stream present but unreadable?**
-   Check `compress` against the `Compression` header.
+1. **Does every post fail with `500` and `Stroom-Status` `400`?**
+   `compress` is on and the `Compression` header says `GZIP`, so the body is decompressed twice.
+   Set it back to `NONE`.
 1. **Is the queue growing?**
    That means delivery is failing and being retried, which is the configuration working as intended, masking a problem you still need to fix.
 1. **Check parameter names against your installed version.**

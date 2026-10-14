@@ -31,7 +31,7 @@ For example the element `<Expression>$time < now()</Expression>` would be transf
 
 | Property | Description | Default | Type |
 |---|---|---|---|
-| `tags` | A comma separated list of XML element names (case sensitive) between which non-escaped | - | String |
+| `tags` | A comma separated list of XML element names (case sensitive) between which non-escaped XML characters will be escaped, e.g. '>' => '&gt;'. | - | String |
 
 
 ### BOMRemovalFilterInput
@@ -138,19 +138,19 @@ The Resulting XML will conform to the http://www.w3.org/2013/XSL/json namespace.
 | Property | Description | Default | Type |
 |---|---|---|---|
 | `addRootObject` | Add a root map element. | `true` | Boolean |
-| `allowBackslashEscapingAnyCharacter` | Feature that can be enabled to accept quoting of all character using backslash | `false` | Boolean |
-| `allowComments` | Feature that determines whether parser will allow use of Java/C++ style | `false` | Boolean |
-| `allowMissingValues` | Feature allows the support for \"missing\" values in a JSON array: missing value | `false` | Boolean |
-| `allowNonNumericNumbers` | Feature that allows parser to recognize set of \"Not-a-Number\" (NaN) tokens as | `false` | Boolean |
-| `allowNumericLeadingZeros` | Feature that determines whether parser will allow JSON integral numbers to start | `false` | Boolean |
-| `allowSingleQuotes` | Feature that determines whether parser will allow use of single quotes (apostrophe, | `false` | Boolean |
-| `allowTrailingComma` | Feature that determines whether we will allow for a single trailing comma | `false` | Boolean |
-| `allowUnquotedControlChars` | Feature that determines whether parser will allow JSON Strings to contain unquoted | `false` | Boolean |
-| `allowUnquotedFieldNames` | Feature that determines whether parser will allow use of unquoted field names | `false` | Boolean |
-| `allowYamlComments` | Feature that determines whether parser will allow use of YAML comments, ones | `false` | Boolean |
-| `maxDepth` | Maximum number of levels in the JSON document. An Error will be logged if | `500` | Integer |
-| `maxStringLength` | String values longer than this length will result in an Error being logged, | `100000000` | Integer |
-| `stringTruncateLength` | String values will be truncated to this length. This is to protect Stroom | `10000` | Integer |
+| `allowBackslashEscapingAnyCharacter` | Feature that can be enabled to accept quoting of all character using backslash quoting mechanism: if not enabled, only characters that are explicitly listed by JSON specification can be thus escaped (see JSON spec for small list of these characters) | `false` | Boolean |
+| `allowComments` | Feature that determines whether parser will allow use of Java/C++ style comments (both '/'+'*' and '//' varieties) within parsed content or not. | `false` | Boolean |
+| `allowMissingValues` | Feature allows the support for "missing" values in a JSON array: missing value meaning sequence of two commas, without value in-between but only optional white space. | `false` | Boolean |
+| `allowNonNumericNumbers` | Feature that allows parser to recognize set of "Not-a-Number" (NaN) tokens as legal floating number values (similar to how many other data formats and programming language source code allows it). | `false` | Boolean |
+| `allowNumericLeadingZeros` | Feature that determines whether parser will allow JSON integral numbers to start with additional (ignorable) zeroes (like: 000001). | `false` | Boolean |
+| `allowSingleQuotes` | Feature that determines whether parser will allow use of single quotes (apostrophe, character '\'') for quoting Strings (names and String values). If so, this is in addition to other acceptable markers but not by JSON specification). | `false` | Boolean |
+| `allowTrailingComma` | Feature that determines whether we will allow for a single trailing comma following the final value (in an Array) or member (in an Object). These commas will simply be ignored. | `false` | Boolean |
+| `allowUnquotedControlChars` | Feature that determines whether parser will allow JSON Strings to contain unquoted control characters (ASCII characters with value less than 32, including tab and line feed characters) or not. If feature is set false, an exception is thrown if such a character is encountered. | `false` | Boolean |
+| `allowUnquotedFieldNames` | Feature that determines whether parser will allow use of unquoted field names (which is allowed by Javascript, but not by JSON specification). | `false` | Boolean |
+| `allowYamlComments` | Feature that determines whether parser will allow use of YAML comments, ones starting with '#' and continuing until the end of the line. This commenting style is common with scripting languages as well. | `false` | Boolean |
+| `maxDepth` | Maximum number of levels in the JSON document. An Error will be logged if this is exceeded. | `500` | Integer |
+| `maxStringLength` | String values longer than this length will result in an Error being logged, regardless of the value of stringTruncateLength. Setting this to a very large value effectively disables this. | `100000000` | Integer |
+| `stringTruncateLength` | String values will be truncated to this length. This is to protect Stroom from running out of memory when there are very large string values in the JSON. When a value is truncated a Warning will be logged.Setting this to a very large value effectively disables this. | `10000` | Integer |
 
 
 ### XMLFragmentParser
@@ -206,10 +206,10 @@ A filter consuming XML events in the `records:2` namespace to index/store the fi
 |---|---|---|---|
 | `batchSize` | Maximum number of documents to index in each bulk request. | `10000` | Integer |
 | `cluster` | Target Elasticsearch cluster. | - | Document |
-| `indexName` | Name of the Elasticsearch index. Variables specified such as `{year}` are replaced with | - | String |
+| `indexName` | Name of the Elasticsearch index. Variables specified such as `{year}` are replaced with the corresponding field values contained in the document root. Field names beginning with an underscore are not written to the document and are only used in the index name pattern. | - | String |
 | `ingestPipeline` | Name of the Elasticsearch ingest pipeline to execute when indexing. | - | String |
-| `purgeOnReprocess` | When reprocessing a stream, first delete any documents from the index matching the | `true` | Boolean |
-| `refreshAfterEachBatch` | Refresh the index after each batch is processed, making the indexed documents visible to | `false` | Boolean |
+| `purgeOnReprocess` | When reprocessing a stream, first delete any documents from the index matching the source stream ID. | `true` | Boolean |
+| `refreshAfterEachBatch` | Refresh the index after each batch is processed, making the indexed documents visible to searches. | `false` | Boolean |
 
 
 ### HttpPostFilter
@@ -315,8 +315,8 @@ This ensures that if non-compliant data is generated, it will be flagged as in e
 
 | Property | Description | Default | Type |
 |---|---|---|---|
-| `namespaceURI` | Limits the schemas that can be used to validate data to those with a matching | - | String |
-| `schemaGroup` | Limits the schemas that can be used to validate data to those with a matching | - | String |
+| `namespaceURI` | Limits the schemas that can be used to validate data to those with a matching namespace URI. | - | String |
+| `schemaGroup` | Limits the schemas that can be used to validate data to those with a matching schema group name. | - | String |
 | `schemaLanguage` | The schema language that the schema is written in. | `XMLConstants.W3C_XML_SCHEMA_NS_URI` | String |
 | `schemaValidation` | Should schema validation be performed? | `true` | Boolean |
 | `systemId` | Limits the schemas that can be used to validate data to those with a matching system id. | - | String |
@@ -341,7 +341,7 @@ Delivers source data to the specified index in an external Solr instance/cluster
 | `batchSize` | How many documents to send to the index in a single post. | `1000` | Integer |
 | `commitWithinMs` | Commit indexed documents within the specified number of milliseconds. | `-1` | Integer |
 | `index` | The index to send records to. | - | Document |
-| `softCommit` | Perform a soft commit after every batch so that docs are available for searching | `true` | Boolean |
+| `softCommit` | Perform a soft commit after every batch so that docs are available for searching immediately (if using NRT replicas). | `true` | Boolean |
 
 
 ### SplitFilter
@@ -398,7 +398,7 @@ The specified XSLT can be used to transform the input XML into XML conforming to
 |---|---|---|---|
 | `pipelineReference` | A list of places to load reference data from if required. | - | PipelineReference |
 | `suppressXSLTNotFoundWarnings` | If XSLT cannot be found to match the name pattern suppress warnings. | `false` | Boolean |
-| `usePool` | Advanced: Choose whether or not you want to use cached XSLT templates to improve | `true` | Boolean |
+| `usePool` | Advanced: Choose whether or not you want to use cached XSLT templates to improve performance. | `true` | Boolean |
 | `xslt` | The XSLT to use. | - | Document |
 | `xsltNamePattern` | A name pattern to load XSLT dynamically. | - | String |
 
@@ -440,10 +440,10 @@ Writer to convert XML events data into XML output in the specified character enc
 |---|---|---|---|
 | `encoding` | The output character encoding to use. | `UTF-8` | String |
 | `indentOutput` | Should output XML be indented and include new lines (pretty printed)? | `false` | Boolean |
-| `preventEscapeSwitching` | Some inputs might contain control character 0 which turns off output escaping. | `false` | Boolean |
+| `preventEscapeSwitching` | Some inputs might contain control character 0 which turns off output escaping. Set this to true to prevent that behaviour. | `false` | Boolean |
 | `suppressXSLTNotFoundWarnings` | If XSLT cannot be found to match the name pattern suppress warnings. | `false` | Boolean |
 | `xslt` | A previously saved XSLT, used to modify the output via xsl:output attributes. | - | Document |
-| `xsltNamePattern` | A name pattern for dynamic loading of an XSLT, that will modfy the output via | - | String |
+| `xsltNamePattern` | A name pattern for dynamic loading of an XSLT, that will modfy the output via xsl:output attributes. | - | String |
 
 
 ## Destination
@@ -476,9 +476,9 @@ If multiple paths are specified in the 'outputPaths' property it will pick one a
 
 | Property | Description | Default | Type |
 |---|---|---|---|
-| `compressionMethod` | Compression method to apply, if compression is enabled. Supported values: | `DEFAULT_COMPRESSION_METHOD_PROP_VALUE` | String |
+| `compressionMethod` | Compression method to apply, if compression is enabled. Supported values: . | `DEFAULT_COMPRESSION_METHOD_PROP_VALUE` | String |
 | `filePermissions` | Set file system permissions of finished files (example: 'rwxr--r--') | - | String |
-| `outputPaths` | One or more destination paths for output files separated with commas. | - | String |
+| `outputPaths` | One or more destination paths for output files separated with commas. Replacement variables can be used in path strings such as ${feed}. | - | String |
 | `rollSize` | When the current output file exceeds this size it will be closed and a new one created. | - | String |
 | `splitAggregatedStreams` | Choose if you want to split aggregated streams into separate output files. | `false` | Boolean |
 | `splitRecords` | Choose if you want to split individual records into separate output files. | `false` | Boolean |
@@ -494,9 +494,9 @@ If multiple paths are specified in the 'outputPaths' property it will pick one a
 
 | Property | Description | Default | Type |
 |---|---|---|---|
-| `fileSystemUri` | URI for the Hadoop Distributed File System (HDFS) to connect to, e.g. | - | String |
-| `outputPaths` | One or more destination paths for output files separated with commas. Replacement | - | String |
-| `rollSize` | When the current output file exceeds this size it will be closed | - | String |
+| `fileSystemUri` | URI for the Hadoop Distributed File System (HDFS) to connect to, e.g. hdfs://mynamenode.mydomain.com:8020 | - | String |
+| `outputPaths` | One or more destination paths for output files separated with commas. Replacement variables can be used in path strings such as ${feed}. | - | String |
+| `rollSize` | When the current output file exceeds this size it will be closed and a new one created. | - | String |
 | `runAsUser` | The user to connect to HDFS as | - | String |
 | `splitAggregatedStreams` | Choose if you want to split aggregated streams into separate output files. | `false` | Boolean |
 | `splitRecords` | Choose if you want to split individual records into separate output files. | `false` | Boolean |
@@ -511,37 +511,37 @@ This element should be preferred over the deprecated .
 
 | Property | Description | Default | Type |
 |---|---|---|---|
-| `compressionMethod` | Compression method to apply, if compression is enabled. Supported values: | `DEFAULT_COMPRESSION_METHOD_PROP_VALUE` | String |
-| `connectionRequestTimeout` | Returns the connection lease request timeout used when requesting a connection | - | String |
-| `connectionTimeout` | Determines the timeout until a new connection is fully established. | - | String |
+| `compressionMethod` | Compression method to apply, if compression is enabled. Supported values: . | `DEFAULT_COMPRESSION_METHOD_PROP_VALUE` | String |
+| `connectionRequestTimeout` | Returns the connection lease request timeout used when requesting a connection from the connection manager. Default: 3 minutes. The timeout is specified as either milliseconds, e.g. '60000' or with a duration suffix, e.g. '500ms', '2s', '1m', etc. | - | String |
+| `connectionTimeout` | Determines the timeout until a new connection is fully established. This may also include transport security negotiation exchanges such as SSL or TLS protocol negotiation. A timeout value of zero is interpreted as an infinite timeout. Default: 3 minutes. The timeout is specified as either milliseconds, e.g. '60000' or with a duration suffix, e.g. '500ms', '2s', '1m', etc. | - | String |
 | `contentType` | The content type | `application/json` | String |
-| `forwardChunkSize` | Should data be sent in chunks and if so how big should the chunks be. | - | String |
+| `forwardChunkSize` | Should data be sent in chunks and if so how big should the chunks be. Size is either specified in bytes e.g. '1024' or with a IEC unit suffix, e.g. '1K', '1M', '1G', etc. | - | String |
 | `forwardUrl` | The URL to send data to. | - | String |
-| `hostnameVerificationEnabled` | Set this to true to verify that the destination host name matches against | `true` | Boolean |
+| `hostnameVerificationEnabled` | Set this to true to verify that the destination host name matches against the host names in the certificate supplied by the destination server. | `true` | Boolean |
 | `httpHeadersIncludeStreamMetaData` | Provide stream metadata as HTTP headers | `true` | Boolean |
-| `httpHeadersStreamMetaDataAllowList` | Comma delimited list of stream meta data keys to include as HTTP headers. | - | String |
-| `httpHeadersStreamMetaDataDenyList` | Comma delimited list of stream meta data keys to exclude as HTTP headers. | - | String |
+| `httpHeadersStreamMetaDataAllowList` | Comma delimited list of stream meta data keys to include as HTTP headers. Only works when httpHeadersIncludeStreamMetaData is set to true. If empty all headers are sent, unless httpHeadersStreamMetaDataDenyList is used. If httpHeadersStreamMetaDataAllowList contains keys, httpHeadersStreamMetaDataDenyList is ignored. | - | String |
+| `httpHeadersStreamMetaDataDenyList` | Comma delimited list of stream meta data keys to exclude as HTTP headers. Only works when httpHeadersIncludeStreamMetaData is set to true. If empty all headers are sent, unless httpHeadersStreamMetaDataAllowList is used. If httpHeadersStreamMetaDataAllowList contains keys, httpHeadersStreamMetaDataDenyList is ignored. | - | String |
 | `httpHeadersUserDefinedHeader1` | Additional HTTP Header 1, format is 'HeaderName: HeaderValue' | - | String |
 | `httpHeadersUserDefinedHeader2` | Additional HTTP Header 2, format is 'HeaderName: HeaderValue' | - | String |
 | `httpHeadersUserDefinedHeader3` | Additional HTTP Header 3, format is 'HeaderName: HeaderValue' | - | String |
 | `keyStorePassword` | The key store password | - | String |
 | `keyStorePath` | The key store file path on the server | - | String |
-| `keyStoreType` | The key store type. | `JKS` | String |
-| `logMetaKeys` | Specifies Which meta data keys will have their values logged in the send log. A Comma | `guid,receiptid,feed,system,environment,remotehost,remoteaddress` | String |
-| `readTimeout` | How long to wait for data to be available before closing the connection. | - | String |
-| `requestMethod` | The HTTP request method. Valid values are | `POST` | String |
-| `rollSize` | When the current output exceeds this size it will be closed and a | - | String |
+| `keyStoreType` | The key store type. Valid values are ['JCEKS', 'JKS', 'DKS', 'PKCS11', 'PKCS12']. | `JKS` | String |
+| `logMetaKeys` | Specifies Which meta data keys will have their values logged in the send log. A Comma delimited string of keys. | `guid,receiptid,feed,system,environment,remotehost,remoteaddress` | String |
+| `readTimeout` | How long to wait for data to be available before closing the connection. The timeout is specified as either milliseconds, e.g. '60000' or with a duration suffix, e.g. '500ms', '2s', '1m', etc. | - | String |
+| `requestMethod` | The HTTP request method. Valid values are GET, POST, HEAD, OPTIONS, PUT, DELETE and TRACE. | `POST` | String |
+| `rollSize` | When the current output exceeds this size it will be closed and a new one created. Size is either specified in bytes e.g. '1024' or with a IEC unit suffix, e.g. '1K', '1M', '1G', etc. | - | String |
 | `splitAggregatedStreams` | Choose if you want to split aggregated streams into separate output. | `false` | Boolean |
 | `splitRecords` | Choose if you want to split individual records into separate output. | `false` | Boolean |
 | `sslProtocol` | The SSL protocol to use | `TLSv1.2` | String |
-| `timeout` | Determines the timeout until arrival of a response from the opposite endpoint. | - | String |
-| `timeToLive` | The maximum time a pooled connection can stay idle (not leased to any thread) | - | String |
+| `timeout` | Determines the timeout until arrival of a response from the opposite endpoint. A timeout value of zero is interpreted as an infinite timeout. Default: 3 minutes. The timeout is specified as either milliseconds, e.g. '60000' or with a duration suffix, e.g. '500ms', '2s', '1m', etc. | - | String |
+| `timeToLive` | The maximum time a pooled connection can stay idle (not leased to any thread) before it is shut down. Default: 1 hour. The timeout is specified as either milliseconds, e.g. '60000' or with a duration suffix, e.g. '500ms', '2s', '1m', etc. | - | String |
 | `trustStorePassword` | The trust store password | - | String |
 | `trustStorePath` | The trust store file path on the server | - | String |
-| `trustStoreType` | The trust store type | `JKS` | String |
+| `trustStoreType` | The trust store type Valid values are ['JCEKS', 'JKS', 'DKS', 'PKCS11', 'PKCS12']. | `JKS` | String |
 | `useCompression` | Should data be compressed when sending | `true` | Boolean |
-| `useContentEncodingHeader` | Whether to use the 'Content-Encoding' HTTP header when | `false` | Boolean |
-| `useJvmSslConfig` | Use JVM SSL config. | `true` | Boolean |
+| `useContentEncodingHeader` | Whether to use the 'Content-Encoding' HTTP header when useCompression is 'true'. If 'false' (the default), the 'Compression' header will be used, which is supported by .Stroom/Stroom-Proxy destinations. 'Content-Encoding' would be required for other destinations, but is only applicable for compression types 'gz', 'zstd' or 'deflate'. | `false` | Boolean |
+| `useJvmSslConfig` | Use JVM SSL config. Set this to true if the Stroom node has been configured with key/trust stores using java system properties like 'javax.net.ssl.keyStore'.Set this to false if you are explicitly setting key/trust store properties on this HttpAppender. | `true` | Boolean |
 
 
 ### RollingFileAppender
@@ -556,13 +556,13 @@ On system shutdown all active files will be rolled.
 
 | Property | Description | Default | Type |
 |---|---|---|---|
-| `compressionMethod` | Compression method to apply, if compression is enabled. Supported values: | `CompressorStreamFactory.GZIP` | String |
+| `compressionMethod` | Compression method to apply, if compression is enabled. Supported values: . | `CompressorStreamFactory.GZIP` | String |
 | `fileName` | Choose the name of the file to write. | - | String |
 | `filePermissions` | Set file system permissions of finished files (example: 'rwxr--r--') | - | String |
 | `frequency` | Choose how frequently files are rolled. | `1h` | String |
-| `outputPaths` | One or more destination paths for output files separated with commas. | - | String |
+| `outputPaths` | One or more destination paths for output files separated with commas. Replacement variables can be used in path strings such as ${feed}. | - | String |
 | `rolledFileName` | Choose the name that files will be renamed to when they are rolled. | - | String |
-| `rollSize` | When the current output file exceeds this size it will be closed and a new one | `100M` | String |
+| `rollSize` | When the current output file exceeds this size it will be closed and a new one created, e.g. 10M, 1G. | `100M` | String |
 | `schedule` | Provide a cron expression to determine when files are rolled. | - | String |
 | `useCompression` | Apply GZIP compression to output files | `false` | Boolean |
 
@@ -577,11 +577,11 @@ On system shutdown all active streams will be rolled.
 
 | Property | Description | Default | Type |
 |---|---|---|---|
-| `feed` | The feed that output stream should be written to. If not specified the feed the input | - | Document |
+| `feed` | The feed that output stream should be written to. If not specified the feed the input stream belongs to will be used. | - | Document |
 | `frequency` | Choose how frequently streams are rolled. | `1h` | String |
 | `rollSize` | Choose the maximum size that a stream can be before it is rolled. | `100M` | String |
 | `schedule` | Provide a cron expression to determine when streams are rolled. | - | String |
-| `segmentOutput` | Should the output stream be marked with indexed segments to allow fast access to | `true` | Boolean |
+| `segmentOutput` | Should the output stream be marked with indexed segments to allow fast access to individual records? | `true` | Boolean |
 | `streamType` | The stream type that the output stream should be written as. This must be specified. | - | String |
 | `volumeGroup` | Optionally override the default volume group of the destination feed. | - | String |
 
@@ -596,7 +596,7 @@ A destination used to write an output stream to an S3 bucket.
 |---|---|---|---|
 | `bucketNamePattern` | Set the bucket name pattern if you want to override the one provided by the S3 config. | - | String |
 | `cacheControl` | A general header field used to specify caching policies. | - | String |
-| `compressionMethod` | Compression method to apply, if compression is enabled. Supported values: | `DEFAULT_COMPRESSION_METHOD_PROP_VALUE` | String |
+| `compressionMethod` | Compression method to apply, if compression is enabled. Supported values: . | `DEFAULT_COMPRESSION_METHOD_PROP_VALUE` | String |
 | `contentDisposition` | Object presentational information. | - | String |
 | `contentEncoding` | The content encodings (like compression) that have been applied to the object's data. | - | String |
 | `contentType` | The object type. | - | String |
@@ -617,7 +617,7 @@ For each `<kafkaRecord>` element converts it into a Kafka message that is passed
 
 | Property | Description | Default | Type |
 |---|---|---|---|
-| `flushOnSend` | At the end of the stream, wait for acknowledgement from the Kafka broker for all | `true` | Boolean |
+| `flushOnSend` | At the end of the stream, wait for acknowledgement from the Kafka broker for all the messages sent. This ensures errors are caught in the pipeline process. | `true` | Boolean |
 | `kafkaConfig` | Kafka configuration details relating to where and how to send Kafka messages. | - | Document |
 
 
@@ -630,9 +630,9 @@ The configuration allows for starting a new stream once a size threshold is reac
 
 | Property | Description | Default | Type |
 |---|---|---|---|
-| `feed` | The feed that output stream should be written to. If not specified the feed the input | - | Document |
-| `rollSize` | When the current output stream exceeds this size it will be closed and a | - | String |
-| `segmentOutput` | Should the output stream be marked with indexed segments to allow fast access to | `true` | Boolean |
+| `feed` | The feed that output stream should be written to. If not specified the feed the input stream belongs to will be used. | - | Document |
+| `rollSize` | When the current output stream exceeds this size it will be closed and a new one created. | - | String |
+| `segmentOutput` | Should the output stream be marked with indexed segments to allow fast access to individual records? | `true` | Boolean |
 | `splitAggregatedStreams` | Choose if you want to split aggregated streams into separate output streams. | `false` | Boolean |
 | `splitRecords` | Choose if you want to split individual records into separate output streams. | `false` | Boolean |
 | `streamType` | The stream type that the output stream should be written as. This must be specified. | - | String |

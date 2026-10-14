@@ -16,7 +16,7 @@ It is created from the user interface, or from the command line when the user in
 
 ## Creating one
 
-1. Open **Administration** → **API Keys**.
+1. Open **Security** → **Manage API Keys**.
 1. Create a key, choosing the user it belongs to and when it expires.
 1. **Copy the key now.**
    It is shown once.

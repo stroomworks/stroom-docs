@@ -88,7 +88,7 @@ Resist that: see [Choosing a feed]({{< relref "../choosing-a-feed.md" >}}).
 ## Compression
 
 If you compress content before `InvokeHTTP`, with a `CompressContent` processor set to gzip, set the `Compression` dynamic property to `GZIP`.
-NiFi will not set it for you, and Stroom ignores `Content-Encoding`.
+NiFi will not set it for you: `CompressContent` sets no `Content-Encoding` header, so without `Compression` the gzip bytes are stored as they are.
 
 
 ## Batch shape

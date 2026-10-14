@@ -11,9 +11,9 @@ aliases:
   - /docs/howtos/general/enablingprocessorshowto/
 ---
 
-A [pipeline]({{< relref "pipelines.md" >}}) does nothing on its own.
+A [pipeline]({{< relref "../pipelines.md" >}}) does nothing on its own.
 Data is sent through it by a **processor**, and the processor decides what to send using one or more **processor filters**.
-Each filter is a query over the [stream store]({{< relref "streams.md" >}}): every stream that matches becomes a **task**, and each task runs one stream through the pipeline on one node.
+Each filter is a query over the [stream store]({{< relref "../streams/_index.md" >}}): every stream that matches becomes a **task**, and each task runs one stream through the pipeline on one node.
 
 Because the raw data stays in the stream store after it has been processed, you can run it through a pipeline again at any time.
 That is how you fix a translation: correct it, then reprocess the stored data, with no need to collect it again.
@@ -24,6 +24,8 @@ That is how you fix a translation: correct it, then reprocess the stored data, w
 Processors are managed on the **Processors** tab of a {{< stroom-icon "document/Pipeline.svg" "Pipeline" >}} Pipeline.
 The table shows the processor as a parent row with its filters below it.
 A pipeline can have as many filters as you need, for example one per feed.
+A folder's **Processors** tab shows the same table for every pipeline in the folder.
+[The Processors tab]({{< relref "processors-tab.md" >}}) describes the screen in detail, including why its buttons are greyed out when the processor row rather than a filter row is selected, and who can change it.
 
 Both the processor and the filter have an **Enabled** tick box, and both must be ticked before any data is processed.
 Disabling the processor pauses every filter on the pipeline; disabling one filter pauses only that filter.
@@ -32,7 +34,7 @@ A new filter is created disabled, unless you tick **Enable new filters** when cr
 {{% note %}}
 Processing also depends on two jobs: **Processor Task Creator**, which creates tasks, and **Data Processor**, which runs them on each node.
 If both rows are enabled but nothing happens, check those jobs.
-See [Nodes and jobs]({{< relref "../operate/nodes-and-jobs.md" >}}).
+See [Nodes and jobs]({{< relref "../../operate/nodes-and-jobs.md" >}}).
 {{% /note %}}
 
 
@@ -91,9 +93,9 @@ The **Processors** table shows each filter's progress.
 A filter with a **Max Create Time** becomes `Complete` once it has created tasks for everything up to that time.
 A filter without one never completes: it keeps watching for new streams.
 
-The **Active Tasks** tab of the pipeline lists the tasks themselves.
+The **Active Tasks** tab of the pipeline, feed or folder lists the tasks themselves, finished ones included until they are cleared away; see [The Active Tasks tab]({{< relref "active-tasks-tab.md" >}}).
 If a stream fails, its errors are written to an `Error` stream in the feed.
-[Pipeline debugging]({{< relref "pipeline-debugging.md" >}}) explains how to find them.
+[Pipeline debugging]({{< relref "../pipeline-debugging.md" >}}) explains how to find them.
 
 {{% warning %}}
 The tracker only moves forward.
@@ -121,8 +123,8 @@ A filter with no profile is not restricted.
 ## Processing and reprocessing existing data
 
 This section explains what reprocessing is.
-For the procedure, and what it costs, see [Reprocess data]({{< relref "../operate/resetting/reprocess-data.md" >}}) and [Reset a processor filter]({{< relref "../operate/resetting/reset-a-processor-filter.md" >}}).
-To find out whether processing is working at all, see [Is data processing?]({{< relref "../operate/checking-it-works/is-data-processing.md" >}}).
+For the procedure, and what it costs, see [Reprocess data]({{< relref "../../operate/resetting/reprocess-data.md" >}}) and [Reset a processor filter]({{< relref "../../operate/resetting/reset-a-processor-filter.md" >}}).
+To find out whether processing is working at all, see [Is data processing?]({{< relref "../../operate/checking-it-works/is-data-processing.md" >}}).
 
 You can also create filters from any data browser: the **Data** tab of a feed, a pipeline or a folder.
 Select streams, then click **Process** {{< stroom-icon "process.svg" >}}.
@@ -136,7 +138,7 @@ The dialog sets the new filter's priority (or **Attempt to automatically set pri
   Stroom finds the pipelines that produced them and adds a reprocess filter to each, which runs their input streams through again.
 
 This is the usual way to recover from a translation fault.
-Fix the XSLT or Text Converter, step through a failing stream to check the fix (see [Pipeline debugging]({{< relref "pipeline-debugging.md" >}})), then reprocess the `Error` streams or the bad `Events` streams.
+Fix the XSLT or Text Converter, step through a failing stream to check the fix (see [Pipeline debugging]({{< relref "../pipeline-debugging.md" >}})), then reprocess the `Error` streams or the bad `Events` streams.
 Filters created this way are marked in the **Reprocess** column of the **Processors** table.
 
 
@@ -147,15 +149,17 @@ Those earlier streams are logically deleted, so a feed holds only the latest res
 
 That clean-up covers streams in the stream store only.
 Anything a pipeline sent elsewhere is not withdrawn.
-Documents already written to an index stay there, so reprocessing adds a second copy (see [Reset an index]({{< relref "../operate/resetting/reset-an-index.md" >}})), and files or HTTP posts sent to another system are sent again.
+Documents already written to an index stay there, so reprocessing adds a second copy (see [Reset an index]({{< relref "../../operate/resetting/reset-an-index.md" >}})), and files or HTTP posts sent to another system are sent again.
 Plan for this before reprocessing a large amount of data through a pipeline that indexes or exports.
 
 
 ## Related pages
 
-* [Pipelines]({{< relref "pipelines.md" >}})
-* [Streams]({{< relref "streams.md" >}})
-* [Feeds]({{< relref "feed.md" >}})
-* [Parsers and translation]({{< relref "translation.md" >}})
-* [Pipeline debugging]({{< relref "pipeline-debugging.md" >}})
-* [Nodes and jobs]({{< relref "../operate/nodes-and-jobs.md" >}})
+* [Pipelines]({{< relref "../pipelines.md" >}})
+* [Streams]({{< relref "../streams/_index.md" >}})
+* [Feeds]({{< relref "../feed.md" >}})
+* [Parsers and translation]({{< relref "../translation.md" >}})
+* [Pipeline debugging]({{< relref "../pipeline-debugging.md" >}})
+* [Nodes and jobs]({{< relref "../../operate/nodes-and-jobs.md" >}})
+* [The Processors tab]({{< relref "processors-tab.md" >}}): the screen where processors and filters are managed, and when its buttons are enabled.
+* [The Active Tasks tab]({{< relref "active-tasks-tab.md" >}})

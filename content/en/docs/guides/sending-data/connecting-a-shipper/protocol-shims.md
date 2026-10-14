@@ -19,7 +19,7 @@ This matters because some agents have no generic HTTP output at all.
 Elastic Beats emit only to Elasticsearch, Logstash, Kafka, Redis, a file or the console, so there is no configuration that makes Filebeat post to Stroom directly.
 
 Read [The datafeed contract]({{< relref "../../../reference/the-datafeed-contract.md" >}}) first.
-The compression trap applies to the shim's outbound side exactly as it does everywhere else.
+The compression rules apply to the shim's outbound side exactly as they do everywhere else: declare a compressed body with `Compression` or `Content-Encoding`, never both and never neither.
 
 
 ## Beats estates: an Elasticsearch bulk listener

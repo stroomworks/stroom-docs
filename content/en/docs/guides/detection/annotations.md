@@ -117,6 +117,8 @@ Searches over an index can also show the annotations on each event.
 The same fields, prefixed `annotation:` (for example `annotation:Status` and `annotation:AssignedTo`), can be added as columns, and are listed under **Annotation Fields** in the Query help pane.
 A table of events then shows which have already been looked at, and by whom.
 
+{{< image src="guides/detection/annotations/annotation-fields-on-index.png" alt="A Query document whose StroomQL reads from an index and selects StreamId, EventId, User, annotation:Title and annotation:Status. The help pane on the left lists Annotation Fields alongside Data Sources, Structure and Fields. In the results table, one event has its annotation's title filled in and the other rows have the annotation columns empty." >}}An index query with annotation columns. Events that have an annotation show its fields; events nobody has annotated show them empty, so the same table tells you what still needs looking at.{{< /image >}}
+
 The `annotation()` and `createAnnotation()` [expression functions]({{< relref "../../reference/expression-functions.md#link" >}}) make a link in a table cell that opens an existing annotation, or starts a new one for that row.
 
 
@@ -161,7 +163,7 @@ That view can be showing you what you just typed.
 **An annotation is kept on its own schedule, not the data's.**
 
 Annotations have their own retention, separate from the streams they point at.
-[Data retention]({{< relref "../../concepts/streams.md#data-retention" >}}) can remove the events an annotation links to while the annotation itself remains, leaving a case that refers to evidence no longer held.
+[Data retention]({{< relref "../../concepts/streams/_index.md#data-retention" >}}) can remove the events an annotation links to while the annotation itself remains, leaving a case that refers to evidence no longer held.
 
 If annotations are part of your audit trail, set the two retention periods deliberately and with each other in mind.
 {{< /trap >}}

@@ -47,7 +47,7 @@ Stroom builds its database schemas when it first starts, and nothing responds un
 Open `https://localhost` in a browser and sign in with username `admin` and password `admin`.
 You will have to accept the self-signed certificate.
 
-Then, in the [explorer tree]({{< relref "../concepts/user-interface.md" >}}) on the left, double-click **System** to see every [stream]({{< relref "../concepts/streams.md" >}}) Stroom holds.
+Then, in the [explorer tree]({{< relref "../concepts/user-interface/_index.md" >}}) on the left, double-click **System** to see every [stream]({{< relref "../concepts/streams/_index.md" >}}) Stroom holds.
 There should already be some: the stack runs a log sender that forwards Stroom's own application, user and request logs back into Stroom, and processing is on by default.
 
 {{< golden >}}

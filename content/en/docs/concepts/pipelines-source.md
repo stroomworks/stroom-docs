@@ -10,7 +10,7 @@ pageKind: concept
 ---
 
 In Stroom, data doesn't just "arrive" at a pipeline.
-Instead, pipelines are attached to [streams]({{< relref "streams.md" >}}) of data that have already been stored in the system.
+Instead, pipelines are attached to [streams]({{< relref "streams/_index.md" >}}) of data that have already been stored in the system.
 This document explains the relationship between the Stroom Data Store, Processors, and the Pipeline Source.
 
 
@@ -27,7 +27,7 @@ It handles the low-level details of:
 
 ## How pipelines are triggered
 
-Data is fed into a pipeline via a **Processor Filter** (see [Processor filters and tasks]({{< relref "processing.md" >}})).
+Data is fed into a pipeline via a **Processor Filter** (see [Processor filters and tasks]({{< relref "processing/_index.md" >}})).
 This is the "engine" that drives the work:
 
 1. **Definition**: You create a Processor Filter on a Pipeline and define a set of criteria (e.g., "All streams for Feed 'MY_FEED' with type 'Raw Events'").
@@ -79,7 +79,7 @@ These can be used as "Header" variables in your XSLT transformations.
 When troubleshooting why data isn't being fed into your pipeline, check these meta attributes:
 
 * **Status**: Only streams with a status of `Locked` (while being written) or `Unlocked` (ready for use) can be processed.
-  `Deleted` or `Hidden` streams are ignored.
+  `Deleted` streams, the only other status, are ignored.
 * **Stream type**: Ensure your Processor Filter is looking for the correct type (e.g., `Raw Events` vs `Raw Reference`).
 * **Feed**: The pipeline will only process data associated with the specific Feed(s) defined in the filter.
 

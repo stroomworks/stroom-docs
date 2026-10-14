@@ -14,7 +14,7 @@ aliases:
 A **Lucene Index** is the standard built-in index within Stroom and serves as a primary data source for searching and [dashboards]({{< relref "dashboards.md" >}}).
 An index is analogous to a library catalogue, providing a very fast way to locate specific records or events without scanning through every stream.
 
-The index stores field values and maintains pointers (Stream ID and Event ID) to the original source documents in the [stream store]({{< relref "streams.md" >}}).
+The index stores field values and maintains pointers (Stream ID and Event ID) to the original source documents in the [stream store]({{< relref "streams/_index.md" >}}).
 This allows Stroom to provide instant search results while still being able to "drill down" into the raw data.
 
 
@@ -146,7 +146,7 @@ The full procedure is in [Reset an index]({{< relref "../operate/resetting/reset
 
 Resetting an index is performed by deleting its physical shards:
 
-1. **Disable processing**: First, disable the [Processor Filter]({{< relref "processing.md" >}}) associated with the index to prevent new data from being written during the reset.
+1. **Disable processing**: First, disable the [Processor Filter]({{< relref "processing/_index.md" >}}) associated with the index to prevent new data from being written during the reset.
 1. **Delete shards**:
    * Open the Lucene Index document.
    * Navigate to the **Shards** tab.

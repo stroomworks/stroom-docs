@@ -53,7 +53,7 @@ Its query must read from a **View** (see [StroomQL and data sources]({{< relref 
 
 Which streams the rule sees is set by a processor filter on the **Execution** tab, the same kind of filter that drives pipeline processing.
 The view's **Meta Filter** is the default.
-See [Processing]({{< relref "../../concepts/processing.md" >}}) for how processor filters and tasks work.
+See [Processing]({{< relref "../../concepts/processing/_index.md" >}}) for how processor filters and tasks work.
 
 
 ### Table builder
@@ -90,6 +90,10 @@ Each one has:
 * **Start Time** and **End Time (Optional)**: the bounds of the schedule.
 * **Run as user**: the query runs with this user's permissions.
 
+A new schedule is named `Daily`, runs on the cron expression `0 0 0 * * ?` (midnight every day), has a **Start Time** of now, and starts **disabled**.
+Tick **Enabled** before expecting it to run.
+See [Execution schedules]({{< relref "execution-schedules.md" >}}).
+
 Each run has an execution time (when it actually ran) and an effective execution time (the time the run stands for).
 Relative dates in the query and its time range, such as `day() - 1d` (see [date expressions]({{< relref "../../reference/dates.md#date-expressions" >}})), are worked out from the effective time.
 If the start time is in the past, the schedule works through each missed run in turn, so a new rule can be run over historic data and then carry on from now.
@@ -108,14 +112,18 @@ The **Settings** tab holds:
 * **Level**: Low, Medium, High or Critical.
 * **Status**: Experimental, Testing, Stable or Deprecated.
   This describes the rule's maturity and is carried on its detections.
-* **Include rule documentation**: puts the rule's **Documentation** tab text in its detections as their description.
-  Leave it off if the documentation should not leave Stroom, for example by email.
+* **Include Rule Documentation**: puts the rule's **Documentation** tab text in its detections as their description.
+  It is ticked by default.
+  Untick it if the documentation should not leave Stroom, for example by email.
 * **Feed for errors**: the feed that errors from running the rule are written to.
 
 
 ## Notifications
 
 The **Notifications** tab lists where the rule's detections go.
+A new rule comes with one **Stream** notification, enabled, with **Maximum Notifications** of 100 and no **Destination Feed** set.
+Set its **Destination Feed**, or the rule has nowhere to write its detections.
+
 A rule can have several notifications, each with its own **Destination Type**:
 
 * **Stream**: writes detections to the **Destination Feed** as a `Detections` stream.
@@ -215,9 +223,10 @@ To test against existing data, [reprocess it]({{< relref "../../operate/resettin
    Fix it in the Query document first.
 1. **Is the rule enabled?**
    Saving a rule does not start it.
-1. **Are the executor jobs enabled?**
-   `Analytic Executor: Streaming`, `Analytic Executor: Scheduled Query` and `Analytic Executor: Table Builder` each drive one kind of rule.
-   A disabled executor means that whole kind never runs, with no error.
+1. **Are the jobs that run it enabled?**
+   `Analytic Executor: Scheduled Query` drives scheduled rules and `Analytic Executor: Table Builder` drives table builder rules.
+   Streaming rules run as processor tasks, so they need `Data Processor` and `Processor Task Creator` like any pipeline processing.
+   A disabled job means that whole kind never runs, with no error.
 1. **Is it the right kind of rule for the question?**
    A streaming rule over historical data finds nothing.
    See the trap.
@@ -234,5 +243,5 @@ To test against existing data, [reprocess it]({{< relref "../../operate/resettin
 
 * [StroomQL and data sources]({{< relref "../../concepts/query-language.md" >}}): the query language, data sources and views.
 * [Annotations]({{< relref "annotations.md" >}}): investigating what a rule finds.
-* [Processing]({{< relref "../../concepts/processing.md" >}}): processor filters and tasks.
+* [Processing]({{< relref "../../concepts/processing/_index.md" >}}): processor filters and tasks.
 * [Dashboards]({{< relref "../../concepts/dashboards.md" >}}): searching detections and events visually.

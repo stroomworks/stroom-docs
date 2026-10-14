@@ -85,7 +85,7 @@ See [Pipeline debugging]({{< relref "pipeline-debugging.md" >}}).
 You can find the {{< stroom-icon "step.svg" >}} button in the lower right-hand corner of the Feed Data page.
 
 Pipelines run when a processor filter selects streams for them.
-See [Processor filters and tasks]({{< relref "processing.md" >}}), and [Is data processing?]({{< relref "../operate/checking-it-works/is-data-processing.md" >}}) if nothing seems to happen.
+See [Processor filters and tasks]({{< relref "processing/_index.md" >}}), and [Is data processing?]({{< relref "../operate/checking-it-works/is-data-processing.md" >}}) if nothing seems to happen.
 
 
 ## Summary

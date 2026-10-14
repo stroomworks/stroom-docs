@@ -135,7 +135,7 @@ The above configuration results in the following XML output for the whole input:
     xmlns="records:2"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="records:2 file://records-v2.0.xsd"
-    version="3.0">
+    version="2.0">
   <record>
     <data value="01/01/2010" />
     <data value="00:00:00" />

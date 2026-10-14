@@ -15,15 +15,15 @@ This page closes it.
 
 Data arrives by HTTP POST to the [datafeed endpoint]({{< relref "../../reference/the-datafeed-contract.md" >}}), either directly or through Stroom Proxy.
 The receiving end decides, from the headers and the [feed's configuration]({{< relref "../../concepts/feed.md" >}}), whether to accept it.
-If it accepts, the data becomes a **[stream]({{< relref "../../concepts/streams.md" >}})** on that feed.
+If it accepts, the data becomes a **[stream]({{< relref "../../concepts/streams/_index.md" >}})** on that feed.
 
 
 ## The sender's side of the story
 
-Every post gets an HTTP status and three response headers worth capturing:
+Every post gets an HTTP status, and three more things worth capturing:
 
-* **`ReceiptId`** on success, as `<proxy ID>_<UUID>`.
-  It identifies that one post, and it is what lets you trace a specific delivery through a proxy chain.
+* **The receipt ID** on success, as the response body rather than a header, for example `1791981748008_0000_S_node1a`.
+  It identifies that one post, is stored on the stream as its `ReceiptId` attribute, and is what lets you trace a specific delivery through a proxy chain.
 * **`Stroom-Status`** on failure: a numeric code more specific than the HTTP status.
 * **`Stroom-Error`** on failure: the reason, in words.
   Stroom Proxy reads this off its own downstream responses to log forwarding failures, and it is the quickest way to find out why a post was rejected.
@@ -34,12 +34,11 @@ A sender that records none of them will cheerfully discard data Stroom refused.
 |---|---|---|
 | `200` | `0` | Accepted. |
 | `406` | `100` | No `Feed` header was supplied. |
-| `406` | `101` | The feed is not defined. |
-| `406` | `110` | The feed exists but is not set to receive data. |
+| `406` | `110` | The feed is not set to receive data, **or does not exist at all**. A direct post cannot tell the two apart. |
 | `406` | `113` | Rejected by a data receipt policy rule. |
-| `401` | `300`, `301` | A client certificate or token is required and was not supplied. |
-| `403` | `3xx` | The credential was supplied but is not authorised for this feed. |
-| `413` | `500` | The content is larger than the configured limit. |
+| `401` | `300` to `304` | No credential was supplied. `302`, *Client token or certificate required*, is the usual one. |
+| `401` | `310` to `315` | A credential was supplied but was not accepted, for example an expired data feed key (`314`). |
+| `413` | `410` | The content is larger than the configured limit. |
 | `500` | `400` | The compressed stream is invalid, truncated or corrupt. |
 
 There are [more than twenty codes]({{< relref "../../reference/response-codes.md" >}}) in total; this is the set you meet in practice.
@@ -75,14 +74,14 @@ It defaults to a time range, and data with an older create time will not be list
 {{< /verify >}}
 
 {{< trap severity="silent" >}}
-**A feed set to `DROP` returns `200` and discards the data.**
+**A feed set to Drop returns `200` and discards the data.**
 
 A feed's status has three values.
-`RECEIVE` stores the data.
-`REJECT` refuses it with a `406`, so the sender finds out.
-**`DROP` accepts the post, answers `200`, and throws the data away**: by design, for shedding traffic you do not want without making the sender retry.
+**Receive** stores the data.
+**Reject** refuses it with `406` and `Stroom-Status` `110`, so the sender finds out.
+**Drop accepts the post, answers `200`, and throws the data away**, with effect from the moment you save it: by design, for shedding traffic you do not want without making the sender retry.
 
-Nothing about the sender's view distinguishes `DROP` from success.
+Nothing about the sender's view distinguishes **Drop** from success.
 If data is vanishing with no errors anywhere, check the feed's status first.
 {{< /trap >}}
 
@@ -92,14 +91,15 @@ If data is vanishing with no errors anywhere, check the feed's status first.
    If the sender does not record them, reproduce the post with `curl -v` and read them yourself.
    Most arrival problems are answered here, and `Stroom-Error` usually answers them in one line.
 1. **Is the feed set to receive?**
-   Open the feed, **Settings** tab, check **Feed Status** is `RECEIVE`.
-   `DROP` is the quiet one: see above.
+   Open the feed, **Settings** tab, check **Feed Status** is **Receive**.
+   **Drop** is the quiet one: see above.
 1. **Did a receipt rule reject it?**
    A `Stroom-Status` of `113` means a data receipt policy rule matched.
    Check the rules under the receipt configuration, not the feed.
 1. **Was the `Feed` header right?**
    Feed names are exact.
-   A typo gives `100` or `101`, not a helpful message about a near match.
+   A typo in a direct post gives `110`, exactly as if the feed were set to **Reject**, not a helpful message about a near match.
+   If the status is **Receive** and you still get `110`, check the spelling of the `Feed` header against the feed's name.
 1. **If you are posting through a proxy, is it forwarding?**
    Look at the proxy's repository: data that arrived but has not been forwarded is still on its disk.
    Check the proxy's own admin health endpoint and its logs for forwarding failures.
@@ -107,7 +107,7 @@ If data is vanishing with no errors anywhere, check the feed's status first.
 1. **Is the Data tab's filter hiding it?**
    Widen the time range before concluding the stream is absent.
 1. **Is this an authentication problem that looks like something else?**
-   A `401` or `403` with a `3xx` status code is about the certificate, token or data feed key, not about the feed's configuration.
+   A `401` with a `3xx` status code is about the certificate, token or data feed key, not about the feed's configuration.
 {{< /diagnose >}}
 
 

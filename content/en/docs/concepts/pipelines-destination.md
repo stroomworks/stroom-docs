@@ -19,7 +19,7 @@ The most common destination for pipeline output is back into Stroom's own data s
 This allows for multi-stage processing.
 For example, Normalisation -> Enrichment -> Indexing.
 
-* {{< pipe-elm "StreamAppender" >}}: Writes the output as a new [stream]({{< relref "streams.md" >}}).
+* {{< pipe-elm "StreamAppender" >}}: Writes the output as a new [stream]({{< relref "streams/_index.md" >}}).
   You must specify:
   * **Feed**: Which [feed]({{< relref "feed.md" >}}) the new data belongs to.
   * **Stream type**: Typically `Events` (for processed data) or `Context`.
@@ -47,7 +47,7 @@ For example, "What was the last known IP for this user?".
 
 * {{< pipe-elm "PlanBFilter" >}}: Instead of writing to a stream or index, this filter writes data into an **LMDB (Lightning Memory-Mapped Database)** shard.
 * **How it works**:
-  1. The pipeline processes data (often with a `Reference Data` stream type).
+  1. The pipeline processes data (often `Reference` or `Raw Reference` streams).
   1. The {{< pipe-elm "PlanBFilter" >}} at the end of the pipe populates an LMDB map (State, Temporal State, Session, etc.).
   1. Once the pipeline completes, the shard is uploaded to storage nodes for central merging.
 * **Usage**: Other pipelines can then perform ultra-fast lookups against these Plan B maps using the [`stroom:lookup()`]({{< relref "../reference/xslt-functions/reference-data.md" >}}) XSLT function or the [`getState()`]({{< relref "../reference/expression-functions.md" >}}) Dashboard function.
