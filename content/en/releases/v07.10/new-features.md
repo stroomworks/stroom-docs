@@ -12,7 +12,7 @@ description: >
 
 ### `ceilingTime(..)` & `floorTime(...)`
 
-Two new functions similar to the existing [`ceilingXXX`]({{< relref "docs/reference-section/expressions/date#ceiling-yearmonthdayhourminutesecond" >}}) and [`floorXXX`]({{< relref "docs/reference-section/expressions/date#floor-yearmonthdayhourminutesecond" >}}) functions, except that an arbitrary duration can be used.
+Two new functions similar to the existing [`ceilingXXX`]({{< relref "/docs/reference/expression-functions.md" >}}) and [`floorXXX`]({{< relref "/docs/reference/expression-functions.md" >}}) functions, except that an arbitrary duration can be used.
 
 For example, `floorTime($time, 'PT5m')` will floor the time to the latest time that is divisible by 5 minutes.
 
@@ -37,7 +37,7 @@ if (input == test1) {
 }
 ```
 
-See [case]({{< relref "docs/reference-section/expressions/logic#case" >}}) for details.
+See [case]({{< relref "/docs/reference/expression-functions.md" >}}) for details.
 
 
 ### `formatIECByteSize(...)`
@@ -70,7 +70,7 @@ formatMetricByteSize(bytes, omitTrailingZeros, significantFigures)
 
 ### `decode(...)`
 
-The existing [`decode(...)`]({{< relref "docs/reference-section/expressions/string#decode" >}}) function has been changed so that you can use any capture groups in the regular expression patterns in the result arguments.
+The existing [`decode(...)`]({{< relref "/docs/reference/expression-functions.md" >}}) function has been changed so that you can use any capture groups in the regular expression patterns in the result arguments.
 For example:
 
 ```clike
@@ -82,7 +82,7 @@ Which would output `String-123`.
 
 ### `data(...)`
 
-The existing [`data(...)`]({{< relref "docs/reference-section/expressions/link#data" >}}) function has been changed so that you can display the stream info and metadata instead of the stream data by setting the `viewType` argument to a value of `info`.
+The existing [`data(...)`]({{< relref "/docs/reference/expression-functions.md" >}}) function has been changed so that you can display the stream info and metadata instead of the stream data by setting the `viewType` argument to a value of `info`.
 
 For example:
 
@@ -111,9 +111,9 @@ parse-dateTime(string, pattern)
 parse-dateTime(string, pattern, timezone)
 ```
 
-This function will either parse a date/time string in {{< glossary "ISO8601" >}} standard date/time format or in a custom date/time format using the supplied pattern and optional timezone.
+This function will either parse a date/time string in {{< glossary "iso-8601" "ISO8601" >}} standard date/time format or in a custom date/time format using the supplied pattern and optional timezone.
 
-For details of the pattern syntax see [Custom Date Formats]({{< relref "docs/reference-section/dates#custom-date-formats" >}}).
+For details of the pattern syntax see [Custom Date Formats]({{< relref "/docs/reference/dates.md#custom-date-formats" >}}).
 
 All forms of the function return an `xs:dateTime` value for use by standard XSLT/XPath functions that can consume an `xs:dateTime` value.
 
@@ -129,9 +129,9 @@ format-dateTime(DateTimeValue, pattern, timezone)
 ```
 
 All three variants take an `xs:dateTime` value as the first argument.
-If only one argument is supplied, the function will output the date/time as a standard {{< glossary "ISO8601" >}} format `xs:string`.
-If two or more arguments are supplied then it will output the date/time formatted using the specified [pattern]({{< relref "docs/reference-section/dates#custom-date-formats" >}}) and optionally using the specified timezone.
-If no timezone is supplied, the date/time is assumed to be in {{< glossary "UTC" >}}.
+If only one argument is supplied, the function will output the date/time as a standard {{< glossary "iso-8601" "ISO8601" >}} format `xs:string`.
+If two or more arguments are supplied then it will output the date/time formatted using the specified [pattern]({{< relref "/docs/reference/dates.md#custom-date-formats" >}}) and optionally using the specified timezone.
+If no timezone is supplied, the date/time is assumed to be in {{< glossary "coordinated-universal-time-utc" "UTC" >}}.
 
 
 ### Meta Functions

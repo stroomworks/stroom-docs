@@ -89,3 +89,16 @@ This will then apply all of tags added to `tags` to each descendant page.
 
 A short description of what the page/section covers.
 This will be shown on the index page of its parent.
+
+
+## Page contract keys
+
+Pages in the `docs` section carry some extra keys, which the build checks: `pageKind` (always), `verification` (on pages that tell the reader to do something), and optionally `status`, `betaNote` and `thirdParty`.
+
+```yaml
+pageKind: guide
+verification: required
+thirdParty: "Fluent Bit"
+```
+
+See [Page Contract]({{< relref "page-contract" >}}) for what each one means and what the build enforces.

@@ -1,0 +1,47 @@
+<svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+  <style>svg{--bg:#ffffff;--surface-2:#eef1f5;--hair-strong:#c6ccd6;--fg:#14161a;--fg-muted:#576070;--fg-faint:#646d7c;--accent:#bb4b00;--accent-tint:#fff1e6;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:#ffffff}</style>
+  <defs>
+    <marker id="is-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L8 4 L0 8 z" fill="var(--fg-faint)"/>
+    </marker>
+  </defs>
+  <g font-size="13">
+    <g transform="translate(0 92)">
+      <rect width="130" height="56" rx="5" fill="var(--surface-2)" stroke="var(--hair-strong)" stroke-width="1.5"/>
+      <text x="65" y="33" text-anchor="middle" fill="var(--fg)" font-weight="600">A search</text>
+    </g>
+
+    <g transform="translate(190 92)">
+      <rect width="150" height="56" rx="5" fill="var(--surface-2)" stroke="var(--hair-strong)" stroke-width="1.5"/>
+      <text x="75" y="25" text-anchor="middle" fill="var(--fg)" font-weight="600">The index</text>
+      <text x="75" y="44" text-anchor="middle" fill="var(--fg-muted)" font-size="12">matches on indexed fields</text>
+    </g>
+
+    <g stroke="var(--fg-faint)" stroke-width="1.5" fill="none" marker-end="url(#is-arrow)">
+      <path d="M130 120 L182 120"/>
+      <path d="M340 110 L370 110 L370 46 L402 46"/>
+      <path d="M340 130 L370 130 L370 190 L402 190"/>
+      <path d="M560 190 L592 190"/>
+    </g>
+
+    <!-- stored: comes straight back -->
+    <g transform="translate(410 16)">
+      <rect width="300" height="60" rx="5" fill="none" stroke="var(--hair-strong)" stroke-width="1.5"/>
+      <text x="16" y="26" fill="var(--fg)" font-weight="600">Stored field</text>
+      <text x="16" y="46" fill="var(--fg-muted)" font-size="12">the value is in the index, so it returns at once</text>
+    </g>
+
+    <!-- not stored: extraction reads the stream back -->
+    <g transform="translate(410 160)">
+      <rect width="150" height="60" rx="5" fill="var(--accent-tint)" stroke="var(--accent)" stroke-width="1.5"/>
+      <text x="75" y="25" text-anchor="middle" fill="var(--fg)" font-weight="600">Not stored</text>
+      <text x="75" y="44" text-anchor="middle" fill="var(--accent)" font-size="12">extraction pipeline</text>
+    </g>
+    <g transform="translate(600 160)">
+      <rect width="118" height="60" rx="5" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text x="59" y="25" text-anchor="middle" fill="var(--fg)" font-weight="600">The source</text>
+      <text x="59" y="44" text-anchor="middle" fill="var(--fg-muted)" font-size="12">stream</text>
+    </g>
+    <text x="410" y="244" fill="var(--fg-muted)" font-size="12">If retention has removed that stream, the column comes back empty.</text>
+  </g>
+</svg>

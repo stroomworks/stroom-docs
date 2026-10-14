@@ -1,0 +1,70 @@
+<svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+  <style>svg{--bg:#ffffff;--surface-2:#eef1f5;--hair-strong:#c6ccd6;--fg:#14161a;--fg-muted:#576070;--fg-faint:#646d7c;--accent:#bb4b00;--accent-tint:#fff1e6;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:#ffffff}</style>
+  <g font-size="13">
+    <!-- row 1: every node -->
+    <text x="0" y="36" fill="var(--fg)" font-weight="600">Every node</text>
+    <text x="0" y="54" fill="var(--fg-muted)" font-size="12">acts on this node's own</text>
+    <text x="0" y="70" fill="var(--fg-muted)" font-size="12">caches, files and tasks</text>
+    <g transform="translate(230 18)">
+      <g>
+        <rect width="120" height="58" rx="5" fill="var(--accent-tint)" stroke="var(--accent)" stroke-width="1.5"/>
+        <text x="60" y="26" text-anchor="middle" fill="var(--fg)" font-weight="600">Node A</text>
+        <text x="60" y="44" text-anchor="middle" fill="var(--accent)" font-size="12">runs</text>
+      </g>
+      <g transform="translate(140 0)">
+        <rect width="120" height="58" rx="5" fill="var(--accent-tint)" stroke="var(--accent)" stroke-width="1.5"/>
+        <text x="60" y="26" text-anchor="middle" fill="var(--fg)" font-weight="600">Node B</text>
+        <text x="60" y="44" text-anchor="middle" fill="var(--accent)" font-size="12">runs</text>
+      </g>
+      <g transform="translate(280 0)">
+        <rect width="120" height="58" rx="5" fill="var(--accent-tint)" stroke="var(--accent)" stroke-width="1.5"/>
+        <text x="60" y="26" text-anchor="middle" fill="var(--fg)" font-weight="600">Node C</text>
+        <text x="60" y="44" text-anchor="middle" fill="var(--accent)" font-size="12">runs</text>
+      </g>
+    </g>
+
+    <!-- row 2: one at a time -->
+    <text x="0" y="136" fill="var(--fg)" font-weight="600">One at a time</text>
+    <text x="0" y="154" fill="var(--fg-muted)" font-size="12">enabled everywhere; the</text>
+    <text x="0" y="170" fill="var(--fg-muted)" font-size="12">cluster lock elects one</text>
+    <g transform="translate(230 118)">
+      <g>
+        <rect width="120" height="58" rx="5" fill="var(--accent-tint)" stroke="var(--accent)" stroke-width="1.5"/>
+        <text x="60" y="26" text-anchor="middle" fill="var(--fg)" font-weight="600">Node A</text>
+        <text x="60" y="44" text-anchor="middle" fill="var(--accent)" font-size="12">holds the lock</text>
+      </g>
+      <g transform="translate(140 0)">
+        <rect width="120" height="58" rx="5" fill="none" stroke="var(--hair-strong)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="60" y="26" text-anchor="middle" fill="var(--fg-muted)" font-weight="600">Node B</text>
+        <text x="60" y="44" text-anchor="middle" fill="var(--fg-faint)" font-size="12">skips this turn</text>
+      </g>
+      <g transform="translate(280 0)">
+        <rect width="120" height="58" rx="5" fill="none" stroke="var(--hair-strong)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="60" y="26" text-anchor="middle" fill="var(--fg-muted)" font-weight="600">Node C</text>
+        <text x="60" y="44" text-anchor="middle" fill="var(--fg-faint)" font-size="12">skips this turn</text>
+      </g>
+    </g>
+
+    <!-- row 3: one node -->
+    <text x="0" y="236" fill="var(--fg)" font-weight="600">One node</text>
+    <text x="0" y="254" fill="var(--fg-muted)" font-size="12">shared state, no lock, so</text>
+    <text x="0" y="270" fill="var(--fg-muted)" font-size="12">one is enough</text>
+    <g transform="translate(230 218)">
+      <g>
+        <rect width="120" height="58" rx="5" fill="var(--accent-tint)" stroke="var(--accent)" stroke-width="1.5"/>
+        <text x="60" y="26" text-anchor="middle" fill="var(--fg)" font-weight="600">Node A</text>
+        <text x="60" y="44" text-anchor="middle" fill="var(--accent)" font-size="12">enabled</text>
+      </g>
+      <g transform="translate(140 0)">
+        <rect width="120" height="58" rx="5" fill="none" stroke="var(--hair-strong)" stroke-width="1.5"/>
+        <text x="60" y="26" text-anchor="middle" fill="var(--fg-muted)" font-weight="600">Node B</text>
+        <text x="60" y="44" text-anchor="middle" fill="var(--fg-faint)" font-size="12">off</text>
+      </g>
+      <g transform="translate(280 0)">
+        <rect width="120" height="58" rx="5" fill="none" stroke="var(--hair-strong)" stroke-width="1.5"/>
+        <text x="60" y="26" text-anchor="middle" fill="var(--fg-muted)" font-weight="600">Node C</text>
+        <text x="60" y="44" text-anchor="middle" fill="var(--fg-faint)" font-size="12">off</text>
+      </g>
+    </g>
+  </g>
+</svg>

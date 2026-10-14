@@ -1,0 +1,11 @@
+{{- /*
+What looks like confirmation but is not. Must be inside a verify block.
+Usage: {{< not-proof >}} ... {{< /not-proof >}}
+See style-guide/page-contract.md.
+*/ -}}
+{{- /* Hugo only allows a closing tag on a shortcode whose own template uses .Inner. */ -}}
+{{- if not .Inner }}{{ errorf "%s: %s has no content" .Position .Name }}{{ end -}}
+{{- if not (and .Parent (eq .Parent.Name "verify")) -}}
+  {{- errorf "%s: not-proof must be inside a verify block" .Position -}}
+{{- end -}}
+{{- partial "contract-block.html" (dict "sc" . "kind" "not-proof" "label" "This does not prove it worked") -}}

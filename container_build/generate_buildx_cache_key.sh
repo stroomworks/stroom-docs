@@ -74,7 +74,7 @@ main() {
   local_repo_root="$(git rev-parse --show-toplevel)"
   
   echo "Creating cache key with" \
-    "user_id: ${user_id}, group_id: ${group_id}" > /dev/stderr
+    "user_id: ${user_id}, group_id: ${group_id}" >&2
 
   files=(
     "${local_repo_root}/container_build/runInHugoDocker.sh" \
@@ -98,7 +98,7 @@ main() {
   # Gen the sha256 for each file so we can spot which files are different
   if [[ "${debug:-false}" = true && "${is_mac_os}" = false ]]; then
     for file in "${files[@]}"; do
-      sha256sum "${file}" > /dev/stderr
+      sha256sum "${file}" >&2
     done
     echo -e "${cache_key_source}" > "/tmp/hugo_source_$(date -u +"%FT%H%M%S")"
   fi

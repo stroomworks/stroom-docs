@@ -1,0 +1,44 @@
+<svg viewBox="0 0 680 260" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+  <style>svg{--bg:#ffffff;--surface-2:#eef1f5;--hair-strong:#c6ccd6;--fg:#14161a;--fg-muted:#576070;--fg-faint:#646d7c;--accent:#bb4b00;--accent-tint:#fff1e6;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:#ffffff}</style>
+  <defs>
+    <marker id="cp-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L8 4 L0 8 z" fill="var(--fg-faint)"/>
+    </marker>
+  </defs>
+  <g font-size="13">
+    <!-- the three sources, strongest first -->
+    <g transform="translate(0 16)">
+      <rect width="300" height="60" rx="5" fill="var(--accent-tint)" stroke="var(--accent)" stroke-width="1.5"/>
+      <text x="18" y="26" fill="var(--fg)" font-weight="600">The configuration file</text>
+      <text x="18" y="46" fill="var(--fg-muted)" font-size="12">on this node, under appConfig</text>
+      <text x="282" y="36" text-anchor="end" fill="var(--accent)" font-weight="600">wins</text>
+    </g>
+    <g transform="translate(0 96)">
+      <rect width="300" height="60" rx="5" fill="var(--surface-2)" stroke="var(--hair-strong)" stroke-width="1.5"/>
+      <text x="18" y="26" fill="var(--fg)" font-weight="600">The Properties screen</text>
+      <text x="18" y="46" fill="var(--fg-muted)" font-size="12">cluster-wide, stored in the database</text>
+    </g>
+    <g transform="translate(0 176)">
+      <rect width="300" height="60" rx="5" fill="var(--surface-2)" stroke="var(--hair-strong)" stroke-width="1.5"/>
+      <text x="18" y="26" fill="var(--fg)" font-weight="600">The default</text>
+      <text x="18" y="46" fill="var(--fg-muted)" font-size="12">built into the software</text>
+    </g>
+
+    <!-- precedence runs upward -->
+    <g stroke="var(--fg-faint)" stroke-width="1.5" fill="none" marker-end="url(#cp-arrow)">
+      <path d="M330 206 L330 110"/>
+      <path d="M330 126 L330 50"/>
+    </g>
+    <text x="344" y="86" fill="var(--fg-muted)" font-size="12">each one above</text>
+    <text x="344" y="104" fill="var(--fg-muted)" font-size="12">overrides the one below</text>
+
+    <!-- the consequence -->
+    <g transform="translate(400 96)">
+      <rect width="280" height="112" rx="5" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text x="18" y="28" fill="var(--accent)" font-weight="600">So, if the file sets it</text>
+      <text x="18" y="52" fill="var(--fg-muted)" font-size="12">editing the Properties screen</text>
+      <text x="18" y="70" fill="var(--fg-muted)" font-size="12">saves your value and changes</text>
+      <text x="18" y="88" fill="var(--fg-muted)" font-size="12">nothing. No conflict is reported.</text>
+    </g>
+  </g>
+</svg>

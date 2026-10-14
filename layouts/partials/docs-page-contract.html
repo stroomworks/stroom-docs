@@ -1,0 +1,63 @@
+{{- /*
+Checks a documentation page's front matter against the page contract, and renders the
+banners that front matter asks for. Called from layouts/docs/list.html and
+layouts/docs/content.html, after the page description.
+
+The checks fail the build, naming the file, because Stroom fails silently in many places
+and a page that tells the reader to do something must also tell them how to know it
+worked. Skipping that has to be a visible decision in a diff, not an omission.
+See content/en/community/documentation/style-guide/page-contract.md.
+
+  pageKind      required: tutorial | concept | guide | reference | operate
+  verification  required for tutorial, guide and operate (required | not-applicable);
+                not allowed on the others. "required" means the page has a verify block.
+  status        optional: stable (default) | beta. beta renders a banner.
+  betaNote      optional sentence added to the beta banner.
+  thirdParty    optional tool name. Renders a provenance banner; needs verification: required.
+*/ -}}
+{{- /* Only the docs section has a contract; community and the rest share these layouts. */ -}}
+{{- if and .File (eq .Section "docs") -}}
+{{- $page := . -}}
+{{- $file := .File.Path -}}
+{{- $kinds := slice "tutorial" "concept" "guide" "reference" "operate" -}}
+{{- $instructs := slice "tutorial" "guide" "operate" -}}
+{{- $kind := $page.Params.pageKind -}}
+{{- $verification := $page.Params.verification -}}
+{{- $status := $page.Params.status | default "stable" -}}
+
+{{- if not (in $kinds $kind) -}}
+  {{- errorf "%s: pageKind %q is not one of %s" $file $kind (delimit $kinds ", ") -}}
+{{- end -}}
+{{- if in $instructs $kind -}}
+  {{- if not (in (slice "required" "not-applicable") $verification) -}}
+    {{- errorf "%s: pageKind %q instructs the reader, so it needs verification: required | not-applicable" $file $kind -}}
+  {{- end -}}
+{{- else if $verification -}}
+  {{- errorf "%s: pageKind %q does not instruct the reader, so verification does not apply" $file $kind -}}
+{{- end -}}
+{{- if and (eq $verification "required") (not ($page.HasShortcode "verify")) -}}
+  {{- errorf "%s: front matter says verification: required, but the page has no verify block. Add one, or say verification: not-applicable and mean it." $file -}}
+{{- end -}}
+{{- if not (in (slice "stable" "beta") $status) -}}
+  {{- errorf "%s: status %q is not stable or beta" $file $status -}}
+{{- end -}}
+{{- if and $page.Params.thirdParty (ne $verification "required") -}}
+  {{- errorf "%s: thirdParty needs verification: required; an unrun config snippet is exactly where the reader must be able to check it worked" $file -}}
+{{- end -}}
+
+{{- if eq $status "beta" }}
+<div class="pageinfo pageinfo-warning contract-banner">
+<p><strong>Not in a Stroom release yet.</strong>
+This page describes work in progress that is not yet in a released version of Stroom.
+{{- with $page.Params.betaNote }} {{ . | markdownify }}{{ end }}</p>
+</div>
+{{- end -}}
+
+{{- with $page.Params.thirdParty }}
+<div class="pageinfo pageinfo-info contract-banner">
+<p><strong>Where these facts came from.</strong>
+The Stroom side of this page is verified against the Stroom source.
+The {{ . }} configuration is written from {{ . }}&rsquo;s own documentation and has not been run here, and its options move between releases: treat it as a starting point and check it against your version.</p>
+</div>
+{{- end -}}
+{{- end -}}

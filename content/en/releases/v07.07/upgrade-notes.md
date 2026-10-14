@@ -55,7 +55,7 @@ All other nodes will wait until that is complete before proceeding with the boot
 
 It is recommended however to use a single node to execute the migration.
 To avoid Stroom starting up and beginning processing you can use the `migrage` command to just migrate the database and not fully boot Stroom.
-See [`migrage` command]({{< relref "/docs/user-guide/tools/command-line#migrate" >}}) for more details.
+See [`migrage` command]({{< relref "/docs/guides/automation/command-line.md" >}}) for more details.
 
 
 <!-- 

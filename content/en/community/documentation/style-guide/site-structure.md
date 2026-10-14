@@ -37,6 +37,24 @@ A single page describing what stroom is.
 #### Documentation (`docs`)
 
 This is where all the documentation for installing, administering and using stroom is located.
+It is split into five sections by what the reader is doing, not by which part of Stroom the page is about:
+
+| Section       | Directory      | The reader is...                          | Typical page                                   |
+|---------------|----------------|-------------------------------------------|------------------------------------------------|
+| Get Started   | `get-started/` | following a thread, start to finish       | Install for evaluation, send your first data   |
+| Concepts      | `concepts/`    | building a mental model                   | Streams, pipelines, reference data             |
+| Guides        | `guides/`      | doing a specific job                      | Connecting a shipper, building an index        |
+| Reference     | `reference/`   | looking one thing up                      | Pipeline elements, configuration properties    |
+| Operate       | `operate/`     | installing, running, fixing or resetting  | Troubleshooting, resetting an index            |
+
+When adding a page, decide which of these the reader is doing first; that decides the section.
+A page that explains a model and also tells you how to do something is usually two pages: a concept and a guide.
+
+Every page in `docs` declares what kind of page it is in its front matter, and pages that tell the reader to do something must also say how to tell it worked.
+See [Page Contract]({{< relref "page-contract" >}}).
+
+Some pages in `reference/` are generated from the Stroom source and must not be edited by hand.
+See [Building the Documentation]({{< relref "../building#regenerating-the-reference-pages" >}}).
 
 
 #### News/Releases (`news`)

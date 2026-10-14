@@ -861,3 +861,81 @@ h6[id]::before {
 Auto numbering end
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+
+// The page-contract blocks: timing, verify (with golden and not-proof inside it), trap
+// and diagnose. See content/en/community/documentation/style-guide/page-contract.md.
+// They are deliberately loud: a reader skimming for "how do I know this worked?" should
+// find the answer without reading the prose around it.
+//
+// Explicit colours rather than $success/$warning/$danger, which Docsy maps to blue and
+// to one shared red: a silent failure and a destructive one need to look different.
+$contract-check: #2e7d32;       // green 800: how to tell it worked
+$contract-silent: $stroom-dirty-amber;
+$contract-destructive: #c62828; // red 800: loses data, or cannot be undone
+$contract-timing: $stroom-blue;
+
+.contract {
+  border: 1px solid $gray-300;
+  border-left-width: 4px;
+  border-radius: 0.25rem;
+  padding: 0.75rem 1rem;
+  margin: 1.5rem 0;
+  max-width: 80%;
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  .contract-label {
+    font-weight: $font-weight-bold;
+    margin-bottom: 0.5rem;
+  }
+
+  .contract-aside {
+    font-style: italic;
+    color: $gray-700;
+  }
+
+  // golden and not-proof sit inside a verify block, so they are narrower and lighter.
+  .contract {
+    max-width: none;
+    margin: 1rem 0;
+  }
+}
+
+.contract-timing {
+  border-left-color: $contract-timing;
+}
+
+.contract-verify {
+  border-left-color: $contract-check;
+}
+
+.contract-golden {
+  border-left-color: $contract-check;
+  background-color: rgba($contract-check, 0.07);
+}
+
+.contract-not-proof {
+  border-left-color: $contract-silent;
+  background-color: rgba($contract-silent, 0.07);
+}
+
+.contract-trap {
+  border-left-color: $contract-silent;
+}
+
+.contract-trap-destructive,
+.contract-trap-immutable {
+  border-left-color: $contract-destructive;
+}
+
+.contract-diagnose {
+  border-left-color: $gray-600;
+}
+
+@media print {
+  .contract {
+    max-width: none;
+  }
+}

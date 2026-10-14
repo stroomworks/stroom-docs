@@ -1,0 +1,12 @@
+{{- /*
+How long this should take, and whether it is asynchronous.
+Usage: {{< timing mode="async" >}} ... {{< /timing >}}   (mode: immediate | async)
+See style-guide/page-contract.md.
+*/ -}}
+{{- /* Hugo only allows a closing tag on a shortcode whose own template uses .Inner. */ -}}
+{{- if not .Inner }}{{ errorf "%s: %s has no content" .Position .Name }}{{ end -}}
+{{- $mode := .Get "mode" -}}
+{{- if not (in (slice "immediate" "async") $mode) -}}
+  {{- errorf "%s: timing mode %q is not one of immediate, async" .Position $mode -}}
+{{- end -}}
+{{- partial "contract-block.html" (dict "sc" . "kind" "timing" "label" (cond (eq $mode "async") "How long: not immediate" "How long: immediate")) -}}

@@ -16,7 +16,7 @@ The existing {{< glossary "cron" >}}/frequency scheduler was quite simplistic an
 The cron format has changed from a three value cron expression (e.g. `* * *` to run every minute) to six value one.
 Existing three value cron expressions will be migrated to the new syntax when deploying Stroom v7.4.
 
-For full details of the new scheduler see [Scheduler]({{< relref "docs/user-guide/jobs/scheduler" >}})
+For full details of the new scheduler see [Scheduler]({{< relref "/docs/reference/jobs.md" >}})
 
 {{< image "releases/07.04/schedule-icon.png" "700x" >}}New cron schedule format.{{< /image >}}
 {{< cardpane >}}
@@ -30,12 +30,12 @@ For full details of the new scheduler see [Scheduler]({{< relref "docs/user-guid
 ### Keyboard Shortcuts
 
 Various new keyboard shortcuts for performing actions in Stroom.
-See [Keyboard Shortcuts]({{< relref "/docs/reference-section/keyboard-shortcuts" >}}) for details.
+See [Keyboard Shortcuts]({{< relref "/docs/reference/keyboard-shortcuts.md" >}}) for details.
 
 * Add the keyboard shortcut {{< key-bind "ctrl+enter" >}} to the code pane of the stepper to perform a _step refresh_ {{< stroom-icon name="refresh.svg" colour="green">}}.
 * Add the keyboard shortcut {{< key-bind "ctrl+enter" >}} to the Dashboards to execute all queries.
 * Add multiple _Goto_ type shortcuts to jump directly to a screen.
-  See [Direct Access to Screens]({{< relref "/docs/reference-section/keyboard-shortcuts#direct-access-to-screens" >}}) for details.
+  See [Direct Access to Screens]({{< relref "/docs/reference/keyboard-shortcuts.md#direct-access-to-screens" >}}) for details.
 
 
 ### Documentation

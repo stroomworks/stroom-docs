@@ -86,6 +86,27 @@ The image can be defined with a maximum width (e.g. `"300x"`) or a maximum heigh
 {{</* image "style-guide/svg-logo.svg" "120x" /*/>}}
 ```
 
+
+### Alt text
+
+By default the image's alt text is its file name, which tells a screen reader user nothing.
+Use the named parameters `src`, `size` (optional) and `alt` to describe what the image shows.
+Describe what the reader is meant to see in it, not just what it is.
+
+**Example:**
+
+{{< image src="style-guide/svg-logo.svg" size="120x" alt="The W3C SVG logo: the letters SVG over a stylised orange flower." />}}
+
+**Markdown:**
+
+```markdown
+{{</* image src="style-guide/svg-logo.svg" size="120x" alt="The W3C SVG logo: the letters SVG over a stylised orange flower." /*/>}}
+```
+
+{{% note %}}
+Positional and named parameters cannot be mixed in one shortcode call.
+{{% /note %}}
+
 ### .png files
 
 `.png` files can be rendered in their original size by omitting the size argument.

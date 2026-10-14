@@ -1,7 +1,7 @@
 # See this link for details of how this is put together
 # https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md
 # https://pptr.dev/guides/docker 
-FROM node:22-bullseye-slim
+FROM node:22-trixie-slim
 
 # Configure default locale (important for chrome-headless-shell).
 ENV LANG=en_US.UTF-8  
@@ -22,15 +22,19 @@ RUN userdel -r node \
   && apt-get install -y \
      wget \
     gnupg \
-  && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-  && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+  # apt-key is gone from Debian 13, so the key goes in its own keyring, referenced by the
+  # repository's signed-by option, which also limits the key to that one repository.
+  && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub \
+    | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg \
+  && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" \
+    > /etc/apt/sources.list.d/google.list \
   && apt-get update \
   && apt-get install -y --no-install-recommends \
     google-chrome-stable \
     fonts-ipafont-gothic \
     fonts-wqy-zenhei \
     fonts-thai-tlwg \
-    fonts-kacst \
+    fonts-kacst-one \
     fonts-freefont-ttf \
     libxss1 \
     dbus \
@@ -74,12 +78,15 @@ RUN echo "USER_ID: [$USER_ID]" \
   && if [ -n "${user_name}" ]; then echo "Found user [${user_name}] with id ${USER_ID}"; fi \
   && if [ -z "${user_name}" ]; then echo "Creating user [builder] with id ${USER_ID}"; fi \
   && if [ -z "${user_name}" ]; then adduser --uid "$USER_ID" --system --shell /bin/false --disabled-password --ingroup  "${group_name}" builder; fi \
-  && adduser builder audio \
-  && adduser builder video \
   && if [ ! -n "${user_name}" ]; then user_name="builder"; fi \
   && echo "user_name: [$user_name]" \
-  && mkdir -p "/home/${user_name}/Downloads" \
-  && chown -R "${USER_ID}:${GROUP_ID}" "/home/${user_name}" \
+  && adduser "${user_name}" audio \
+  && adduser "${user_name}" video \
+  && home_dir="/home/${user_name}" \
+  && if [ "${USER_ID}" = "0" ]; then home_dir="/root"; fi \
+  && echo "home_dir: [$home_dir]" \
+  && mkdir -p "${home_dir}/Downloads" \
+  && chown -R "${USER_ID}:${GROUP_ID}" "${home_dir}" \
   && chown -R "${USER_ID}:${GROUP_ID}" ./node_modules \
   && chown -R "${USER_ID}:${GROUP_ID}" ./package.json \
   && chown -R "${USER_ID}:${GROUP_ID}" ./package-lock.json \

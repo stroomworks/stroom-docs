@@ -1,0 +1,9 @@
+{{- /*
+How to tell it worked: specific, observable, falsifiable.
+Usage: {{< verify >}} ... {{< golden >}}...{{< /golden >}} {{< not-proof >}}...{{< /not-proof >}} {{< /verify >}}
+A page with `verification: required` in its front matter must have one.
+See style-guide/page-contract.md.
+*/ -}}
+{{- /* Hugo only allows a closing tag on a shortcode whose own template uses .Inner. */ -}}
+{{- if not .Inner }}{{ errorf "%s: %s has no content" .Position .Name }}{{ end -}}
+{{- partial "contract-block.html" (dict "sc" . "kind" "verify" "label" "Check it worked") -}}

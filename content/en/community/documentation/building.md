@@ -22,6 +22,8 @@ If you cannot or do not want to install Docker and buildx on your local machine 
 {{% /note %}}
 
 Docker or Docker Desktop is required as all the build steps are performed in docker containers to ensure a consistent and known build environment.
+Both rootful and {{< external-link "rootless" "https://docs.docker.com/engine/security/rootless/" >}} docker are supported.
+The scripts detect which one is running (see `container_build/docker_env.sh`) and choose the container user so that files written into the repository are owned by you.
 It also ensures that the local build environment matches that used in GitHub actions.
 
 `docker-buildx` is a plugin for docker that allows caching of the docker images to speed up the build process.
@@ -241,9 +243,52 @@ To test the PDF generation, run this from the repository root:
 {{</ command-line >}}
 
 
+### Regenerating the reference pages
+
+Some pages in `content/en/docs/reference/` are lists that the Stroom source already holds, so they are generated from it rather than written by hand:
+
+* `documents.md` - every document type.
+* `jobs.md` - every scheduled job.
+* `response-codes.md` - every datafeed response code.
+* `pipeline-elements.md` - every pipeline element and its properties.
+* `expression-functions.md` - every dashboard and StroomQL function.
+* `configuration-properties.md` - every configuration property and its default value.
+
+The same run regenerates the element to icon map in `layouts/shortcodes/pipe-elm.html` (used by the `pipe-elm` shortcode) and copies the element and document type icons into `assets/images/stroom-ui/`.
+
+{{% warning %}}
+Do not edit these pages by hand.
+Any change will be lost the next time they are generated.
+Change the generator (`scripts/docs/gen-docs-reference.mjs`) or, for descriptions, the Stroom source.
+{{% /warning %}}
+
+Re-run the generator when the version of Stroom these docs describe changes.
+It needs a checkout of the Stroom repository at that version:
+
+{{< command-line >}}
+./generate_reference_docs.sh ../stroom
+{{</ command-line >}}
+
+This uses a local `node` (version 16 or later) if there is one and otherwise runs in the same docker image as the Hugo build.
+The output is committed, so neither the site build nor CI need the Stroom source.
+A page keeps its `aliases`, and keeps its `date` unless its content changed, so a run against an unchanged Stroom produces no diff.
+Review the diff before committing it.
+
+Document type descriptions are not in the Stroom source.
+They come from `data/stroom/documents.json`.
+
+The generator writes each page in the Markdoc dialect it was originally written for, then converts it with `scripts/docs/lib/markdoc-to-hugo.mjs`.
+That is the same conversion the restructured documentation was migrated with (`scripts/docs/migrate-from-markdoc.mjs`), so generated pages follow the same house style as the rest.
+
+
 ## Updating the Docsy theme
 
 The Docsy theme is a dependency of this Hugo site. See {{< external-link "Update the Hugo Docsy Module" "https://www.docsy.dev/docs/updating/updating-hugo-module/" >}} for details on how to update the version of the Docsy theme.
+
+{{% note %}}
+`layouts/docs/list.html` and `layouts/docs/content.html` are copies of Docsy's own layouts with one line added, the call to the `docs-page-contract.html` partial that renders the page-contract banners and checks.
+When Docsy is upgraded, re-copy those two files from the new version and add that line back.
+{{% /note %}}
 
 In those instructions when it says to run a `hugo` command you need to do it from within the hugo docker container.
 

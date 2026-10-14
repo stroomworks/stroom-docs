@@ -1,5 +1,4 @@
-<!-- 
-{{/*
+{{- /*
 Short code to add a html <a> link tag with a globe icon to indicate it is an external link.
 Supports replacing '@@VERSION@@' with the value of 'version' from config.toml. This
 allows us to have links to versioned gh-pages sites and not have to change them on each release.
@@ -15,24 +14,20 @@ e.g.:
 {{< external-link "BBC News" "https://www.bbc.co.uk/news" />}}
 {{< external-link "https://www.bbc.co.uk/news" />}}
 
-*/}}
--->
+*/ -}}
 
-{{ $versionTag := "@@VERSION@@" }}
-{{ $stroomVersion := $.Site.Params.version }}
-{{ $text := replace (.Get 0) $versionTag $stroomVersion }}
-{{ $url := "" }}
-{{ $title := "" }}
-{{ if not (.Get 1) }}
-  {{ $url = $text }}
-  {{ $title = printf "External link to %s" $url }}
-{{ else }}
-  {{ $url = replace (.Get 1) $versionTag $stroomVersion }}
-  {{ $title = printf "%s (external link to %s)" $text $url }}
-{{ end }}
-<span class="external-link">
-  <a href="{{ $url }}" target="_blank" class="" style="" title="{{- $title }}">
-    <span>{{- $text -}}</span>
-    <i class="external-link-icon fas fa-external-link-alt fa-sm text-secondary"></i>
-  </a>
-</span>
+{{- $versionTag := "@@VERSION@@" -}}
+{{- $stroomVersion := $.Site.Params.version -}}
+{{- $text := replace (.Get 0) $versionTag $stroomVersion -}}
+{{- $url := "" -}}
+{{- $title := "" -}}
+{{- if not (.Get 1) -}}
+  {{- $url = $text -}}
+  {{- $title = printf "External link to %s" $url -}}
+{{- else -}}
+  {{- $url = replace (.Get 1) $versionTag $stroomVersion -}}
+  {{- $title = printf "%s (external link to %s)" $text $url -}}
+{{- end -}}
+{{- /* One line, with no blank lines, so it is safe inside the Inner of any block shortcode. */ -}}
+<span class="external-link"><a href="{{ $url }}" target="_blank" class="" style="" title="{{ $title }}"><span>{{ $text }}</span><i class="external-link-icon fas fa-external-link-alt fa-sm text-secondary"></i></a></span>
+{{- /* Strip trailing newline. */ -}}

@@ -70,7 +70,7 @@ You can now change the format used for displaying the date and time in the user 
 You can also set the time zone used for displaying the date and time in the user interface.
 
 {{% note %}}
-Stroom works in {{< glossary "UTC" >}} time internally.
+Stroom works in {{< glossary "coordinated-universal-time-utc" "UTC" >}} time internally.
 Changing the time zone only affects display of dates/times, not how data is stored or the dates/times in events.
 {{% /note %}}
 
@@ -127,8 +127,8 @@ The document and folder permissions screens have been re-designed with a better 
 
 ### Editor Completion snippets
 
-The number of available [editor completion snippets]({{< relref "docs/user-guide/content/editing-text#auto-completion-and-snippets" >}}) has increased.
-For a list of the available completion snippets see the [Completion Snippet Reference]({{< relref "docs/reference-section/snippet-reference" >}}).
+The number of available [editor completion snippets]({{< relref "/docs/guides/content-management.md" >}}) has increased.
+For a list of the available completion snippets see the [Completion Snippet Reference]({{< relref "/docs/reference/snippet-reference.md" >}}).
 
 {{% note %}}
 Completion snippets are an evolving feature so if you have an requests for generic completion snippets then raise an issue on GitHub and we will consider adding them in.
@@ -235,7 +235,7 @@ These can be useful for providing documentation within a folder in the tree to c
 It is not possible to add documentation to a folder entity itself, so this is useful substitute.
 
 {{% see-also %}}
-See [Documenting Content]({{< relref "/docs/user-guide/content/documentation" >}}) for details on the Markdown syntax.
+See [Documenting Content]({{< relref "/docs/guides/content-management.md" >}}) for details on the Markdown syntax.
 {{% /see-also %}}
 
 
@@ -248,7 +248,7 @@ It defines the location and authentication details for connecting to an elastic 
 {{< image "releases/07.02/elastic-cluster.png" "200x" />}}
 
 {{% see-also %}}
-[Using Elasticsearch to index data]({{< relref "/docs/user-guide/indexing/elasticsearch" >}}) and [searching an Elasticsearch index]({{< relref "/docs/user-guide/search/data-sources/elastic-data-source" >}})
+[Using Elasticsearch to index data]({{< relref "/docs/guides/indexing/elasticsearch.md" >}}) and [searching an Elasticsearch index]({{< relref "/docs/guides/indexing/elasticsearch.md" >}})
 {{% /see-also %}}
 
 Thanks to Pete K for his help adding the new Elasticsearch integration features.
@@ -261,7 +261,7 @@ An _Elastic Index_ {{< stroom-icon "document/ElasticIndex.svg">}} document is a 
 {{< image "releases/07.02/elastic-index.png" "200x" />}}
 
 {{% see-also %}}
-[Searching an Elasticsearch index]({{< relref "/docs/user-guide/search/data-sources/elastic-data-source" >}})
+[Searching an Elasticsearch index]({{< relref "/docs/guides/indexing/elasticsearch.md" >}})
 {{% /see-also %}}
 
 
@@ -302,7 +302,7 @@ These discovered field are then available for the user to pick from in the _Dash
 _ElasticIndexingFilter_ is used to pass fields from an event to an Elasticsearch cluster to index.
 
 {{% see-also %}}
-[Using Elasticsearch to index data]({{< relref "/docs/user-guide/indexing/elasticsearch" >}}).
+[Using Elasticsearch to index data]({{< relref "/docs/guides/indexing/elasticsearch.md" >}}).
 {{% /see-also %}}
 
 
@@ -434,7 +434,7 @@ The documentation is written in {{< glossary "Markdown" >}} syntax.
 It is not possible to add documentation to a _Folder_ but you can create one or more a _Documentation_ entities as a child item of that folder, see [Documentation]({{< relref "#_documentation_" >}}).
 
 {{% see-also %}}
-See [Documenting Content]({{< relref "/docs/user-guide/content/documentation" >}}) for details on the Markdown syntax.
+See [Documenting Content]({{< relref "/docs/guides/content-management.md" >}}) for details on the Markdown syntax.
 {{% /see-also %}}
 
 

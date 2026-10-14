@@ -84,7 +84,7 @@ To create a default version of this file run this script from within the root of
 
 This will create `./local.yml` using `stroom-app/dev.yml` as a template.
 So that you can run a multi-node cluster it will also create `./local2.yml` and `./local3.yml` as well.
-These files are not source controlled so you can make any changes you like to them, e.g. setting log levels or altering stroom property [property values]({{< relref "configuring-stroom" >}})  values.
+These files are not source controlled so you can make any changes you like to them, e.g. setting log levels or altering stroom property [property values]({{< relref "/docs/operate/configuration.md" >}})  values.
 
 
 ## stroom-resources

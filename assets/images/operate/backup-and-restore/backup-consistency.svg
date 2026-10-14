@@ -1,0 +1,57 @@
+<svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+  <style>svg{--bg:#ffffff;--surface-2:#eef1f5;--hair-strong:#c6ccd6;--fg:#14161a;--fg-muted:#576070;--fg-faint:#646d7c;--accent:#bb4b00;--accent-tint:#fff1e6;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:#ffffff}</style>
+  <g font-size="13">
+    <!-- the pair, taken together -->
+    <text x="0" y="14" fill="var(--fg-faint)" font-size="12">TAKEN TOGETHER</text>
+    <g transform="translate(0 24)">
+      <rect width="200" height="52" rx="5" fill="var(--surface-2)" stroke="var(--hair-strong)" stroke-width="1.5"/>
+      <text x="16" y="23" fill="var(--fg)" font-weight="600">Database</text>
+      <text x="16" y="41" fill="var(--fg-muted)" font-size="12">rows describing streams</text>
+    </g>
+    <g transform="translate(220 24)">
+      <rect width="200" height="52" rx="5" fill="var(--surface-2)" stroke="var(--hair-strong)" stroke-width="1.5"/>
+      <text x="16" y="23" fill="var(--fg)" font-weight="600">Volumes</text>
+      <text x="16" y="41" fill="var(--fg-muted)" font-size="12">the files those rows name</text>
+    </g>
+    <g transform="translate(440 24)">
+      <rect width="280" height="52" rx="5" fill="none" stroke="var(--hair-strong)" stroke-width="1.5"/>
+      <text x="16" y="31" fill="var(--fg-muted)" font-size="12">Restores to a system that is true</text>
+    </g>
+
+    <!-- metadata ahead of the files -->
+    <text x="0" y="112" fill="var(--fg-faint)" font-size="12">DATABASE NEWER THAN THE FILES</text>
+    <g transform="translate(0 122)">
+      <rect width="200" height="52" rx="5" fill="var(--accent-tint)" stroke="var(--accent)" stroke-width="1.5"/>
+      <text x="16" y="23" fill="var(--fg)" font-weight="600">Database</text>
+      <text x="16" y="41" fill="var(--accent)" font-size="12">names streams</text>
+    </g>
+    <g transform="translate(220 122)">
+      <rect width="200" height="52" rx="5" fill="none" stroke="var(--hair-strong)" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text x="16" y="23" fill="var(--fg-muted)" font-weight="600">Volumes</text>
+      <text x="16" y="41" fill="var(--fg-faint)" font-size="12">the files are not there</text>
+    </g>
+    <g transform="translate(440 122)">
+      <rect width="280" height="52" rx="5" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+      <text x="16" y="23" fill="var(--accent)" font-size="12">Searches find them.</text>
+      <text x="16" y="41" fill="var(--fg-muted)" font-size="12">Reading one fails.</text>
+    </g>
+
+    <!-- files ahead of the metadata -->
+    <text x="0" y="210" fill="var(--fg-faint)" font-size="12">FILES NEWER THAN THE DATABASE</text>
+    <g transform="translate(0 220)">
+      <rect width="200" height="52" rx="5" fill="none" stroke="var(--hair-strong)" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text x="16" y="23" fill="var(--fg-muted)" font-weight="600">Database</text>
+      <text x="16" y="41" fill="var(--fg-faint)" font-size="12">no row for them</text>
+    </g>
+    <g transform="translate(220 220)">
+      <rect width="200" height="52" rx="5" fill="var(--accent-tint)" stroke="var(--accent)" stroke-width="1.5"/>
+      <text x="16" y="23" fill="var(--fg)" font-weight="600">Volumes</text>
+      <text x="16" y="41" fill="var(--accent)" font-size="12">hold the files</text>
+    </g>
+    <g transform="translate(440 220)">
+      <rect width="280" height="52" rx="5" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+      <text x="16" y="23" fill="var(--accent)" font-size="12">Invisible, and never reclaimed:</text>
+      <text x="16" y="41" fill="var(--fg-muted)" font-size="12">deletion is driven by metadata too.</text>
+    </g>
+  </g>
+</svg>

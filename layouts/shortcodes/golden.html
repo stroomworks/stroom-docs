@@ -1,0 +1,11 @@
+{{- /*
+The one check worth running above all others for this area. Must be inside a verify block.
+Usage: {{< golden >}} ... {{< /golden >}}
+See style-guide/page-contract.md.
+*/ -}}
+{{- /* Hugo only allows a closing tag on a shortcode whose own template uses .Inner. */ -}}
+{{- if not .Inner }}{{ errorf "%s: %s has no content" .Position .Name }}{{ end -}}
+{{- if not (and .Parent (eq .Parent.Name "verify")) -}}
+  {{- errorf "%s: golden must be inside a verify block" .Position -}}
+{{- end -}}
+{{- partial "contract-block.html" (dict "sc" . "kind" "golden" "label" "The check that matters most") -}}

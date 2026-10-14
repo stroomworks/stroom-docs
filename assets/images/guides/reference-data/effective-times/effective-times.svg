@@ -1,0 +1,81 @@
+<svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+  <style>svg{--bg:#ffffff;--surface-2:#eef1f5;--hair-strong:#c6ccd6;--fg:#14161a;--fg-muted:#576070;--fg-faint:#646d7c;--accent:#bb4b00;--accent-tint:#fff1e6;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:#ffffff}</style>
+  <defs>
+    <marker id="et-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L8 4 L0 8 z" fill="var(--accent)"/>
+    </marker>
+  </defs>
+
+  <!-- reference streams, each effective from its point on the line -->
+  <g font-size="13">
+    <g transform="translate(96 20)">
+      <rect width="168" height="52" rx="4" fill="var(--surface-2)" stroke="var(--hair-strong)" stroke-width="1.5"/>
+      <rect width="3" height="52" rx="1.5" fill="var(--hair-strong)"/>
+      <text x="14" y="21" fill="var(--fg)" font-weight="600">1 January</text>
+      <text x="14" y="40" fill="var(--fg-muted)">10.1.4.7 → Cardiff</text>
+    </g>
+    <g transform="translate(316 20)">
+      <rect width="168" height="52" rx="4" fill="var(--surface-2)" stroke="var(--hair-strong)" stroke-width="1.5"/>
+      <rect width="3" height="52" rx="1.5" fill="var(--hair-strong)"/>
+      <text x="14" y="21" fill="var(--fg)" font-weight="600">1 June</text>
+      <text x="14" y="40" fill="var(--fg-muted)">10.1.4.7 → Bristol</text>
+    </g>
+    <g transform="translate(540 20)">
+      <rect width="196" height="52" rx="4" fill="var(--surface-2)" stroke="var(--hair-strong)" stroke-width="1.5"/>
+      <rect width="3" height="52" rx="1.5" fill="var(--hair-strong)"/>
+      <text x="14" y="21" fill="var(--fg)" font-weight="600">1 October</text>
+      <text x="14" y="40" fill="var(--fg-muted)">10.1.4.7 → Bristol, rack 4</text>
+    </g>
+  </g>
+  <text x="8" y="42" font-size="12" fill="var(--fg-faint)">Reference</text>
+  <text x="8" y="58" font-size="12" fill="var(--fg-faint)">streams</text>
+
+  <!-- each stream drops to the moment it becomes effective -->
+  <g stroke="var(--hair-strong)" stroke-dasharray="3 3" stroke-width="1.5">
+    <line x1="100" y1="72" x2="100" y2="124"/>
+    <line x1="320" y1="72" x2="320" y2="124"/>
+    <line x1="544" y1="72" x2="544" y2="124"/>
+  </g>
+
+  <!-- time -->
+  <line x1="40" y1="130" x2="736" y2="130" stroke="var(--hair-strong)" stroke-width="2"/>
+  <g fill="var(--hair-strong)">
+    <circle cx="100" cy="130" r="5"/><circle cx="320" cy="130" r="5"/><circle cx="544" cy="130" r="5"/>
+  </g>
+  <text x="700" y="118" font-size="12" fill="var(--fg-faint)">time</text>
+
+  <!-- the lookup walks back along the line to the newest stream not after the event -->
+  <g stroke="var(--accent)" stroke-width="1.5" fill="none" marker-end="url(#et-arrow)">
+    <path d="M220 160 L220 148 L108 148"/>
+    <path d="M440 160 L440 148 L328 148"/>
+    <path d="M660 160 L660 148 L552 148"/>
+  </g>
+  <g fill="var(--accent)">
+    <circle cx="220" cy="130" r="4"/><circle cx="440" cy="130" r="4"/><circle cx="660" cy="130" r="4"/>
+  </g>
+
+  <!-- events -->
+  <g font-size="13">
+    <g transform="translate(152 190)">
+      <rect width="136" height="52" rx="4" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+      <text x="14" y="21" fill="var(--fg)" font-weight="600">Event, 10 Mar</text>
+      <text x="14" y="40" fill="var(--accent)">Cardiff</text>
+    </g>
+    <g transform="translate(372 190)">
+      <rect width="136" height="52" rx="4" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+      <text x="14" y="21" fill="var(--fg)" font-weight="600">Event, 10 Jul</text>
+      <text x="14" y="40" fill="var(--accent)">Bristol</text>
+    </g>
+    <g transform="translate(578 190)">
+      <rect width="162" height="52" rx="4" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+      <text x="14" y="21" fill="var(--fg)" font-weight="600">Event, yesterday</text>
+      <text x="14" y="40" fill="var(--accent)">Bristol, rack 4</text>
+    </g>
+  </g>
+  <g stroke="var(--accent)" stroke-width="1.5">
+    <line x1="220" y1="134" x2="220" y2="190"/>
+    <line x1="440" y1="134" x2="440" y2="190"/>
+    <line x1="660" y1="134" x2="660" y2="190"/>
+  </g>
+  <text x="8" y="218" font-size="12" fill="var(--fg-faint)">Events</text>
+</svg>

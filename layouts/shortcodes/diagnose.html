@@ -1,0 +1,10 @@
+{{- /*
+An ordered diagnostic sequence, where each step rules out a class of cause.
+Usage: {{< diagnose >}} 1. ... 1. ... {{< /diagnose >}}
+Must contain a numbered list: the order is the content.
+See style-guide/page-contract.md.
+*/ -}}
+{{- if not (findRE `(?m)^\s*\d+\.\s` .Inner 1) -}}
+  {{- errorf "%s: diagnose must contain a numbered list; the order is the content" .Position -}}
+{{- end -}}
+{{- partial "contract-block.html" (dict "sc" . "kind" "diagnose" "label" "If it isn't working" "aside" "In order. Each step rules out a class of cause, so don't skip ahead.") -}}

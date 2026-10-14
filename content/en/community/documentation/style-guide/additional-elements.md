@@ -143,20 +143,20 @@ The following are some example of different links to internal content.
 
 #### Unique page name
 
-* A [link]({{< relref "running#basic-configuration" >}}) to a heading anchor on another page, using only the unique page name.
+* A [link]({{< relref "reset-an-index#the-procedure" >}}) to a heading anchor on another page, using only the unique page name.
   This is quicker to type and won't break if pages are moved but will not work if the page name is not unique.
 
   ```markdown
-  [link]({{</* relref "running#basic-configuration" */>}})
+  [link]({{</* relref "reset-an-index#the-procedure" */>}})
   ```
 
 
 #### Section link
 
-* A [link]({{< relref "docs/HOWTOs" >}}) to a branch/section in the document tree, i.e. to the `\_index.md`.
+* A [link]({{< relref "docs/guides" >}}) to a branch/section in the document tree, i.e. to the `\_index.md`.
 
   ```markdown
-  [link]({{</* relref "docs/HOWTOs" */>}})
+  [link]({{</* relref "docs/guides" */>}})
   ```
 
 
@@ -269,7 +269,7 @@ All paths are relative to `/assets/files/`.
 
 ### Glossary links
 
-If you need to create a link to an item in the [Glossary]({{< relref "docs/glossary" >}}) you can use the `glossary` shortcode.
+If you need to create a link to an item in the [Glossary]({{< relref "/docs/reference/glossary.md" >}}) you can use the `glossary` shortcode.
 E.g.
 
 * A {{< glossary "feed" >}} is something you should know about, and so are {{< glossary "stream" "streams" >}}.

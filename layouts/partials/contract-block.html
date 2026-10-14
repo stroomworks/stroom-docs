@@ -1,0 +1,28 @@
+{{- /*
+The body of every page-contract shortcode (timing, verify, golden, not-proof, trap,
+diagnose). See content/en/community/documentation/style-guide/page-contract.md.
+
+Arguments (a dict):
+  sc     - the shortcode's own context
+  kind   - used for the CSS class, e.g. "verify"
+  label  - the heading the block carries, e.g. "Check it worked"
+  class  - optional extra CSS classes
+  aside  - optional sentence shown under the label
+
+The Inner is rendered as markdown here, rather than by the page, so these are called as
+{{< verify >}}, not {{% verify %}}. A nested shortcode's output is spliced into the Inner
+as HTML before that happens, so a nested block's output must not contain a blank line:
+markdown would end the HTML block there and render the rest as text. The only place a
+blank line can occur in rendered output is inside a <pre>, where a character reference
+for the newline renders identically.
+*/ -}}
+{{- $inner := .sc.Inner | .sc.Page.RenderString (dict "display" "block") -}}
+{{- $inner = replaceRE "\n\n" "\n&#10;" $inner -}}
+<div class="contract contract-{{ .kind }}{{ with .class }} {{ . }}{{ end }}" role="note">
+<p class="contract-label">{{ .label }}</p>
+{{- with .aside }}
+<p class="contract-aside">{{ . }}</p>
+{{- end }}
+{{ $inner | safeHTML }}
+</div>
+{{- /* Strip trailing newline. */ -}}

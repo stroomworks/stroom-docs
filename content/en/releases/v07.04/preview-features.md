@@ -54,7 +54,7 @@ The template enables static text/HTML to be mixed with values taken from the det
 
 The templating uses a template syntax called _jinja_ and specifically the JinJava library.
 The templating syntax includes support for variables, filters, condition blocks, loops, etc.
-Full details of the syntax see [Templating]({{< relref "docs/reference-section/templating" >}}) and for details of the templating context available in email subject/body templates see [Rule Detections Context]({{< relref "docs/reference-section/templating#rule-detections-context" >}}).
+Full details of the syntax see [Templating]({{< relref "/docs/reference/templating.md" >}}) and for details of the templating context available in email subject/body templates see [Rule Detections Context]({{< relref "/docs/reference/templating.md#rule-detections-context" >}}).
 
 
 #### Example Template

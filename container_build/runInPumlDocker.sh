@@ -94,11 +94,11 @@ else
   is_mac_os=false
 fi
 
-user_id=
-user_id="$(id -u)"
-
-group_id=
-group_id="$(id -g)"
+# Which user the container runs as depends on rootful vs rootless docker.
+# shellcheck source=container_build/docker_env.sh
+source "$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )/docker_env.sh"
+user_id="${container_user_id}"
+group_id="${container_group_id}"
 
 image_tag="puml-build-env"
 
@@ -108,38 +108,23 @@ local_repo_root="$(git rev-parse --show-toplevel)"
 
 dest_dir="/builder/shared"
 
-if [[ "${is_mac_os}" = true ]]; then
-  # No GNU binutils on macos
-  docker_group_id="$(stat -f '%g' /var/run/docker.sock)"
-else
-  docker_group_id="$(stat -c '%g' /var/run/docker.sock)"
-fi
-
 echo -e "${GREEN}HOME ${BLUE}${HOME}${NC}"
-echo -e "${GREEN}User ID ${BLUE}${user_id}${NC}"
-echo -e "${GREEN}Group ID ${BLUE}${group_id}${NC}"
+echo -e "${GREEN}Rootless docker ${BLUE}${is_rootless_docker}${NC}"
+echo -e "${GREEN}Container user ID ${BLUE}${user_id}${NC}"
+echo -e "${GREEN}Container group ID ${BLUE}${group_id}${NC}"
 echo -e "${GREEN}Local repo root dir ${BLUE}${local_repo_root}${NC}"
-echo -e "${GREEN}Docker group id ${BLUE}${docker_group_id}${NC}"
 
 # So we are not rate limited, login before doing the build as this
 # will pull images
 docker_login
 
-if ! docker buildx inspect stroom-puml-builder >/dev/null 2>&1; then
-  docker buildx \
-    create \
-    --name stroom-puml-builder
-fi
-
-docker buildx \
-  use \
-  stroom-puml-builder
+ensure_buildx_builder stroom-puml-builder
 
 # Make a hash of these things and effectively use this as the cache key for
 # buildx so any change makes it ignore a previous cache.
 cache_key=
 cache_key="$( \
-  "${local_repo_root}/container_build/generate_buildx_cache_key.sh"
+  "${local_repo_root}/container_build/generate_buildx_cache_key.sh" "${user_id}" "${group_id}"
   )"
 
 cache_dir_base="/tmp/stroom_puml_buildx_caches"
@@ -207,8 +192,6 @@ fi
 
 # Mount the whole repo into the container so we can run the build
 # The mount src is on the host file system
-# group-add gives the permission to interact with the docker cli
-# docker.sock allows use to interact with the docker cli
 # Need :exec on /tmp else LMDB complains with link errors
 # Need to pass in docker creds in case the container needs to do authenticated
 # pulls/pushes with dockerhub

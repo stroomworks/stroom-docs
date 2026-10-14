@@ -84,7 +84,7 @@ The legacy store exists in the directory configured by `stroom.pipeline.referenc
 Each feed specific store will be in a sub-directory with a name like `USER-DETAILS-REFERENCE___309e1ca0-7a5f-4f05-847b-b706805d758c` (i.e. a file system safe version of the _Feed_ name and the _Feed's_ {{< glossary "UUID" >}}.
 
 The migration happens on an as-needed basis.
-When a [lookup]({{< relref "/docs/user-guide/pipelines/xslt/xslt-functions#lookup" >}}) is called from an XSLT, if the required reference stream is found to exist in the legacy store then it will be copied into the appropriate _Feed_ specific store (creating the store if required).
+When a [lookup]({{< relref "/docs/reference/xslt-functions/_index.md" >}}) is called from an XSLT, if the required reference stream is found to exist in the legacy store then it will be copied into the appropriate _Feed_ specific store (creating the store if required).
 After being copied, the stream in the legacy store will be marked as available for purge so will get purged on the next run of the job _Ref Data Off-heap Store Purge_.
 
 When Stroom boots it will delete a legacy store if it is found to be empty, so eventually the legacy store will cease to exist.
@@ -114,7 +114,7 @@ All other nodes will wait until that is complete before proceeding with the boot
 
 It is recommended however to use a single node to execute the migration.
 To avoid Stroom starting up and beginning processing you can use the `migrage` command to just migrate the database and not fully boot Stroom.
-See [`migrage` command]({{< relref "/docs/user-guide/tools/command-line#migrate" >}}) for more details.
+See [`migrage` command]({{< relref "/docs/guides/automation/command-line.md" >}}) for more details.
 
 
 ### Migration Scripts

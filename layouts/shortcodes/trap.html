@@ -1,0 +1,17 @@
+{{- /*
+Something that fails without saying so, destroys data, or cannot be undone.
+Usage: {{< trap severity="silent" >}} ... {{< /trap >}}
+  silent      - reports success and does nothing
+  destructive - loses data when run
+  immutable   - cannot be changed later without a destructive rebuild
+See style-guide/page-contract.md.
+*/ -}}
+{{- /* Hugo only allows a closing tag on a shortcode whose own template uses .Inner. */ -}}
+{{- if not .Inner }}{{ errorf "%s: %s has no content" .Position .Name }}{{ end -}}
+{{- $labels := dict "silent" "Fails silently" "destructive" "Destroys data" "immutable" "Cannot be changed later" -}}
+{{- $severity := .Get "severity" -}}
+{{- $label := index $labels $severity -}}
+{{- if not $label -}}
+  {{- errorf "%s: trap severity %q is not one of silent, destructive, immutable" .Position $severity -}}
+{{- end -}}
+{{- partial "contract-block.html" (dict "sc" . "kind" "trap" "label" $label "class" (printf "contract-trap-%s" $severity)) -}}
