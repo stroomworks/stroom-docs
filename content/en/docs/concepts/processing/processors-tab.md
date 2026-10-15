@@ -103,7 +103,7 @@ The tab itself is only shown to users with `Manage Processors`.
 | **Max Processing Tasks** | A cap on how many of this filter's tasks run at once across the cluster. `0` means no cap. |
 | **Processing Profile** | A named [processor profile]({{< relref "../processing/_index.md" >}}), set up under **Monitoring** → **Processor Profiles**, that limits concurrent tasks per node and across the cluster. |
 | **Limit Task Creation Delay**, **Max Task Creation Delay** | A filter that keeps finding nothing new is checked less and less often. Ticking **Limit Task Creation Delay** caps that wait at **Max Task Creation Delay** for this filter, so occasional data is picked up sooner. Unticked, the cluster-wide limit applies. |
-| **Include in Export** | Whether the filter is included when content is exported. |
+| **Include in Export** | Whether the filter is included when its pipeline is exported, including by a Git Repo push. Importing never updates a filter that already exists; see [Processor filters]({{< relref "../../guides/content-management.md#processor-filters" >}}) on import and export. |
 | **Run As User** | Whose permissions the processing runs with. It must be able to read the feed. |
 | **Set Feed Dependencies** | Feeds this filter waits for, typically reference feeds: streams are held back until the listed feeds have data at least as recent, optionally with minimum and maximum delays. |
 

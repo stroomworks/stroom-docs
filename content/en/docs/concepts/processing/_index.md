@@ -58,7 +58,7 @@ The rest of the dialog holds the filter's settings:
 | **Min Create Time**, **Max Create Time** | Limit the filter to streams created in this window. |
 | **Max Processing Tasks** | The most tasks from this filter that may run at once across the whole cluster. The default, `0`, means no limit. |
 | **Processing Profile** | Confine the filter to a group of nodes and a schedule. See below. |
-| **Include in Export** | Whether the filter is included when content is exported. |
+| **Include in Export** | Whether the filter is included when its pipeline is exported, including by a Git Repo push. Importing never updates a filter that already exists; see [Processor filters]({{< relref "../../guides/content-management.md#processor-filters" >}}) on import and export. |
 | **Run As User** | The user the tasks run as. It defaults to the user who created the filter. |
 | **Set Feed Dependencies** | Hold processing back until data has arrived on other feeds, typically the reference data that the translation looks up. A minimum and a maximum delay can be set. |
 

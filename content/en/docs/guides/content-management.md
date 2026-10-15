@@ -107,6 +107,79 @@ Stroom can import older formats, but an older Stroom may not be able to import a
 {{% /warning %}}
 
 
+### How imported content is matched
+
+Every document has a UUID, and an import matches documents by UUID, not by where they sit in the explorer tree.
+If a document with the same UUID already exists anywhere in Stroom, the import updates that document rather than creating a new one.
+Folders are matched the same way, falling back to a folder of the same name in the same place.
+
+What happens to an existing document's position depends on **Use Import Folders**:
+
+* **Unticked**, the default: the document is updated where it is, and keeps its current folder.
+* **Ticked**: the document is updated and **moved** to the folder the import puts it in.
+
+**Use Import Names** works the same way for names.
+
+{{< trap severity="silent" >}}
+**The same content cannot be imported twice into different places.**
+
+Once a document has been imported, by a direct import or from a [Git Repo](#git-backed-content) or the [content store](#the-content-store), importing it again, to any folder, finds the existing document by its UUID.
+With the default settings it is updated where it already is, and nothing appears in the folder you chose; with **Use Import Folders** ticked it is moved out of its old location instead.
+Either way you still have one copy, and anything that relied on it being in the old place, such as a Git Repo, now manages it from wherever it ended up.
+
+To have a second, independent copy, copy the document in the explorer tree, which gives the copy a new UUID, rather than importing it again.
+{{< /trap >}}
+
+
+### Processor filters
+
+[Processor filters]({{< relref "../concepts/processing/_index.md" >}}) are not documents in the explorer tree.
+They travel with the pipeline they belong to, and follow different rules from everything else on import.
+
+**On export**, a pipeline's filters are written into the zip alongside it, but only those with **Include in Export** ticked.
+These are always left out:
+
+* deleted filters and reprocessing filters;
+* filters whose expression refers to a specific stream by `Id` or `Parent Id`;
+* the processor filters of streaming [analytic rules]({{< relref "detection/analytic-rules.md" >}}), which are never exported.
+
+What is exported is the expression, including any feed dependencies, the priority, **Max Processing Tasks**, **Max Create Time**, the task creation delay and the processing profile's name.
+The filter's database ID, its tracker and its **Run As User** are not.
+
+**On import:**
+
+* **A filter that already exists is not changed.**
+  It is matched by UUID, and if it exists and is not deleted the import skips it, with the warning *Unable to import processor filter as it already exists*.
+* **A deleted filter is restored**, as a new filter that takes over its UUID.
+* **Whether it is enabled is decided by the import, not the zip.**
+  The **Enable Processor Filters** box on the import dialog, off by default, sets every imported filter enabled or disabled.
+* **It starts from the date you give.**
+  **From this date** becomes the filter's **Min Create Time**, replacing any exported value; left blank, the filter starts from the first stream.
+  Its tracker is new, so an enabled filter then works through all the stored data that matches.
+* **It runs as you.**
+  The **Run As User** is set to the user doing the import, who needs permission to view the pipeline.
+* **It has no processing profile.**
+  The profile name is in the export but is not applied, so set the profile again after importing.
+
+How filters arrive depends on the route:
+
+| Route | Imported filters are |
+|---|---|
+| **Tools > Import** | Enabled only if you tick **Enable Processor Filters** |
+| [Git Repo](#git-backed-content) **Pull from Git** | Always disabled |
+| [Content store](#the-content-store) install or upgrade | Always disabled |
+| Content pack import on start (`stroom.contentPackImport`), and the command-line and headless imports | Always enabled, from the first stream |
+
+{{< trap severity="silent" >}}
+**Changes to a filter are never imported over an existing one.**
+
+Because an existing filter is skipped, editing a filter's expression in an export, or in a Git repository, and importing it again changes nothing, and the import only warns.
+This is easy to miss with a Git Repo: each pull updates the pipeline, while its filters stay exactly as they were first imported, disabled.
+
+To take a changed filter, delete the existing one first and then import, or edit the filter in Stroom directly.
+{{< /trap >}}
+
+
 ### Import and export through the API
 
 Content can be moved without the user interface.
@@ -152,6 +225,19 @@ The buttons on the same tab do the work:
 Pulling from Git can overwrite or remove local changes below the Git Repo.
 {{% /warning %}}
 
+A pull is an import, so the [matching rules](#how-imported-content-is-matched) apply, always with **Use Import Folders** and **Use Import Names**.
+Processor filters arrive disabled, and are not updated by later pulls; see [Processor filters](#processor-filters).
+
+{{< trap severity="silent" >}}
+**Content moved out of a Git Repo is pulled back into it.**
+
+Documents are matched by UUID, so a document you move out of the Git Repo's folder is still the one the repository holds.
+The next pull updates it, renames it if its name has changed, and moves it back to its place below the Git Repo.
+The same happens if the same content is managed by two Git Repos, or by a Git Repo and a separate import: whichever runs last decides where it lives.
+
+To take a document out of a Git Repo's control, copy it, which gives the copy a new UUID, and delete the original from the repository.
+{{< /trap >}}
+
 Git Repos can be nested.
 A Git Repo inside another one manages its own content, and the outer one leaves it alone.
 
@@ -165,6 +251,7 @@ Credentials are kept in **Security > Credentials Manager** and used by name, so 
 The Content Store installs ready-made **content packs**: tested sets of schemas, pipelines, translations and other content.
 Open it from **Tools > Content Store**, pick a pack and click **Install**.
 Stroom creates a Git Repo document for the pack and pulls its content.
+Because this is a Git pull, the pack's processor filters arrive disabled, and content already in Stroom with the same UUIDs is updated and moved into the pack's folder; see [How imported content is matched](#how-imported-content-is-matched).
 
 When a newer version of an installed pack is available, the **Upgrade** button becomes active.
 You can also use **Check for updates** and **Pull from Git** on the pack's Git Repo.
