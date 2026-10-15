@@ -1,7 +1,7 @@
 ---
 title: "Version 7.7"
 linkTitle: "7.7"
-weight: 60
+weight: 90
 date: 2025-01-31
 tags: 
 description: >

@@ -108,7 +108,7 @@ latexDashes = true
   # Menu title if your navbar has a versions selector to access old versions of your site.
   # This menu appears only if you have at least one [params.versions] set.
   # DON'T TOUCH! - This will be set at build time by ci_build.sh
-  version_menu = "Stroom Version (7.6)"
+  version_menu = "Stroom Version (7.14)"
   
   # Flag used in the "version-banner" partial to decide whether to display a 
   # banner on every page indicating that this is an archived version of the docs.
@@ -122,7 +122,7 @@ latexDashes = true
   # current doc set.
   # Must match the value in brackets in "version_menu" above
   # DON'T TOUCH! - This will be set at build time by ci_build.sh
-  version = "7.6"
+  version = "7.14"
 
   # A link to latest version of the docs. Used in the "version-banner" partial to
   # point people to the main doc site.
@@ -133,7 +133,7 @@ latexDashes = true
   # Custom stroom-docs param for use in the version-banner partial to tell people
   # what the latest version number is.
   # DON'T TOUCH! - This will be set at build time by ci_build.sh
-  latest_version = "7.6"
+  latest_version = "7.14"
   
   # Repository configuration (URLs for in-page links to opening issues and suggesting changes)
   github_repo = "https://github.com/gchq/stroom-docs"
@@ -147,7 +147,7 @@ latexDashes = true
   # Uncomment this if you have a newer GitHub repo with "main" as the default branch,
   # or specify a new value if you want to reference another branch in your GitHub links
   # DON'T TOUCH! - This will be set at build time by ci_build.sh
-  github_branch = "7.6"
+  github_branch = "7.14"
   
   # Google Custom Search Engine ID. Remove or comment out to disable search.
   #gcs_engine_id = "d72aa9b2712488cc3"
@@ -193,33 +193,65 @@ latexDashes = true
   # latest version served from site root
 
   [[params.versions]]
-    version = "7.6 (Latest)"
-    url = "/" 
+    version = "7.14 (Latest)"
+    url = "/"
+
+  [[params.versions]]
+    version = "7.13"
+    url = "/7.13"
+
+  [[params.versions]]
+    version = "7.12"
+    url = "/7.12"
+
+  [[params.versions]]
+    version = "7.11"
+    url = "/7.11"
+
+  [[params.versions]]
+    version = "7.10"
+    url = "/7.10"
+
+  [[params.versions]]
+    version = "7.9"
+    url = "/7.9"
+
+  [[params.versions]]
+    version = "7.8"
+    url = "/7.8"
+
+  [[params.versions]]
+    version = "7.7"
+    url = "/7.7"
+
+  [[params.versions]]
+    version = "7.6"
+    url = "/7.6"
 
   [[params.versions]]
     version = "7.5"
-    url = "/7.5" 
+    url = "/7.5"
 
   [[params.versions]]
     version = "7.4"
-    url = "/7.4" 
+    url = "/7.4"
 
   [[params.versions]]
     version = "7.3"
-    url = "/7.3" 
+    url = "/7.3"
 
   [[params.versions]]
     version = "7.2"
-    url = "/7.2" 
+    url = "/7.2"
 
   [[params.versions]]
     version = "7.1"
     url = "/7.1"
-  
+
   [[params.versions]]
     version = "7.0"
     url = "/7.0"
-  
+
   # A branch of the docs covering all versions prior to 7.0. Essentially a jumbled mess
   # of historic documentation.
   [[params.versions]]

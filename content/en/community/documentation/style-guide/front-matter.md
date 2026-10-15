@@ -37,6 +37,11 @@ This is the section/page title and will become the `h1` heading (in HTML/Markdow
 The `linkTitle` is the text that is displayed in the left hand navigation sidebar.
 It should be the same as `title` unless the title is quite long, in which case a shorter version should be used so it fits in the sidebar.
 
+Both `title` and `linkTitle` are written in Title Case, e.g. `Send Your First Data`.
+Headings within a page are written in sentence case, e.g. `## Check the data arrived`, keeping the capitals of proper nouns, product names and acronyms (`Stroom Proxy`, `XSLT`, `StroomQL`).
+The reference page generator (`scripts/docs/gen-docs-reference.mjs`) applies the same rule to the headings it generates, using `scripts/docs/lib/sentence-case.mjs`.
+Hand-written pages are not checked, so follow it yourself.
+
 ## Weight
 
 The weight controls the position of the page/section within the other pages/sections of its parent.
@@ -44,10 +49,11 @@ i.e. it controls the order of the pages/sections in the left hand navigation bar
 If no weight is provided then Hugo will use `date`, then `linkTitle`, then the file path.
 
 To assist with re-ordering pages you can use the script `change_weights.sh` in the root of the repo.
-E.g. to change the order of the child items of the user-guide section do the following:
+It takes the path of a section directory, lists that section's child pages and sub-sections in your editor (`$EDITOR`) in their current order, and when you save and close it re-numbers their weights in steps of 10 to match the new order.
+E.g. to change the order of the child items of the Guides section do the following:
 
 ```bash
-./change_weight.sh content/en/docs/user-guide
+./change_weights.sh content/en/docs/guides
 ```
 
 
@@ -83,6 +89,22 @@ cascade:
 ```
 
 This will then apply all of tags added to `tags` to each descendant page.
+
+
+## Aliases
+
+When you move or rename a page, its URL changes.
+Keep the old path in the page's `aliases` list so that existing links, bookmarks and the help links built into the Stroom user interface still work.
+Hugo generates a redirect page at each alias.
+
+```yaml
+aliases:
+  - /docs/user-guide/concepts/streams/
+```
+
+Each alias is the old site-relative path, without the `content/en` prefix or the `.md` extension.
+When you move a page that already has aliases, keep them and add the path you are moving it from; don't replace them.
+Don't remove an alias unless you are sure nothing links to it.
 
 
 ## Description

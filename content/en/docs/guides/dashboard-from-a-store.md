@@ -229,7 +229,7 @@ show LineChart(x = day, y = changes)
 The dashboard query itself returns in seconds for most stores.
 The delay is before that: data sent to Stroom reaches a store only after processing.
 
-For an index, documents become searchable after the `Index Writer Flush` job has run.
+For an index, documents are searchable as soon as the indexing pipeline has written them; the `Index Writer Flush` job only affects the **Doc Count** on the **Shards** tab and when they are committed to disk.
 For a Plan B store, after the `Plan B Merge Processor` job, which runs every minute by default, has merged the pipeline's output.
 On a cluster, a query on a node that is not a Plan B storage node may wait longer, for its snapshot to refresh.
 

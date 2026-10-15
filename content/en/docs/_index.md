@@ -5,7 +5,7 @@ weight: 20
 date: 2026-10-14
 tags:
 description: >
-  How Stroom works, and how to make it work for your data. Written by the engineers who build it.
+  How Stroom works, and how to make it work for your data.
 pageKind: concept
 aliases:
   - /docs/user-guide/

@@ -8,6 +8,15 @@ description: >
   This is a rough guide to what was done to set it up.  Some bits may be missing.
 ---
 
+{{% warning %}}
+This page describes the set-up as it was done in 2021, using Sonatype's OSSRH service.
+**OSSRH reached end of life on 30 June 2025** and has been shut down; its namespaces, including `uk.gov.gchq`, were moved to the {{< external-link "Central Publisher Portal" "https://central.sonatype.com/" >}}, and existing OSSRH accounts sign in there with the same credentials.
+The account, Jira ticket and `gradle-nexus` plugin steps below no longer apply as written.
+See {{< external-link "Sonatype's OSSRH end-of-life notice" "https://central.sonatype.org/pages/ossrh-eol/" >}} and {{< external-link "Gradle's guide to publishing to Maven Central" "https://cookbook.gradle.org/integrations/maven-central/publishing" >}}.
+
+Stroom itself does not currently publish libraries to Maven Central; this applies to the other Stroom repositories that do, such as _event-logging_.
+{{% /warning %}}
+
 ## Create a Sonatype account
 
 You need to create an account on Sonatype and you will need to raise a jira ticket on Sonatype's jira to get approved on the uk.gov.gchq group.
@@ -29,7 +38,6 @@ gpg2 --list-keys
 gpg2  --list-secret-keys | grep "\[SC\]" | tr -s ' ' | cut -d' ' -f2 | cut -d'/' -f2
 
 # To send the public keys to a key server
-gpg2 --keyserver hkp://pool.sks-keyservers.net --send-keys <key id>
 gpg2 --keyserver hkp://keyserver.ubuntu.com --send-keys <key id>
 gpg2 --keyserver hkp://pgp.mit.edu --send-keys <key id>
 

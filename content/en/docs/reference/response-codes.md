@@ -14,7 +14,9 @@ When something is wrong it also returns a **`Stroom-Status`** header carrying th
 
 On success the response body is the post's receipt id, such as `1791981748008_0000_S_node1a`: the receive time, a sequence number, `S` for Stroom or `P` for Stroom Proxy, and the node.
 It is not a header.
-The same id is stored on the stream as its `ReceiptId` attribute, which is what lets you trace a delivery through a chain of proxies.
+Each hop that receives the data, whether a Stroom Proxy or Stroom, sets the `ReceiptId` attribute to the id it issued and appends that id to `ReceiptIdPath`.
+So a stream stored in Stroom has Stroom's own id as its `ReceiptId`, and every id in the chain, including the one the original sender was given, in `ReceiptIdPath`.
+`ReceiptIdPath` is what lets you trace a delivery through a chain of proxies, and the sender's recorded id is what you search it for.
 
 **A sender that records none of these cannot tell you why data is missing.**
 Capture all three.

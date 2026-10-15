@@ -5,7 +5,7 @@ linkTitle: "New Stroom Docs"
 date: 2021-07-09
 tags: 
 description: >
-  
+  The Stroom documentation has a new look and feel, is versioned by Stroom minor version, and has new News and Releases sections.
 ---
 
 The Stroom documentation has been re-vamped with a new look and feel.
@@ -13,6 +13,6 @@ The documentation is now versioned so that you are only reading documentation ap
 
 Other improvements:
 
-* Addtion of News and Releases sections
+* Addition of News and Releases sections
 * Better site and page navigation with the left and right hand menus
 * Tagging of content to help find related material

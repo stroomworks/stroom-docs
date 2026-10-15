@@ -71,7 +71,16 @@ It means receipt is being decided somewhere else.
 
 ## Naming conventions
 
-Stroom does not enforce a specific naming convention for feeds, but a common best practice is to use a hierarchical, upper-case pattern:
+Stroom enforces the characters a feed name may use.
+By default a name must match `^[A-Z0-9_-]{3,}$`: upper-case letters, digits, hyphens and underscores, at least three characters long.
+Creating or renaming a feed with any other name is rejected with an `Invalid name` error, so `my-feed` or `MY FEED` cannot be created.
+The pattern is the `stroom.feed.feedNamePattern` [property]({{< relref "../reference/configuration-properties.md" >}}), so an administrator can change it.
+
+Names are matched exactly when data arrives: a sender posting `Feed: my-feed` does not reach `MY-FEED`.
+See [Choosing a feed]({{< relref "../guides/sending-data/choosing-a-feed.md" >}}).
+
+Within those characters, how you structure names is a convention rather than a rule.
+A common practice is a hierarchical pattern:
 
 **`SYSTEM-SUBSYSTEM-DATATYPE`**
 
@@ -81,7 +90,7 @@ Examples:
 * `APP-WEBSERVER-ACCESS`
 
 Consistency in naming makes it much easier to create broad **Processor Filters** using wildcards (e.g., `FIREWALL-*`).
-For more on deciding how to split data between feeds, see [Choosing a feed]({{< relref "../guides/sending-data/choosing-a-feed.md" >}}).
+For more on deciding how to split data between feeds, see the same page.
 
 
 ## Stream types and their uses

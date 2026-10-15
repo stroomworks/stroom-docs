@@ -63,7 +63,8 @@ It can equally mean the data was deleted after a failure, or that it never arriv
 Check the destination.
 
 **The proxy's [health endpoint]({{< relref "../checking-it-works/health-endpoints.md" >}}) being green does not mean forwarding works.**
-It reports the application's state, not whether its downstream is reachable.
+When the receipt check mode is `FEED_STATUS` or `RECEIPT_POLICY` it does call `downstreamHost`, so an unreachable downstream shows there.
+It never checks the forwarding destinations themselves, so a forward that is failing, or being refused, can sit behind a green health check.
 {{< /not-proof >}}
 
 {{< /verify >}}

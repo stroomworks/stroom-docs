@@ -27,6 +27,7 @@ The paths are set in the `logging:` section of each application's configuration,
 | `logs/app/app.log` | The application log. Startup, errors, warnings, job activity. **Start here.** |
 | `logs/access/access.log` | HTTP requests, including [data posts]({{< relref "../../reference/the-datafeed-contract.md" >}}) to `/datafeed`. |
 | `logs/user/user.log` | User activity, as event-logging records. |
+| `logs/migration/migration.log` | Database migrations: which one is running, and the SQL each applies. Look here when a first start or an upgrade seems to hang. |
 
 **Stroom Proxy**
 
@@ -50,7 +51,7 @@ These are the ones worth knowing:
 | A [Plan B store]({{< relref "plan-b-problems.md" >}}) that has filled and stopped accepting writes | `Plan B` together with `is full` |
 | Plan B storage or schema failures | `Plan B`, `LMDB` |
 | An [index]({{< relref "index-problems.md" >}}) that cannot write shards | `volume group` |
-| Why a post was rejected | the feed name, in the access log |
+| Why a post was rejected | `Sending error response`, in the application log, which gives the status and the reason. The access log has the request and its status code, but not the feed |
 | Why a [proxy forward]({{< relref "proxy-problems.md" >}}) failed | `send.log`, and the destination host name |
 | A node that will not start | the first error after startup begins, not the last |
 

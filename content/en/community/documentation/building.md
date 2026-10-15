@@ -50,7 +50,8 @@ It is assumed that you have a reasonable understanding of how to use Git and Git
 ## Cloning the stroom-docs git repository
 
 The git repository for this site is [stroom-docs (external link)](https://github.com/gchq/stroom-docs).
-_stroom-docs_ uses the Docsy theme (`themes/docsy/`) via a Go module so the theme will be pulled in when Hugo is first run.
+_stroom-docs_ uses the Docsy theme as a Hugo module (a Go module), declared in `go.mod` and in the `[module]` section of `config.toml`.
+There is no `themes/` directory in the repository; Hugo downloads the theme into its module cache when it is first run.
 
 Unless you are a committer on the `gchq/stroom-docs` repository, you will need to fork this repository into your own Github account.
 You can then clone your fork of the repository like so (in this example it is assumed your Github username is `jbloggs`):
@@ -82,10 +83,10 @@ git remote add upstream https://github.com/gchq/stroom-docs.git
 There is a version of the documentation for each minor Stroom version (see [Stroom Versions]({{< relref "versions" >}}).
 
 Before you start editing/viewing the documentation you need to be working from the correct branch of the Git repository.
-If for example you are adding some content that is applicable to Stroom v7.0 then you need to checkout branch `7.0`.
+If for example you are adding some content that is applicable to Stroom v7.13 then you need to checkout branch `7.13`.
 
 {{< command-line >}}
-git checkout 7.0
+git checkout 7.13
 {{</ command-line >}}
 
 
@@ -129,7 +130,7 @@ Codespaces is a paid feature on GitHub, however it comes with 60hrs of free use 
 
 To develop Stroom-Docs with Codespaces do the following:
 
-1. Visit Stroom-Docs' GitHub site at the desired version branch, e.g. {{< external-link "https://github.com/gchq/stroom-docs/tree/7.2" >}} (or visit {{< external-link "https://github.com/gchq/stroom-docs" >}} and switch branch using the branch/tag drop-down button).
+1. Visit Stroom-Docs' GitHub site at the desired version branch, e.g. {{< external-link "https://github.com/gchq/stroom-docs/tree/7.13" >}} (or visit {{< external-link "https://github.com/gchq/stroom-docs" >}} and switch branch using the branch/tag drop-down button).
   {{% note %}}
   If you are developing on a fork then replace `gchq` in the URL with your github username.
   {{% /note %}}
@@ -153,7 +154,7 @@ To stop the code space hit `ctrl+shift+p`, enter `stop` and then select _Codespa
 
 {{% warning %}}
 When editing the documentation using Codespaces you need to manually refresh the browser tab with the served site.
-It does not auto-refresh like it does when running `./serve-site.sh` on your local machine.
+It does not auto-refresh like it does when running `./serve_site.sh` on your local machine.
 {{% /warning %}}
 
 
@@ -186,7 +187,7 @@ This command will be run as part of the GitHub Actions automated build.
 If `runInPumlDocker.sh SVG` is not run having added links to PlantUML images in the documentation, then when you build or serve the site you will see errors like this:
 
 ```text
-Error: Error building site: "/builder/shared/content/en/docs/user-guide/concepts/streams.md:57:1":
+Error: Error building site: "/builder/shared/content/en/about/about.md:40:1":
 failed to render shortcode "image":
 failed to process shortcode: "/builder/shared/layouts/shortcodes/image.html:54:21":
 execute of template failed: template: shortcodes/image.html:54:21:

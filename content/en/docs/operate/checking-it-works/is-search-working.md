@@ -21,18 +21,18 @@ If you have not confirmed that, start at [Is data processing?]({{< relref "is-da
 {{< timing mode="async" >}}
 Indexing happens as part of processing, so it inherits its latency: **minutes to hours** on real volumes.
 
-There is a second delay after that.
-Documents are written to an [index]({{< relref "../../concepts/lucene-index.md" >}}) **shard**, and a shard is not searchable until its writer flushes.
-The `Index Writer Flush` [job]({{< relref "../../reference/jobs.md" >}}) does that on a schedule, so data can be indexed and still not findable for a short while.
+Once indexed, documents are searchable straight away: a search reads each [index]({{< relref "../../concepts/lucene-index.md" >}}) **shard** through its open index writer, so it does not wait for anything to reach disk.
+What lags is the shard's **Doc Count**, which only changes when the `Index Writer Flush` [job]({{< relref "../../reference/jobs.md" >}}) commits the shard, every 10 minutes by default.
 {{< /timing >}}
 
 {{< verify >}}
 Open the index, go to its **Shards** tab and select refresh.
 The list is empty until you do.
 Each shard has a **Doc Count**, the number of documents committed to it.
-A total greater than zero means documents were written.
+A total greater than zero means documents were written; zero just after processing may only mean the shard has not been committed yet.
 
-Then query the index with [StroomQL]({{< relref "../../reference/stroom-query-language.md" >}}) to prove the search path can read them back:
+Then query the index with [StroomQL]({{< relref "../../reference/stroom-query-language.md" >}}) to prove the search path can read them back.
+The index's **Data** tab fills in a query listing its fields, which is the quickest first look; for a count, run this instead:
 
 ```text
 from "MY_INDEX"
@@ -43,10 +43,10 @@ select StreamId, events
 
 This returns one row per indexed stream, with the number of documents from it.
 It needs a `StreamId` field in the index, which an `IdEnrichmentFilter` normally provides; group by any other field the index holds if it has none.
-The totals should agree with the **Doc Count**.
+Once the shards have been committed, the totals should agree with the **Doc Count**.
 
 {{< golden >}}
-**A non-zero Doc Count, rows from the grouped query, and no `Error` streams on the feed.**
+**Rows from the grouped query, no `Error` streams on the feed, and, once the shards are committed, a Doc Count that agrees.**
 
 All three together.
 The **Doc Count** proves documents were written, the query proves they can be searched, and the absence of error streams proves the indexing filter did not fail on the way.
@@ -117,8 +117,9 @@ Decide field types before you load data, not after.
    That is extraction, not indexing.
    The index needs a **Default Extraction Pipeline** to fetch anything beyond its stored fields, and extraction needs `StreamId` and `EventId` in the index to find its way back to the source event.
    Those are normally added for you, by an [`IdEnrichmentFilter`]({{< relref "../../reference/pipeline-elements.md#idenrichmentfilter" >}}) running before the indexing filter.
-1. **Is it just not flushed yet?**
-   If the **Doc Count** is zero moments after processing finished, wait for `Index Writer Flush`, then refresh the **Shards** tab and query again.
+1. **Does the query return rows while the Doc Count is still zero?**
+   Then the documents are there and the shard has just not been committed yet.
+   The **Doc Count** catches up when `Index Writer Flush` next runs; refresh the **Shards** tab after that.
 {{< /diagnose >}}
 
 

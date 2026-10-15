@@ -200,7 +200,8 @@ Another random line.
 
 The page title uses heading level one (`# ` in markdown) so all markdown headings should be >= 2 (`## `, `### `, `#### `, etc.).
 Headings should have two blank lines above them for clarity in the raw markdown.
-The `#` characters should **always** be followed by one space character
+The `#` characters should **always** be followed by one space character.
+Write headings in sentence case, e.g. `## Check the data arrived`; only the page `title` and `linkTitle` are Title Case (see [Title and link title]({{< relref "front-matter#title-and-link-title" >}})).
 
 The following is an example of the heading levels.
 
@@ -239,7 +240,7 @@ This heading level is effectively level 5 on the page but not shown on the right
 Markdown supports an alternate style for headings, as shown below.
 **Don't** use this style as it is not clear from the symbols what the heading level is.
 
-```markddown
+```markdown
 
 Heading level 1
 ===============

@@ -51,6 +51,25 @@ debug() {
   fi
 }
 
+# Returns 0 if the pattern is found in the content, 1 if it is not.
+# Exits the script if rg fails for any other reason, e.g. a bad pattern or
+# a missing directory, so that an error is never mistaken for an unused asset
+# (which, with the 'delete' arg, would delete it).
+is_referenced() {
+  local exit_code=0
+  rg --quiet "$@" content/en/ || exit_code=$?
+
+  if [[ "${exit_code}" -eq 0 ]]; then
+    return 0
+  elif [[ "${exit_code}" -eq 1 ]]; then
+    return 1
+  else
+    echo -e "${RED}ERROR${NC}: rg failed with exit code ${exit_code}" \
+      "for args [$*], aborting"
+    exit 1
+  fi
+}
+
 main() {
   IS_DEBUG=false
   SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
@@ -64,8 +83,9 @@ main() {
 
   setup_echo_colours
 
-  if ! command -v rg; then
-    echo -e "ERROR: You need to install ripgrep"
+  if ! command -v rg > /dev/null; then
+    echo -e "${RED}ERROR${NC}: You need to install ripgrep (rg)"
+    exit 1
   fi
 
   echo "Searching for unused images in ${images_dir}"
@@ -76,11 +96,9 @@ main() {
       asset_filename="$(basename "${asset_file}")"
       local pattern="[\"/]${asset_filename//./\.}\""
       #echo "  Testing file ${asset_file}"
-      if ! rg \
-        --quiet \
+      if ! is_referenced \
         --type md \
-        "${pattern}" \
-        content/en/; then
+        "${pattern}"; then
 
         if [[ "${do_delete}" = true ]]; then
           rm "${asset_file}"
@@ -94,15 +112,16 @@ main() {
 
   echo "Searching for unused files in ${files_dir}"
   for asset_file in "${files_dir}"/**/*; do
+    if [[ ! -f "${asset_file}" ]]; then
+      continue
+    fi
     local asset_filename
     asset_filename="$(basename "${asset_file}")"
     #echo "  Testing file ${asset_file}"
-    if ! rg \
-      --quiet \
+    if ! is_referenced \
       --fixed-strings \
       --type md \
-      "${asset_filename}" \
-      content/en/; then
+      "${asset_filename}"; then
 
       if [[ "${do_delete}" = true ]]; then
         rm "${asset_file}"

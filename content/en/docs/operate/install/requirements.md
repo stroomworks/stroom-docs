@@ -23,13 +23,15 @@ A full JDK is worth having anyway, because the tools that come with it are what 
 
 ## The database
 
-Stroom needs **MySQL 8**.
+Stroom needs **MySQL 8**; Stroom's own Docker stacks use 8.4.
 One database serves the whole cluster: you do not need one per node, and running one per node would not work, since the database is how nodes agree with each other about streams, tasks and locks.
 
 Two settings matter more than the rest:
 
 * **Connection limits.**
-  Every Stroom module opens its own connection pool, and every node runs every module, so the total the database must allow is the per-module pool size multiplied by the number of modules and then by the number of nodes.
+  Each node shares one connection pool between all the modules that use the same connection and pool settings, which by default is all of them, plus a separate pool for cluster locks.
+  A module you give its own connection or pool settings gets its own pool on top.
+  So with the defaults the total the database must allow is roughly the shared pool's maximum size, plus the lock pool's, multiplied by the number of nodes.
   Running out of connections looks like unrelated failures all over Stroom.
   See the database block in [Configuration properties]({{< relref "../../reference/configuration-properties.md" >}}).
 * **Durability.**
@@ -108,5 +110,5 @@ Run time synchronisation on every node, and treat a node with an odd clock as a 
    Compare them directly rather than assuming.
 1. **Did the migration finish?**
    A long first start is usually migration, not a hang.
-   The logs say which migration is running.
+   `logs/migration/migration.log` shows which migration is running.
 {{< /diagnose >}}

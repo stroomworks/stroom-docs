@@ -66,7 +66,7 @@ contentPacks:
     iconUrl: "https://intranet.example/icons/schemas.png"
     licenseName: "Apache 2.0"
     licenseUrl: "https://intranet.example/licences/apache-2.0.txt"
-    stroomPath: "/Content Packs/Core XML Schemas"
+    stroomPath: "/XML Schemas"
     details: "Mirrored on 2026-10-14 from the public content store."
     gitRepoName: "Core XML Schemas"
     gitUrl: "https://git.internal.example/stroom-content/core-xml-schemas.git"
@@ -81,13 +81,14 @@ A few of these decide more than they look:
 | Field | What it decides |
 |---|---|
 | `id` | Identifies the pack within the store. Keep it stable, because it is how a pack is recognised later |
-| `stroomPath` | Where the content lands in the explorer tree |
+| `stroomPath` | The explorer folder the pack's Git Repo document is created in. The document itself is named by `gitRepoName`, so do not repeat that name in the path |
 | `gitPath` | A subdirectory within the repository, when a repository holds more than one pack |
 | `gitCommit` | Pins the content to one commit. Leave it empty to follow the branch |
 | `gitNeedsAuth` | Whether Stroom asks for a credential when installing |
 
-`meta` is required.
-A manifest without it is rejected rather than partially read.
+`meta.ownerId` and `meta.ownerName` are required.
+A manifest missing them, or containing a field Stroom does not recognise, is not loaded at all rather than partially read.
+Nothing in the user interface says why: the store just does not appear, and the reason is in the application log under `Cannot connect to App Store URL` or `Cannot parse App Store URL`.
 
 Serve the file from any web server the Stroom nodes can reach.
 It is a static file, so anything that serves static files will do, including the Git server itself if it can serve a raw file over HTTP.
@@ -97,6 +98,7 @@ It is a static file, so anything that serves static files will do, including the
 
 Set `stroom.contentStore.urls` to your manifest URL.
 It is a list, so you can offer several stores, and replacing the default entry is what takes the public one out of use.
+It is read at startup, so the change needs a restart, and an empty list does not remove the public store: Stroom falls back to it.
 
 On an isolated network, make sure the default entry is gone rather than merely joined by yours: leaving it in place means every load of the content store screen tries to reach the internet and waits for it to fail.
 

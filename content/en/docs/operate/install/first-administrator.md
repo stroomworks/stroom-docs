@@ -11,13 +11,18 @@ verification: required
 ---
 
 A new Stroom installation has no administrator.
-Until one exists nobody can sign in and set the system up, so for most installations this is a required step and it has to be done from the command line.
+Until one exists nobody can sign in and set the system up, so for most installations this is a required step, done from the command line.
 
 
 ## Do you need to?
 
 Not always.
 You can skip it if an administrator already exists, or if you are using an external identity provider and have already granted the **Administrator** permission to a user or group that your provider will match someone to.
+
+With the internal identity provider there is also a shortcut.
+Setting `stroom.security.identity.autoCreateAdminAccountOnBoot: true` makes Stroom create an account called `admin` with the password `admin`, an `Administrators` group holding the **Administrator** permission, and put one in the other, when it starts.
+It is off by default, and is meant for test and demonstration systems: anyone who knows Stroom knows that password.
+If you use it on anything else, sign in and change the password straight away.
 
 Otherwise, read on.
 
@@ -43,8 +48,13 @@ java -jar /path/to/stroom-app-all.jar create_account \
   /path/to/config.yml
 ```
 
-By default Stroom requires this password to be changed at first sign-in, which is governed by `stroom.security.identity.passwordPolicy.forcePasswordChangeOnFirstLogin`.
-Pass `--noPasswordChange` if that does not suit.
+By default Stroom requires this password to be changed at first sign-in.
+Two things govern that, and both have to allow it for the change to be skipped:
+
+* `--noPasswordChange` turns off the flag on this one account.
+* `stroom.security.identity.passwordPolicy.forcePasswordChangeOnFirstLogin`, which is `true` by default, forces a change on any account whose password has never been changed, whatever its own flag says.
+
+So `--noPasswordChange` on its own has no visible effect on a default configuration.
 
 
 ### Make them an administrator

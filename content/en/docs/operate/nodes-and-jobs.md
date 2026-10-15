@@ -70,9 +70,10 @@ Select a job and the bottom half lists every node, each with its own **Enabled**
 A job only runs on a node when it is enabled both for the job as a whole and for that node, so you can choose which nodes do which work.
 
 {{% note %}}
-On a new cluster, jobs are created disabled.
-Enable the ones you need on the nodes you want them to run on.
-(Setting `stroom.job.enableJobsOnBootstrap` creates them enabled instead.
+On a new cluster, most jobs are created enabled.
+The exceptions are the ones that do work you have to choose: pipeline processing (**Processor Task Creator** and **Data Processor**), diagnostics such as **Orphan File Finder**, and jobs for features you may not use, such as **S3 Event Notifications Poll**.
+The **On by default** column in [Scheduled jobs]({{< relref "../reference/jobs.md" >}}) gives each one.
+(Setting `stroom.job.enableJobsOnBootstrap` creates processing and most of the other exceptions enabled too.
 It is meant for demonstration systems, not for production.)
 {{% /note %}}
 

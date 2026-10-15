@@ -58,15 +58,16 @@ For component testing purposes mock implementations of these APIs can be used to
 ## Component API and service implementation, e.g. modules ending in `-impl`
 
 
-### Client interaction - REST services and GWT Action Handlers
+### Client interaction - REST resources
 
 The uppermost layer of the server side code services requests from the client.
-The client may make restful calls as is the case for the new UI or will use Actions that are handles with ActionHandlers as is the case for the legacy GWT UI.
+The client, whether the GWT user interface or another system calling the API, makes RESTful calls to REST resource classes.
+The GWT client makes these calls through `RestFactory` in `stroom-core-client`.
 
 Since this layer deals with all client interaction it should be responsible for creating audit logs for all user activity, e.g. accessing documents, searching etc.
 No audit logging should need to be performed at a lower level within the application as deeper levels have less knowledge of user intent since they may just be playing a part in the wider request.
 
-The client interaction layer adds no logic and asks the underlying service layer to service the encapsulated request away from the REST endpoint wrapping code or GWT action handler code.
+The client interaction layer adds no logic and asks the underlying service layer to service the encapsulated request away from the REST endpoint wrapping code.
 This allows multiple types of endpoint to use the same underlying service layer.
 If a request requires the use of multiple services to form a response, this must be handled within the service layer by the primary service which will be responsible for any such orchestration.
 

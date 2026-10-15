@@ -8,7 +8,7 @@ linkTitle = "Stroom"
 
 <div class="mx-auto">
   <p>
-    <img class="landing-page-logo" src="stroom-amber.svg" alt="Stoom logo" width="600px" height="222px">
+    <img class="landing-page-logo" src="stroom-amber.svg" alt="Stroom logo" width="600px" height="222px">
   </p>
 	<a class="btn btn-lg btn-primary mr-3 mb-4" href="{{< relref "/about/about" >}}">
 		Learn More <i class="fas fa-arrow-alt-circle-right ml-2"></i>
@@ -51,6 +51,18 @@ linkTitle = "Stroom"
 
   {{% blocks/feature icon="fa-chart-bar" title="Statistics" %}}
   Record counts or values of items over time, providing answers to questions such as "how many times has a specific machine provided data in the last hour/day/month?"
+  {{% /blocks/feature %}}
+
+  {{% blocks/feature icon="fa-terminal" title="StroomQL" %}}
+  Query your indexes and other data sources with a text based query language.
+  {{% /blocks/feature %}}
+
+  {{% blocks/feature icon="fa-bell" title="Analytic rules" %}}
+  Keep a query running against your data and send a notification for each match.
+  {{% /blocks/feature %}}
+
+  {{% blocks/feature icon="fa-database" title="Plan B" %}}
+  Store state, sessions, metrics and histograms for lookups during processing and for querying.
   {{% /blocks/feature %}}
 
 {{< /blocks/section >}}

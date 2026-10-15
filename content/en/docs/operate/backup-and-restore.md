@@ -20,11 +20,11 @@ A backup of one without the other restores a system that believes things about i
 | What | Where | Rebuildable? |
 |---|---|---|
 | Stream metadata, processing state, users, permissions, jobs | The database | No |
-| Content: pipelines, XSLTs, indexes, dashboards, feeds | The database, or the document store directory | No |
+| Content: pipelines, XSLTs, indexes, dashboards, feeds | The database | No |
 | Stream data | Data volumes | No |
 | Index shards | Index volumes | Yes, by reprocessing |
 | Reference data store | Each node's off-heap store | Yes, loaded on demand from reference streams |
-| Plan B shards | Each node's store | Yes, by re-merging from source |
+| Plan B shards | The store on each node listed in `stroom.planb.nodeList`; other nodes hold snapshots | Snapshots yes, fetched again from a storing node. The stored shards only by reprocessing the data that wrote them |
 | Configuration | The configuration file on each node | No, but small and worth keeping in version control |
 
 The first four rows are the ones that matter.
@@ -66,7 +66,9 @@ Leaving them out makes backups much smaller and makes recovery slower, because t
 
 {{< timing mode="async" >}}
 Restoring is not finished when the files are back.
-On first start, Stroom reconciles what it finds with what the database says, and nodes rebuild the parts that are per node: the reference data store fills on demand, and Plan B shards merge from their source.
+Stroom does not reconcile what it finds on disk with what the database says: data volumes and the database have to be restored to the same point by you.
+What it does rebuild is the per-node working state: the reference data store fills on demand, and nodes that do not store a Plan B shard fetch a fresh snapshot from one that does.
+A Plan B shard lost from a storing node, or index shards you chose not to back up, come back only by reprocessing.
 
 Expect the first searches after a restore to be slower, and the first reference lookups to pause while the store loads.
 {{< /timing >}}

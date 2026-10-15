@@ -41,11 +41,15 @@ The configuration file `config.toml` in each branch defines such things as what 
 
 {{% note %}}
 This section is for reference only.
-The build script `ci_build.sh` will amend the various version property values prior to building the site.
-Therefore when creating a new version branch you do not need to edit the `config.toml` file.
+The values in `config.toml` are overwritten at build time, so when creating a new version branch you do not need to edit the `config.toml` file.
 {{% /note %}}
 
-This example is from the _7.1_ branch and is based on there being versions _legacy_, _7.0_ and _7.1_, with _7.1_ being the latest.
+The build script `ci_build.sh` gets the list of branches from the GitHub API for the `gchq/stroom-docs` repository (`GIT_API_URL` in `ci_build.sh`) and keeps those named `N.N` (e.g. `7.10`), plus `legacy` if it exists.
+It sorts the `N.N` branches numerically, newest first, and takes the first one as the latest version.
+For each branch it builds, it then rewrites `version_menu`, `archived_version`, `version`, `latest_version`, `github_branch` and `build_version` in `config.toml`, and replaces the `[[params.versions]]` blocks with one block per release branch, with each `url` set relative to the branch being built.
+A version only appears in the version menu once its branch has been pushed to `gchq/stroom-docs`; branches in a fork or in your local clone are not included.
+
+The following examples show the values the build would produce in the _7.0_ and _7.1_ branches, for a repository with the branches _legacy_, _7.0_ and _7.1_, with _7.1_ being the latest.
 
 {{< cardpane >}}
   {{< card header="7.0" >}}
@@ -153,7 +157,7 @@ The following is the built HTML for v7.1 which is the latest.
 <a class="dropdown-item" href="./legacy">Legacy</a>
 ```
 
-The following shows how `params.versions` are set in each version branch, assuming that 7.1 is the latest version.
+The following shows how the build sets `params.versions` in each version branch, assuming that 7.1 is the latest version.
 
 {{< cardpane >}}
   {{< card header="legacy" >}}
@@ -249,7 +253,7 @@ Although the build is run on the `master` branch it will use the `HEAD` commit o
 The build and release can be forced by adding the text `[publish]` to the commit message on `master`.
 This is useful in testing, or if updated documentation is needed for any reason.
 
-For example you can run this on the `master` branch to for:
+For example you can run this on the `master` branch to force a publish:
 
 {{< command-line >}}
 git commit --allow-empty -m "Empty commit to force [publish]" && git push
@@ -292,15 +296,15 @@ Any changes that are specific to a Stroom version, e.g. documenting a new featur
 If the change relates to an as yet unreleased version of Stroom then make the change on `master`.
 
 
-### Changes to the News/Releases
+### Changes to the News and Release Notes
 
 Adding news items or release notes for new versions should be done on the latest release branch.
-The News/Releases section is not included in old versions when released.
+The build removes the News section from every version other than the latest (`UNWANTED_SECTIONS` in `ci_build.sh`); the Release Notes section is kept in each version as it was on that branch.
 
 
 ### Changing the site look
 
-Ideally changes to the look of the site, e.g. upgrading the _Docsy_ theme sub-module to a new commit, adding shortcodes or tweaking the CSS should be done on all branches so when switching between branches the look doesn't change.
+Ideally changes to the look of the site, e.g. upgrading the version of the _Docsy_ theme Go module, adding shortcodes or tweaking the CSS should be done on all branches so when switching between branches the look doesn't change.
 This means this sort of change should be done on the oldest published version branch and then merged up the chain to the others, e.g. `legacy` => `7.0` => `7.1` => `master`.
 
 In some cases a change to the look may require significant refactoring of the content, e.g. changes to a shortcode.
@@ -334,14 +338,14 @@ It does the following:
 To run this script do:
 
 ```bash
-create_mock_combined_site.sh
+./create_mock_combined_site.sh
 ```
 
 The combined site can be served using something like the Python simple HTTP server, e.g. 
 
 ```bash
 cd /tmp/stroom-docs_mock_combined_site
-python -m SimpleHTTPServer 8888
+python3 -m http.server 8888
 ```
 
 Then open a browser at [localhost:8888](localhost:8888).

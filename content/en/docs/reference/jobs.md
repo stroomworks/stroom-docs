@@ -26,8 +26,8 @@ Before investigating anything that looks like slowness or missing data, check th
 
 {{% note %}}
 **On a new installation, pipeline processing is off.**
-*Processor Task Creator* ships disabled, and it is the job that turns processor filters into work.
-Until it is enabled nothing is processed, however many worker nodes are running and however correct the pipelines are, and nothing says so.
+*Processor Task Creator* ships disabled, and it is the job that turns processor filters into work; *Data Processor*, which does that work on each node, ships disabled too.
+Until both are enabled nothing is processed, however many worker nodes are running and however correct the pipelines are, and nothing says so.
 It is the first thing to check on a system that receives data happily but never processes any.
 {{% /note %}}
 
@@ -121,7 +121,7 @@ A job that is enabled but whose last-run time does not move is a job that is fai
 | **Index Shard Retention** | Marks shards past their retention as deleted. Off, old shards are kept and searched. | One node | Yes |
 | **Index Volume Status** | Refreshes free space for the index volumes this node owns. Off, this node can fill an index volume it believes has room. | Every node | Yes |
 | **Index Writer Cache Sweep** | Closes index writers this node has finished with. Off, the node holds file handles and memory it no longer needs. | Every node | Yes |
-| **Index Writer Flush** | Flushes this node's index writers to disk. Off, recent data stays in memory, is missing from searches, and is lost if the node restarts. | Every node | Yes |
+| **Index Writer Flush** | Commits this node's index writers to disk. Searches see new documents without it, but off, the Shards tab's Doc Count never updates and uncommitted documents are lost if the node stops without shutting down cleanly. | Every node | Yes |
 | **Solr Index Optimise** | Compacts Solr indexes. Only relevant if you use Solr indexing. | One at a time | Yes |
 | **Solr Index Retention** | Applies deletion queries to Solr indexes. Only relevant if you use Solr indexing. | One at a time | Yes |
 
@@ -188,7 +188,7 @@ A job that is enabled but whose last-run time does not move is a job that is fai
 | Job | What it does | Nodes | On by default |
 |---|---|---|---|
 | **Java Heap Histogram Statistics** | A deep JVM diagnostic that pauses the JVM while it runs. Leave it off unless you are chasing a memory problem and accept the pause. | Every node | No |
-| **Node Status** | Records this node's CPU and memory. Off, that node goes blank on the monitoring screens while carrying on working. | Every node | Yes |
+| **Node Status** | Records this node's CPU and memory as internal statistics. Off, that node's figures stop while it carries on working. | Every node | Yes |
 | **Property Cache Reload** | Picks up property changes made on another node. Off, this node keeps running on the values it started with and quietly behaves differently from the rest. | Every node | Yes |
 
 

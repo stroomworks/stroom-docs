@@ -24,6 +24,6 @@ Nothing here is production configuration: the point is to see the whole path wor
 
 Work through it in order.
 Each step depends on the one before, and each ends by telling you how to check it worked before you move on.
-**That habit is the most useful thing to take away from this section**, because Stroom is quiet about failure: data that was dropped, a translation that matched nothing and an index that stored nothing all look much the same from a distance.
+**That habit is the most useful thing to take away from this section**, because Stroom can be quiet about failure: data that was dropped, a translation that matched nothing and an index that stored nothing all look much the same from a distance.
 
 If you only want to understand what Stroom is, read [What Stroom is]({{< relref "what-stroom-is.md" >}}) and stop there.

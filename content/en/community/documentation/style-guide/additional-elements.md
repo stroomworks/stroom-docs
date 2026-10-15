@@ -180,7 +180,7 @@ The following are some example of different links to internal content.
 #### Previous page in section link
 
 * A link to the previous page in the current section.
-  If the current page is the last page in the section then no link will be displayed.
+  If the current page is the first page in the section then no link will be displayed.
   What the previous page is is defined by the [page weights]({{< relref "front-matter#weight" >}}) or the default ordering of pages in the section.
 
   This is useful when you have a set of pages in a section that have a natural flow, e.g. where the pages in a section are the sequential steps in an installation guide.
@@ -244,11 +244,13 @@ in the rendered site.
   [link](../using-images#captions)
   ```
 
-* A [link](/docs/style-guide/using-images#captions) to a heading anchor on another page, using an absolute link.
+* A [link]({{< relref "using-images#captions" >}}) to a heading anchor on another page, using an absolute link.
 
   ```markdown
-  [link](/docs/style-guide/using-images#captions)
+  [link](/community/documentation/style-guide/using-images#captions)
   ```
+
+  The rendered link above uses `relref` so that the build checks it; the markdown shows the absolute path it resolves to.
 
 ### Download file links
 
@@ -281,6 +283,22 @@ E.g.
 The argument to the shortcode is the glossary term.
 This should match the heading text on the Glossary page exactly, ignoring case.
 It will be converted to an HTML anchor so that you can link directly to the heading for the term in question.
+
+
+### Pipeline element reference links
+
+If you need a plain text link to an element's entry in the [Pipeline Elements]({{< relref "/docs/reference/pipeline-elements.md" >}}) reference page you can use the `element` shortcode.
+E.g.
+
+* The {{< element "XSLTFilter" >}} element and the {{< element "SplitFilter" "Split Filter" >}} element.
+
+  ```markdown
+  The {{</* element "XSLTFilter" */>}} element and the {{</* element "SplitFilter" "Split Filter" */>}} element.
+  ```
+
+The first argument is the element name exactly as it appears in the heading on the reference page.
+The optional second argument is the link text, which defaults to the element name.
+To show the element with its icon, as it appears in the pipeline editor, use the `pipe-elm` shortcode instead (see [Pipeline elements]({{< relref "using-images#pipeline-elements" >}})).
 
 
 ## Code
@@ -658,6 +676,10 @@ The css/js downloaded from the Prism site is taken from the head of their master
 
 Various page/block level quotes for drawing attention to things.
 
+In pages under `docs`, use the [page contract]({{< relref "page-contract" >}}) shortcodes instead of a generic `warning` or `note` where they apply:
+`trap` for something that fails silently, destroys data or cannot be undone, `verify` for how to tell an action worked, `timing` for how long it takes, and `diagnose` for an ordered troubleshooting sequence.
+The build checks how they are used, and each renders with a fixed label that tells the reader what kind of statement it is.
+
 {{% warning %}}
 Using shortcodes, e.g. `{{</* pipe-elm "SplitFilter" */>}}` inside an of these alerts is currently not fully supported so may not work.
 {{% /warning %}}
@@ -786,7 +808,7 @@ root:
 
 The markdown for this is:
 
-````marckdown
+````markdown
 {{</* cardpane */>}}
   {{</* card header="YAML" */>}}
 ```yaml

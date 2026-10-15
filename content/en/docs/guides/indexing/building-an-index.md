@@ -35,8 +35,8 @@ An index needs three things before anything is searchable: the index document an
 Indexing is background processing, so nothing appears the moment you create the filter.
 The data is indexed as tasks are picked up, which depends on how far behind processing is.
 
-New data is also not searchable the instant it is indexed: it is held in an index writer in memory and becomes visible when that writer is flushed, which the **Index Writer Flush** job does on its schedule.
-Expect a lag of minutes rather than seconds.
+Once indexed, documents are searchable straight away: a search reads each shard through its open index writer.
+Only the **Doc Count** on the index's **Shards** tab lags, until the **Index Writer Flush** job commits the shard, every 10 minutes by default.
 {{< /timing >}}
 
 {{< verify >}}
@@ -54,7 +54,8 @@ A search that returns "some" results is consistent with most of the data being m
 A pipeline whose translation produced no `records:2` output processes to completion and indexes nothing.
 
 **A search returning results is not proof the index is current.**
-Unflushed data is invisible, so a search can be correct about everything up to the last flush and silently missing everything after it.
+It shows what has been indexed so far, and indexing follows processing, so streams still waiting for tasks are missing without anything saying so.
+Check the indexing pipeline's processor filter has caught up before trusting a count.
 {{< /not-proof >}}
 
 {{< /verify >}}
@@ -77,8 +78,9 @@ Set the volume group when you create the index.
 1. **Did the translation produce `records:2` output?**
    Step the indexing pipeline and look at the parser output.
    This is the usual cause of processed-but-not-indexed.
-1. **Has the index been flushed?**
-   If **Index Writer Flush** is disabled on the node doing the work, recent data stays in memory and never appears in searches.
+1. **Is the Doc Count zero while searches return results?**
+   The shard has not been committed yet; searches see uncommitted documents, the **Doc Count** does not.
+   If **Index Writer Flush** is disabled on the node doing the work, the count never catches up, and documents not yet committed are lost if the node stops without shutting down cleanly.
 1. **Are you searching the time range you indexed?**
    Results are partitioned by event time, not by when you processed them.
    A backfill lands in old partitions.

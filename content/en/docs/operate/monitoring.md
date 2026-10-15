@@ -42,7 +42,10 @@ See [Scheduled jobs]({{< relref "../reference/jobs.md" >}}), which says what sto
 ## Where the numbers come from
 
 * **The Jobs screen** shows each job's last and next run, per node.
-* **The Nodes screen** shows which nodes are up, and their CPU and memory, as recorded by the **Node Status** job.
+* **The Nodes screen** shows which nodes are up, how long since each started, its build version and how quickly it answers a ping.
+* **The Node Status job** records each node's CPU and memory use as internal statistics, every minute.
+  They go to the statistic stores named in `stroom.statistics.internal.enabledStoreTypes`, where you can query or chart them like any other statistic.
+  With no statistic store set up, they are dropped.
 * **The health endpoints** give the same information in a form a monitoring system can scrape.
   See [Health endpoints]({{< relref "checking-it-works/health-endpoints.md" >}}).
 * **Stroom's own logs**, which can be fed back into Stroom.

@@ -23,7 +23,8 @@ If it accepts, the data becomes a **[stream]({{< relref "../../concepts/streams/
 Every post gets an HTTP status, and three more things worth capturing:
 
 * **The receipt ID** on success, as the response body rather than a header, for example `1791981748008_0000_S_node1a`.
-  It identifies that one post, is stored on the stream as its `ReceiptId` attribute, and is what lets you trace a specific delivery through a proxy chain.
+  It identifies that one post.
+  Each hop records its own id in the stream's `ReceiptId` attribute and appends it to `ReceiptIdPath`, so searching `ReceiptIdPath` for the id the sender was given is what lets you trace a specific delivery through a proxy chain.
 * **`Stroom-Status`** on failure: a numeric code more specific than the HTTP status.
 * **`Stroom-Error`** on failure: the reason, in words.
   Stroom Proxy reads this off its own downstream responses to log forwarding failures, and it is the quickest way to find out why a post was rejected.

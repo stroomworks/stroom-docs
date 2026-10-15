@@ -332,8 +332,9 @@ const JOB_NOTES = {
 
   // ---- indexing
   'Index Writer Flush': ['Indexing', 'every',
-    'Flushes this node\'s index writers to disk. Off, recent data stays in memory, is ' +
-    'missing from searches, and is lost if the node restarts.'],
+    'Commits this node\'s index writers to disk. Searches see new documents without it, ' +
+    'but off, the Shards tab\'s Doc Count never updates and uncommitted documents are lost ' +
+    'if the node stops without shutting down cleanly.'],
   'Index Writer Cache Sweep': ['Indexing', 'every',
     'Closes index writers this node has finished with. Off, the node holds file handles ' +
     'and memory it no longer needs.'],
@@ -416,8 +417,8 @@ const JOB_NOTES = {
 
   // ---- node and cluster
   'Node Status': ['Node and cluster', 'every',
-    'Records this node\'s CPU and memory. Off, that node goes blank on the monitoring ' +
-    'screens while carrying on working.'],
+    'Records this node\'s CPU and memory as internal statistics. Off, that node\'s figures ' +
+    'stop while it carries on working.'],
   'Property Cache Reload': ['Node and cluster', 'every',
     'Picks up property changes made on another node. Off, this node keeps running on the ' +
     'values it started with and quietly behaves differently from the rest.'],
@@ -597,7 +598,8 @@ function jobs() {
     `{% /callout %}\n\n` +
     `{% callout type="note" %}\n` +
     `**On a new installation, pipeline processing is off.** *Processor Task Creator* ships ` +
-    `disabled, and it is the job that turns processor filters into work. Until it is ` +
+    `disabled, and it is the job that turns processor filters into work; *Data Processor*, ` +
+    `which does that work on each node, ships disabled too. Until both are ` +
     `enabled nothing is processed, however many worker nodes are running and however ` +
     `correct the pipelines are, and nothing says so. It is the first thing to check on a ` +
     `system that receives data happily but never processes any.\n` +
@@ -1145,9 +1147,13 @@ function responseCodes() {
     `and a **\`Stroom-Error\`** header carrying the reason in words.\n\n` +
     `On success the response body is the post's receipt id, such as ` +
     `\`1791981748008_0000_S_node1a\`: the receive time, a sequence number, \`S\` for Stroom ` +
-    `or \`P\` for Stroom Proxy, and the node. It is not a header. The same id is stored on ` +
-    `the stream as its \`ReceiptId\` attribute, which is what lets you trace a delivery ` +
-    `through a chain of proxies.\n\n` +
+    `or \`P\` for Stroom Proxy, and the node. It is not a header. Each hop that receives ` +
+    `the data, whether a Stroom Proxy or Stroom, sets the \`ReceiptId\` attribute to the id ` +
+    `it issued and appends that id to \`ReceiptIdPath\`. So a stream stored in Stroom has ` +
+    `Stroom's own id as its \`ReceiptId\`, and every id in the chain, including the one the ` +
+    `original sender was given, in \`ReceiptIdPath\`. \`ReceiptIdPath\` is what lets you ` +
+    `trace a delivery through a chain of proxies, and the sender's recorded id is what you ` +
+    `search it for.\n\n` +
     `**A sender that records none of these cannot tell you why data is missing.** Capture ` +
     `all three.\n\nThere are **${entries.length}** codes.\n` +
     body

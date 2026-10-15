@@ -86,7 +86,12 @@ Check the documentation for specific shortcode to see how to call it.
 To make your life much easier when editing the documentation it is highly recommended to use a text editor that supports text snippets.
 Snippets make it very quick to add shortcodes into the documentation.
 
-For example the following {{< external-link "UltiSnips (for Vim)" "https://github.com/SirVer/ultisnips" >}} and {{< external-link "VS Code" "https://code.visualstudio.com/docs/editor/userdefinedsnippets" >}} snippets adds a skeleton front matter to a page.
+For example the following {{< external-link "UltiSnips (for Vim)" "https://github.com/SirVer/ultisnips" >}} and {{< external-link "VS Code" "https://code.visualstudio.com/docs/editor/userdefinedsnippets" >}} snippets add a skeleton front matter to a page.
+
+The skeleton includes the [page contract]({{< relref "page-contract" >}}) keys that every page under `docs` must have.
+It defaults to a `guide` with a `verify` block, which passes the build checks as it stands.
+For a `concept` or `reference` page, delete the `verification` line and the `verify` block.
+Pages outside `docs` are not checked, so delete the `pageKind` and `verification` lines and the `verify` block there.
 
 {{< cardpane >}}
   {{< card header="UltiSnips (for Vim)" >}}
@@ -98,11 +103,17 @@ linkTitle: "$1"
 #weight:
 date: `date "+%Y-%m-%d"`
 tags: $2
+pageKind: ${3:guide}
+verification: ${4:required}
 description: >
-  $3
+  $5
 ---
 
 $0
+
+{{</* verify */>}}
+How to tell it worked.
+{{</* /verify */>}}
 endsnippet
 ```
   {{< /card >}}
@@ -117,13 +128,19 @@ endsnippet
       "title: \"${1:Title}\"",
       "linkTitle: \"$1\"",
       "#weight:",
-      "date: `date \"+%Y-%m-%d\"`",
+      "date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE",
       "tags: $2",
+      "pageKind: ${3:guide}",
+      "verification: ${4:required}",
       "description: >",
-      "  $3",
+      "  $5",
       "---",
       "",
-      "$0"
+      "$0",
+      "",
+      "{{</* verify */>}}",
+      "How to tell it worked.",
+      "{{</* /verify */>}}"
     ],
     "description": "Hugo markdown metadata front matter"
   }

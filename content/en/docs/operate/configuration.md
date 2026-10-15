@@ -42,7 +42,8 @@ That order is the single most useful thing to know about Stroom configuration, b
 {{% warning %}}
 **A property set in the YAML file cannot be changed from the user interface.**
 You can edit it, it saves, and the effective value does not move, because the YAML override still takes precedence.
-Nothing reports a conflict.
+Nothing warns you when you save.
+(On a cluster where the nodes disagree, the property editor does show a warning icon, *Multiple value sources exist in the cluster*, but that is about nodes differing from each other, not about the YAML winning.)
 {{% /warning %}}
 
 The Properties screen shows all three values for each property along with the effective one, so it will tell you this has happened if you look at the right column.

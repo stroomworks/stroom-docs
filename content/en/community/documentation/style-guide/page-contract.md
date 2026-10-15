@@ -71,6 +71,18 @@ The build fails, naming the file, if:
 
 These checks are in `layouts/partials/docs-page-contract.html`.
 
+The shortcodes check themselves too, on any page that uses them, not only pages in `docs`.
+The build fails, naming the file and position, if:
+
+* A `verify`, `golden`, `not-proof`, `trap` or `timing` block has no content.
+* A `golden` or `not-proof` block is not directly inside a `verify` block.
+* A `trap` has no `severity`, or one that is not `silent`, `destructive` or `immutable`.
+* A `timing` has no `mode`, or one that is not `immediate` or `async`.
+* A `diagnose` block does not contain a numbered list, i.e. no line starting with a number followed by a full stop, such as `1. `.
+  An empty `diagnose` block fails this check.
+
+These checks are in the shortcode templates in `layouts/shortcodes/`.
+
 
 ## Shortcodes
 

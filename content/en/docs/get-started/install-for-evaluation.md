@@ -28,7 +28,7 @@ The other stacks create no accounts at all, and need an administrator to be crea
 ## Install and start
 
 ```bash
-bash <(curl -s https://gchq.github.io/stroom-resources/v7.1/get_stroom.sh)
+bash <(curl -s https://gchq.github.io/stroom-resources/v7.14/get_stroom.sh)
 cd stroom_core_test/stroom_core_test*
 ./start.sh
 ```

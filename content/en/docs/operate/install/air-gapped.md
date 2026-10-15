@@ -30,16 +30,19 @@ Take exact versions rather than latest of anything.
 A version mismatch found on an isolated network is expensive to fix, because fixing it means another trip across.
 
 
-## Turn off what reaches out
+## Point the content store inward
 
-Two things try the internet by default and should be settled deliberately rather than left to fail:
+One setting looks to the internet by default, and should be settled deliberately rather than left to fail:
 
 * **Content store downloads.**
-  `stroom.contentStore.urls` points at a public content store.
-  On an isolated network, either clear it or point it at a copy you host internally: see [Hosting your own content store]({{< relref "local-content-store.md" >}}).
-* **Content pack import on start**, under `stroom.contentPackImport`, if you use it.
+  `stroom.contentStore.urls` points at the public content store on GitHub.
+  On an isolated network, replace it with the URL of a copy you host internally: see [Hosting your own content store]({{< relref "local-content-store.md" >}}).
+  Clearing it does not work, because an empty or blank list falls back to the public default.
+  Changing it needs a restart.
 
-Neither failing is fatal, which is exactly the problem: the system comes up looking healthy and some content you expected is simply absent.
+Content pack import on start, under `stroom.contentPackImport`, does not reach out: it is off by default, and when on it imports packs from a local directory (`importDirectory`), which is a reasonable way to bring content across.
+
+A content store that cannot be reached is not fatal, which is exactly the problem: the system comes up looking healthy and the content you expected is simply absent.
 
 
 ## Certificates

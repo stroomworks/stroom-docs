@@ -32,7 +32,7 @@ A filter shown as enabled under a disabled processor processes nothing, and neit
 This is the most common cause of "nothing is happening" in all of Stroom.
 {{< /trap >}}
 
-{{< image src="get-started/index-and-search/processor-disabled-filter-enabled.png" alt="A pipeline's Processors tab with two rows. The parent processor row has its Enabled box unticked; the filter row beneath it is ticked. Below, the filter's details show its expression, Feed equals the feed name AND Type equals Raw Events, while Last Poll Age, Last Poll Task Count, Total Tasks Created and Status are all blank." >}}A filter enabled under a disabled processor. Nothing has been polled or created, and nothing on the screen says why.{{< /image >}}
+{{< image src="get-started/index-and-search/processor-disabled-filter-enabled.png" alt="A pipeline's Processors tab with two rows. The parent processor row has its Enabled box unticked; the filter row beneath it is ticked. Below, the filter's details show its expression, Feed equals the feed name AND Type equals Raw Events, while Last Poll Age, Last Poll Task Count, Total Tasks Created and Status are all blank." >}}A filter enabled under a disabled processor. Nothing has been polled or created.{{< /image >}}
 
 When processing has run, the feed's **Data** tab has an `Events` stream for each `Raw Events` stream.
 
@@ -139,75 +139,76 @@ On its **Processors** tab, add a filter for `Feed = TEST-EVENTS` AND `Type = Eve
 {{< timing mode="async" >}}
 **Processing is asynchronous.**
 The task creator polls on an interval, then the work queues.
-For three rows this is seconds; for real volumes it is minutes to hours.
+For three events this is seconds; for real volumes it is minutes to hours.
 
-There is a second delay after that: documents are not searchable until the index writer flushes, which a [scheduled job]({{< relref "../reference/jobs.md" >}}) does.
-
-So an empty result immediately after enabling the filter means **not yet**, not **failed**.
+Once the indexing pipeline has run, its documents are searchable straight away: a search reads the shard through its open writer, so it does not wait for anything to be written to disk.
+What does lag is the **Doc Count** on the index's **Shards** tab, which only changes when the **Index Writer Flush** job commits the shard, every 10 minutes by default.
 {{< /timing >}}
 
 {{< verify >}}
-First confirm processing produced output: on the feed's **Data** tab, look for a stream of type `Events`, and check there is no stream of type `Error`.
-
-Then check the index.
-Open `TEST-EVENTS-INDEX`, go to its **Shards** tab and click refresh: the list is empty until you do.
-**Doc Count** is the number of documents committed to each shard, and **Last Commit** says when.
-
-Then search it.
-Create a **[Query]({{< relref "../concepts/query-language.md" >}})** and run:
+Open `TEST-EVENTS-INDEX` and go to its **Data** tab.
+The tab fills in a **[StroomQL]({{< relref "../concepts/query-language.md" >}})** query for you, built from the index's fields with the time field first, so there is nothing to type and no field name to get wrong:
 
 ```text
-from "TEST-EVENTS-INDEX"
-eval events = count()
-group by StreamId
-select StreamId, events
+from "TEST-EVENTS-INDEX" limit 100 select EventTime, StreamId, EventId, User, Action, IP
 ```
 
-There is one row per stream you indexed, with `events` at `3` for each post of the sample file.
+The order of the other fields follows the index's field list.
+Click **Run** (the play button).
 
 {{< golden >}}
-**The Shards tab shows a non-zero Doc Count, the query returns your events, and there are no `Error` streams.**
+**One row per event you sent, three for each post of the sample file, with every column filled in.**
 
-All of them.
-The count proves documents exist; the query proves they are searchable; the absence of errors proves the indexing filter did not fail on the way.
-Any one alone can mislead you.
+If you see that, you are done: there is nothing further to check.
+Rows can only come back if the translation produced events, the indexing pipeline ran over them, the indexing filter wrote them to a shard, and the shard is searchable.
+Filled-in columns show the indexing XSLT wrote each field and that the fields are stored.
 {{< /golden >}}
 
 {{< not-proof >}}
 **The index's field list proves nothing.**
 It is populated from the index's configuration, not its contents, and it looks complete and healthy when zero documents have been written.
-This is how people conclude indexing worked when it did not.
 
 **An `Events` stream existing is not proof it contains events.**
-Open it.
 A translation that matched nothing produces a valid, empty output stream.
 
-**`select count()` without a `group by` is not a total.**
-It returns one row per document, each with a count of `1`.
-Group by a field, as above, or read the Doc Count on the **Shards** tab.
+**A Doc Count of zero just after processing is not proof of failure**, for the reason above.
+Trust the **Data** tab.
 {{< /not-proof >}}
 
+**Create Dashboard** on the same tab turns the query into a dashboard in one step; the [next page]({{< relref "your-first-dashboard.md" >}}) builds one by hand so you can see how the parts fit together.
 {{< /verify >}}
 
+If the **Data** tab does not show what you expect, work through these in order.
+Each step rules out one stage of the chain, from the raw data to the index.
+
 {{< diagnose >}}
-1. **Are both the processor and the filter enabled?**
-   Check first, every time.
-1. **Is there an `Error` stream on the feed?**
-   Read it.
-   The volume group failure appears only here, and so do most other indexing failures.
-1. **Is there an `Events` stream at all?**
-   If not, the first pipeline did not run, and this is a [processing problem]({{< relref "../operate/checking-it-works/is-data-processing.md" >}}) rather than an indexing one: the filter's criteria may not match your data.
-1. **Does the `Events` stream contain events?**
-   Open it.
-   Empty output is the namespace mismatch from the previous page.
-1. **Did the indexing pipeline run?**
-   Its filter must select `Type = Events`, not `Raw Events`, and both its processor and filter must be enabled.
+1. **Does the tab show an error instead of results?**
+   Read it, and check the index's **Settings** tab for a **Volume Group**.
+1. **Has it simply not run yet?**
+   Open the indexing pipeline's **Processors** tab and select its filter.
+   A blank **Last Poll Age** means the filter has never polled: its processor is off, or the **Processor Task Creator** job is not running.
+   **Total Tasks Created** above zero, with the feed's **Data** tab showing no new streams yet, means the work is queued: wait and run the query again.
+1. **Is there an `Error` stream on `TEST-EVENTS`?**
+   Open the feed's **Data** tab and read any `Error` stream.
+   A missing volume group, `Index volume group name must be specified`, appears only here, and so do most other indexing failures.
+1. **Is there an `Events` stream, and does it contain events?**
+   No `Events` stream means the first pipeline did not run, which is a [processing problem]({{< relref "../operate/checking-it-works/is-data-processing.md" >}}).
+   An `Events` stream with nothing inside it is the namespace mismatch from the [previous page]({{< relref "your-first-translation.md" >}}).
+1. **Are the indexing pipeline's processor and filter both enabled, and does the filter select `Type = Events`?**
+   A filter on `Raw Events`, or one left disabled, means the indexing pipeline never sees the translated events, and nothing says so.
 1. **Does the indexing XSLT write `<record>` elements whose `data` names match the index's fields?**
-   Step the indexing pipeline over an `Events` stream and look at the `xsltFilter` output.
+   [Step]({{< relref "../concepts/pipeline-debugging.md#debugging-with-stepping-mode" >}}) the indexing pipeline over an `Events` stream and look at the `xsltFilter` output.
    The `IndexingFilter` ignores anything that is not a `records:2` record, and ignores a `data` name that is not a field.
-1. **Is the Doc Count still zero moments after processing?**
-   Wait for the index writer to flush, refresh the **Shards** tab, then ask again.
+1. **Rows come back, but some columns are empty?**
+   Either the XSLT does not write that field (step 6), or the field is not **Stored**.
+   An index without a **Default Extraction Pipeline** can only show stored fields.
+   Ticking **Stored** only affects documents written afterwards, so tick it, then [reset the index]({{< relref "../operate/resetting/reset-an-index.md" >}}) and process the data again.
+   See [Choosing fields]({{< relref "../guides/indexing/choosing-fields.md" >}}) for why a changed field definition can take a while to apply.
+1. **Fewer rows than events sent?**
+   Check for an `Error` stream as in step 3, and for streams the indexing filter has not reached yet as in step 2.
 {{< /diagnose >}}
+
+See [Is search working?]({{< relref "../operate/checking-it-works/is-search-working.md" >}}) and [Index problems]({{< relref "../operate/troubleshooting/index-problems.md" >}}) for indexes beyond this walk-through.
 
 
 ## Next

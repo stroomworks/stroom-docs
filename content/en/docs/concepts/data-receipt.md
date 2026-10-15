@@ -115,11 +115,11 @@ Each successful post is given a unique receipt ID, which is written into the bod
 It looks like this:
 
 ```text
-0000001738332835967_0000_P_node1
+1738332835967_0000_P_node1
 ```
 
 The parts are the receipt time in milliseconds since the epoch, a sequence number for posts received in the same millisecond, `P` or `S` for Stroom Proxy or Stroom, and the proxy ID or Stroom node name.
-When data passes through a chain of proxies, each one appends its receipt ID to the `ReceiptIdPath` attribute, so you can trace where it has been.
+When data passes through a chain of proxies, each hop, Stroom included, replaces `ReceiptId` with its own receipt ID and appends it to the `ReceiptIdPath` attribute, so `ReceiptIdPath` shows where the data has been and holds the ID the original sender was given.
 Proxy IDs and node names must be unique across the estate for this to work.
 
 

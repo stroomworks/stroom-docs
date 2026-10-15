@@ -35,13 +35,13 @@ See [Reset an index]({{< relref "../resetting/reset-an-index.md" >}}).
 {{< timing mode="async" >}}
 Indexing follows processing, so it inherits its latency.
 
-Then a shard is not searchable until its writer flushes, which the `Index Writer Flush` job does on a schedule.
-Data can be indexed and not yet findable, briefly.
+Once indexed, documents are searchable straight away, because a search reads each shard through its open writer.
+Only the **Doc Count** on the **Shards** tab lags, until the `Index Writer Flush` job commits the shard, every 10 minutes by default.
 {{< /timing >}}
 
 {{< verify >}}
 Open the index, go to its **Shards** tab and select refresh, since the list is empty until you do.
-Add up the **Doc Count** column, which counts the documents committed to each shard.
+Add up the **Doc Count** column, which counts the documents committed to each shard; it can trail the real count until the next flush.
 Then confirm a search reads them back, with one row per indexed stream:
 
 ```text
@@ -52,7 +52,7 @@ select StreamId, events
 ```
 
 {{< golden >}}
-**A non-zero Doc Count, rows from the query, and no `Error` streams.**
+**Rows from the query, no `Error` streams, and, once the shards are committed, a non-zero Doc Count.**
 
 The **Doc Count** proves documents were written, the query proves they are readable, and the absence of errors proves the indexing filter did not fail on the way.
 Any one alone can mislead.

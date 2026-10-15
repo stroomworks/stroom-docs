@@ -180,7 +180,9 @@ Streaming rules run as processor tasks, like pipeline processing.
 See [Nodes and jobs]({{< relref "../../operate/nodes-and-jobs.md" >}}).
 
 {{< timing mode="async" >}}
-A **streaming** rule runs as events are processed, so it only sees data that arrives after the rule is enabled: creating a rule does not look back over what is already stored.
+A **streaming** rule runs as processor tasks over the streams its processor filter matches.
+A new filter starts from the oldest matching stream, so unless you set a **Min Create Time** on it, a new rule first works through everything already stored, and detections for old data can arrive alongside new ones.
+After that, it sees each stream once, as it is processed.
 
 A **scheduled** rule runs when its schedule is next due, which may be hours away.
 Its first execution tells you whether it works, so set a short schedule while testing and lengthen it afterwards.
@@ -209,12 +211,13 @@ Check the executor jobs are enabled, and that the rule itself is.
 {{< /verify >}}
 
 {{< trap severity="silent" >}}
-**A streaming rule does not see data that arrived before it existed.**
+**Changing a streaming rule does not re-examine streams it has already processed.**
 
-It is attached to processing, so it only examines events as they are processed.
-Enabling a rule and then looking for detections in last week's data finds nothing, and nothing says why.
+The rule's processor filter remembers how far it has got, and editing the rule's query, or the filter's expression, does not move that back.
+A rule fixed after it has run therefore applies the fix only to streams processed from then on; the streams it already passed are never looked at again under the new query, and nothing says so.
 
-To test against existing data, [reprocess it]({{< relref "../../operate/resetting/reprocess-data.md" >}}), or use a scheduled query whose time range covers the period you care about.
+To run the corrected rule over earlier data, [reprocess it]({{< relref "../../operate/resetting/reprocess-data.md" >}}), [replace the filter]({{< relref "../../operate/resetting/reset-a-processor-filter.md" >}}), or use a scheduled query whose time range covers the period you care about.
+See [The tracker cannot be rewound]({{< relref "../../concepts/processing/processors-tab.md#the-tracker-cannot-be-rewound" >}}).
 {{< /trap >}}
 
 {{< diagnose >}}
@@ -227,9 +230,11 @@ To test against existing data, [reprocess it]({{< relref "../../operate/resettin
    `Analytic Executor: Scheduled Query` drives scheduled rules and `Analytic Executor: Table Builder` drives table builder rules.
    Streaming rules run as processor tasks, so they need `Data Processor` and `Processor Task Creator` like any pipeline processing.
    A disabled job means that whole kind never runs, with no error.
+1. **Has the streaming rule's processor filter reached the data?**
+   A rule only sees streams its filter matches: check the filter on the **Execution** tab is enabled, that its expression and **Min Create Time** include the streams you expect, and that it has tasks.
+   If the rule or filter was edited after it had already processed the streams, they will not be looked at again; see the trap.
 1. **Is it the right kind of rule for the question?**
-   A streaming rule over historical data finds nothing.
-   See the trap.
+   To look over a fixed period of stored data, a scheduled query is usually the better fit.
 1. **For a scheduled rule, has its schedule come round yet?**
    Check the execution history before concluding it is broken.
 1. **Are detections being written somewhere you are not looking?**

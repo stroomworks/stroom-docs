@@ -31,7 +31,7 @@ This page covers **authentication**: proving who someone is.
 What they are then allowed to do is [Users and permissions]({{< relref "users-and-permissions.md" >}}).
 
 
-## The three options
+## The options
 
 `stroom.security.authentication.openId.identityProviderType` takes one of:
 
@@ -39,10 +39,12 @@ What they are then allowed to do is [Users and permissions]({{< relref "users-an
 |---|---|---|
 | `INTERNAL_IDP` | In Stroom | A standalone system, evaluation, or anywhere with no existing provider |
 | `EXTERNAL_IDP` | In your provider | Any estate that already has one |
-| `NO_IDP` | Nowhere | A remote proxy that only forwards onward |
 
-**Stroom defaults to `INTERNAL_IDP`.**
-Stroom Proxy defaults to `NO_IDP`, and `INTERNAL_IDP` is not valid for a proxy at all: a proxy has no accounts of its own.
+**Stroom defaults to `INTERNAL_IDP`**, and will not start with any other value.
+
+Stroom Proxy has the same setting with a different choice.
+It defaults to `NO_IDP`, meaning it authenticates nobody itself, which suits a remote proxy that only forwards onward; set `EXTERNAL_IDP` to have it check tokens from your provider.
+`INTERNAL_IDP` is not valid for a proxy at all, because a proxy has no accounts of its own, and `NO_IDP` is not valid for Stroom.
 
 
 ## Internal
@@ -76,7 +78,7 @@ This is the part that is easy to get wrong and expensive to correct.
 | Setting | Default | What it is for |
 |---|---|---|
 | `uniqueIdentityClaim` | `sub` | The claim that identifies the person. Stroom keys its user record on this |
-| `userDisplayNameClaim` | None | A friendlier name to show. Need not be unique, and may change |
+| `userDisplayNameClaim` | `preferred_username` | A friendlier name to show. Need not be unique, and may change |
 | `fullNameClaimTemplate` | `${name}` | The person's full name, for display |
 
 When someone signs in for the first time, Stroom creates a user record keyed on the value of `uniqueIdentityClaim`.

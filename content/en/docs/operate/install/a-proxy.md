@@ -59,6 +59,10 @@ Set it, and make it unique across the estate.
 It goes into every receipt ID this proxy issues, and a chain of proxies appends each one to `ReceiptIdPath`, which is how a stream can be traced back through the hops it took.
 Two proxies sharing an id makes that trace ambiguous exactly when you need it.
 
+Left unset, the proxy generates a UUID-based id on first start, stores it in its home directory and logs a warning.
+That id stays unique and stable, but it is opaque: a receipt path made of generated ids tells you how many hops there were, not which sites they were.
+Copying a proxy's home directory to build another copies the stored id too.
+
 
 ### `downstreamHost`
 
@@ -155,7 +159,8 @@ See [Controlling what is accepted]({{< relref "../../guides/receiving-and-routin
    With aggregation on, a batch is held until it is full or old enough.
    Compare the age of the oldest queued item against `aggregationFrequency`.
 1. **Is `proxyId` set and unique?**
-   Without it, receipt paths cannot be traced and two sites can look like one.
+   Unset, receipt paths carry generated ids that do not say which site is which.
+   Set the same on two proxies, or copied with a home directory, two sites look like one.
 1. **Does the receipt check mode match downstream?**
    See the trap above.
 1. **Is the disk filling?**

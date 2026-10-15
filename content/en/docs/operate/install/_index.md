@@ -70,7 +70,8 @@ Getting them up in the right order saves time, because each one is hard to test 
 1. **Volumes**, so there is somewhere to write data and index shards.
    See [Volumes]({{< relref "../../concepts/volumes.md" >}}).
 1. **Turn processing on.**
-   Pipeline processing ships disabled, so nothing is processed until the **Processor Task Creator** job is enabled.
+   Pipeline processing ships disabled, so nothing is processed until both the **Processor Task Creator** and **Data Processor** jobs are enabled.
+   The first creates the work and the second does it, on each node where it is on.
    See [Scheduled jobs]({{< relref "../../reference/jobs.md" >}}).
 
 Steps 4 and 7 are the two that catch people, because neither announces itself.

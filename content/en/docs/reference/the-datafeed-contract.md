@@ -106,7 +106,8 @@ Never hardcode a key into a configuration file that ships in version control or 
 
 On success the response returns `200`, and the response **body** is the receipt ID that identifies that one post, for example `1791981748008_0000_S_node1a`.
 It is formed from the receipt time in epoch milliseconds, a sequence number, `S` for Stroom or `P` for Stroom Proxy, and the node name.
-There is no `ReceiptId` response header; the same ID is stored on the stream as its `ReceiptId` attribute.
+There is no `ReceiptId` response header.
+The ID is stored on the stream as its `ReceiptId` attribute and appended to `ReceiptIdPath`; when the data passes through Stroom Proxy, each later hop replaces `ReceiptId` with its own ID, so it is `ReceiptIdPath` that keeps the one the sender was given.
 
 On failure it carries **`Stroom-Status`** with a numeric code and **`Stroom-Error`** with the reason in words.
 Stroom Proxy reads `Stroom-Error` off its own downstream responses to log forwarding failures, and it is the quickest way to find out why a post was rejected.
