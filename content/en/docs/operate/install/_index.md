@@ -43,6 +43,11 @@ aliases:
   - /docs/install-guide/upgrades/v6-to-v7/
 ---
 
+{{% note %}}
+Building Stroom from source and running it on your own machine to work on it?
+See [Running Stroom in an IDE]({{< relref "/community/dev-guide/stroom-in-an-ide.md" >}}) instead.
+{{% /note %}}
+
 A Stroom installation is a handful of pieces that have to agree with each other: a database, one or more Stroom nodes, somewhere to put the data, and a way for people to sign in.
 
 Getting them up in the right order saves time, because each one is hard to test until the one before it works.

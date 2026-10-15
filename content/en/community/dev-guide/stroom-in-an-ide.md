@@ -2,283 +2,162 @@
 title: "Running Stroom in an IDE"
 linkTitle: "Running Stroom in an IDE"
 weight: 20
-date: 2022-01-25
+date: 2026-10-15
 tags: 
 description: >
-  How to run Stroom in an Integrated Development Environment, e.g. IntelliJ
+  Building Stroom from source and running it on your own machine, with the database in Docker and the application in IntelliJ.
 
 ---
 
-We tend to use IntelliJ as our Java IDE of choice.
-This is a guide for running Stroom in IntelliJ for the purposes of developing/debugging Stroom.
+This page is for people changing Stroom itself.
+It gets a single node running from source, backed by a database in Docker, reachable at `https://localhost`, then covers running the tests and checks.
+
+Nothing here is how you run Stroom for real.
+A development node relaxes security so the user interface can be debugged, and creates an `admin` account with the password `admin`.
 
 
 ## Prerequisites
 
-In order to build/run/debug Stroom you will need the following:
+* **Java 25**, the Eclipse Temurin distribution.
+  The build is set to that version and will not compile with an older one.
+  {{< external-link "SDKMAN!" "https://sdkman.io/install" >}} makes installing and switching JDKs straightforward.
+* **Git**.
+* **Docker**, with Docker Compose, for the database and Nginx.
+* **IntelliJ IDEA**.
+  Most Stroom developers use it, and the repository ships run configurations for it.
+  Any IDE will do, but you would be setting those up yourself.
+* **bash 4+**, plus **jq**, **GNU grep** and **GNU sed** for the helper scripts.
+  We develop on Linux, so on a Mac you may have problems with some of the scripts.
 
- * OpenJDK 15
- * Git
- * Gradle
- * IntelliJ
- * Docker CE
- * Docker Compose
-
-These instructions assume that all servcies will either run in the IDE or in Docker containers.
-
-We develop on Linux so if you are running on a Mac you may experience issues with some of our shell scripts.
-For running the various shell scripts in our repositories you are advised to install
-
-* bash 4+
-* jq
-* GNU grep
-* GNU sed
+You do not need Gradle installed.
+The repository includes the Gradle wrapper, `./gradlew`, which fetches the right version on first use.
 
 
-## Stroom git repositories
+## Get the code
 
-To develop Stroom you will need to clone/fork multiple git repositories.
-To quickly clone all of the Stroom repositories you can use the helper script described in {{< external-link "stroom-resource" "https://github.com/gchq/stroom-resources/blob/master/README.md" >}}.
+As a minimum you need two repositories: `stroom`, the application, and `stroom-resources`, which holds the Docker Compose stack it runs against.
 
-
-## Database setup
-
-Stroom requires a MySQL database to run.
-You can either point stroom at a local MySQL server or use the MySQL Docker container from _stroom-resources_.
-
-
-### MySQL in a Docker container
-
-See the section below on [stroom-resources](#stroom-resources).
-
-
-### Host based MySQL server
-
-With an instance of MySQL server 8.0 running on your local machine do the following to create the _stroom_ database:
+Clone them next to each other, in the same parent directory.
+The run configurations look for `stroom-resources` at `../stroom-resources` relative to `stroom`, for its development certificates.
 
 {{< command-line "dev" "localhost" >}}
-# log into your MySQL server using your root credentials
-mysql --user=root --password=myrootpassword
+git clone https://github.com/gchq/stroom.git
+git clone https://github.com/gchq/stroom-resources.git
 {{</ command-line >}}
 
-Then run the following commands in the MySQL shell:
-
-{{< sql-shell >}}
-drop database stroom;
-create database stroom;
-grant all privileges on stroom.* to stroomuser@localhost identified by 'stroompassword1';
-quit;
-{{</ sql-shell >}}
+To clone all the Stroom repositories at once, use `stroom-resources/bin/cloneOrCheckStroomRepos.sh`, described in the {{< external-link "stroom-resources README" "https://github.com/gchq/stroom-resources/blob/master/README.md" >}}.
 
 
-## Local configuration file
+## Start the services
 
-When running stroom in an IDE you need to have a local configuration file to allow you to change settings locally without affecting the repository.
-The local configuration file live in the root of the _Stroom_ repository `./local.yml`.
-
-To create a default version of this file run this script from within the root of the stroom git repository.
-
-{{< command-line "dev" "localhost" >}}
-./local.yml.sh
-{{</ command-line >}}
-
-This will create `./local.yml` using `stroom-app/dev.yml` as a template.
-So that you can run a multi-node cluster it will also create `./local2.yml` and `./local3.yml` as well.
-These files are not source controlled so you can make any changes you like to them, e.g. setting log levels or altering stroom property [property values]({{< relref "/docs/operate/configuration.md" >}})  values.
-
-
-## stroom-resources
-
-As a minimum to develop stroom you will need clones of the `stroom` and `stroom-resources` git repositories.
-`stroom-resources` provides the docker-compose configuration for running the many docker containers needed.
-
-Having cloned `stroom-resources` navigate to the directory `stroom-resources/bin` and run the script
+From `stroom-resources/bin`, run:
 
 {{< command-line "dev" "localhost" >}}
 ./bounceIt.sh -y
 {{</ command-line >}}
 
-On first run this will create a default version of the git-ignored file `stroom-resources/bin/local.env` which is intended for use by developers to configure the docker stacks to run.
+`bounceIt.sh` stops anything from the stack that is already running and starts it again; `-y` skips the confirmation prompt.
 
-This file is used to set a number of environment variables that docker compose will use to configure the various containers.
-The key variable in there is `SERVICE_LIST`.
-This is a bash array that sets the services to run.
-By default it is set to run `stroom-all-dbs` (MySQL + database init scripts) and `nginx` which are sufficient for running Stroom in an IDE.
+On first run it creates `stroom-resources/bin/local.env` from `local.default.env`.
+That file is not under version control and is yours to edit.
+Its `SERVICE_LIST` is a bash array of the containers to run, and the default is what a development node needs:
 
+* **`stroom-all-dbs`**: MySQL, listening on `localhost:3307`, with the `stroom` database and user already created.
+* **`nginx`**: serves `https://localhost` and passes requests through to Stroom on port 8080.
+* **`scylladb`**.
 
-## Verify the Gradle build
+Run it again whenever you want the stack restarted.
+The data in the database survives a bounce.
 
-Before trying to run Stroom in an IDE it is worth performing a Gradle build to verify the code compiles and all dependencies are present.
-This command will run all parts of the build except for the tests which can take 20+mins to run.
-Some parts of the build are run inside docker containers (to remove the need to install additional dependencies) so on first run there will be an overhead of building the docker image layers.
-These layers will be cached which will speed up future builds.
-
-{{< command-line "dev" >}}
-./gradlew clean build -x test
-{{</ command-line >}}
+Check that `docker ps` lists the `stroom-all-dbs` and `nginx` containers, running and not restarting.
 
 
-## Local or embedded MySQL
+## Create your local configuration
 
-The Junit integration tests that need a database can either be run against the local MySQL (i.e. `stroom-all-dbs`) or an embedded MySQL instance.
-
-Configuring the database used can be done with the JVM argument `-DuseEmbeddedMySql=false`, which can be set in _Run/Debug Configurations_ => _Edit configuration templates..._ => _JUnit_ => _VM options_ in Intellij.
-False will use your local MySQL instance, true with use the embedded one.
-The CI build uses the embedded MySQL.
-
-The pros/cons of using the embedded instance are:
-
-{{< cardpane >}}
-  {{< card header="Pros" >}}
-* No dependency on _stroom-resources_ to run the full build.
-  {{< /card >}}
-  {{< card header="Cons" >}}
-* Requires the MySQL binaries to be downloaded, sometimes multiple times.
-* Consumes a lot of disk space if multiple instances are run.
-* Harder to debug tests as the database is destroyed at the end of the test.
-  {{< /card >}}
-{{< /cardpane >}}
-
-
-## Clearing down your environment
-
-If you need to work from a clean slate and you are using the container based MySQL you can run the following:
-
-{{% warning %}}
-This script will delete ALL containers running/stopped whether related to Stroom or not.
-It is essentially a clean slate for your docker environment.
-If you are running other unrelated containers, don't run this.
-
-It will also delete all stroom state held on the filesystem, i.e. the stream store and lucene index shards.
-{{% /warning %}}
+From the root of the `stroom` repository, run:
 
 {{< command-line "dev" "localhost" >}}
-pwd
-(out)/home/dev/git_work/stroom-resources/bin
-(out)
-./clean.sh \
-&& rm -rf ~/tmp/stroom \
-&& rm -rf /tmp/stroom \
-&& rm -rf ~/.stroom/volumes \
-&& rm -rf ~/.stroom/temp \
-&& rm -rf ~/.stroom/logs \
-&& rm -rf ~/.stroom/v7
+./local.yml.sh
 {{</ command-line >}}
 
+This writes `local.yml`, using `stroom-app/dev.yml` as the template, and `local2.yml` and `local3.yml` for running a three-node cluster.
+None of them are under version control, so change them as you like: log levels, [property values]({{< relref "/docs/operate/configuration.md" >}}), anything you are testing.
 
-## Sample Data
-
-When developing Stroom it is helpful to have Stroom run with pre-loaded content and data as by default it will be completely empty.
-`SetupSampleData.java` is a class that loads pre-defined content and data into the database and file system so that Stroom can begin processing data on boot.
-This sample data/content is very useful for manually testing and exercising the application in development.
-This class assumes that the database being used for Stroom is completely empty.
-
-To run _SetupSampleData_ use the pre-defined Run Configuration in IntelliJ called _SetupSampleData_.
-This will load content (e.g. XSLTs, Pipelines, etc.), create Feeds and load data into the Feeds.
-
-You should now have a database and stream store populated with tables and data, providing you with some predefined feeds, data, translations, pipelines, dashboards, etc.
-
-When Stroom is next started it will begin to process the data using the pre-defined pipelines.
+`local.yml` already points at the database on port 3307, and is the file every development run configuration starts Stroom with.
 
 
-## Running Stroom from the IDE
+## Open it in IntelliJ
 
-The user interface for Stroom is built using GWT (see [GWT Project](http://www.gwtproject.org/) for more information or GWT specific documentation).
-As a result Stroom needs to be started up with GWT _Super Dev Mode_.
-_Super Dev Mode_ handles the on-the-fly compilation of the Java user interface source into JavaScript and the source map that links client JavaScript back to Java source for client side debugging.
+Open the root of the `stroom` repository, and let IntelliJ import it as a Gradle project.
+The first import downloads all the dependencies and takes a while.
 
-The following steps for running and debugging Stroom in IDEA assume you have a MySQL database running on `localhost:3307`, with a database `stroom` and user `stroomuser` already created.
+Then set the project SDK to your Java 25 install, in **File** → **Project Structure** → **Project**.
+
+The shared run configurations in `.idea/runConfigurations` appear in the run configuration list without any setup.
 
 
-### JAVA_HOME
+## Build and run
 
-Ensure environment variable `JAVA_HOME` is set and points to a valid JDK 15 directory
+Three steps, in this order:
 
-{{< command-line "dev" >}}
-export JAVA_HOME=~/.jdks/openjdk-15.0.2
+1. **`clean`**, which removes anything left by an earlier build.
+1. **`gwtDraftCompile`**, which compiles the user interface from Java into JavaScript.
+   A draft compile is unoptimised and much quicker than the full `gwtCompile` a release uses.
+1. **`Stroom Node 1 (GWT Super Dev)`**, which starts Stroom with `local.yml`.
+
+The draft compile is the slow step, a few minutes.
+You do not need to repeat it every time: run it again after pulling changes or switching branches, or when the user interface fails to load.
+
+
+### In IntelliJ
+
+Open the **Gradle** tool window and run the tasks from there by double-clicking them:
+
+* **stroom** → **Tasks** → **build** → **clean**
+* **stroom** → **stroom-app-gwt** → **Tasks** → **gwt** → **gwtDraftCompile**
+* **stroom** → **stroom-app** → **Tasks** → **application** → **Stroom Node 1 (GWT Super Dev)**
+
+There is also an IntelliJ run configuration called **Stroom Node 1 (GWT Super Dev)**, in the list at the top of the window.
+It starts the same application, and starting it with **Debug** lets you set breakpoints in server code.
+
+Both set the JVM argument `-DgwtSuperDevMode=true`, which relaxes the content security policy so the browser can load the user interface from the GWT code server (see [Changing the user interface](#changing-the-user-interface)).
+
+
+### On the command line
+
+From the root of the `stroom` repository:
+
+{{< command-line "dev" "localhost" >}}
+./gradlew clean
 {{</ command-line >}}
 
-Alternatively to simplify the process of installing and managing Java JDKs consider using {{< external-link "SDKMan" "https://sdkman.io/install" >}}.
-
-
-### Build `stroom-app`
-
-NOTE: During development, it is helpful to skip running unit and integration tests, to speed up the build process:
-{{< command-line "dev" >}}
-./gradlew clean build -x test
+{{< command-line "dev" "localhost" >}}
+./gradlew :stroom-app-gwt:gwtDraftCompile
 {{</ command-line >}}
 
-
-### Start a single Stroom node
-
-1. Select the IDEA run configuration named `Stroom GWT SuperDevMode`
-1. Click `Debug`.
-   Stroom will start, with log output displayed in the `Run` pane at the bottom of the window.
-
-This run configuration essentially sets the JVM argument `-DgwtSuperDevMode=true` to run the application in Super Dev Mode.
-
-Watch the log output. Once you see a log INFO message containing the text "Started", you will be able to launch the app in a browser from: https://localhost.
-
-You will see the Stroom blue background, with a username/password prompt.
-Enter the following default credentials:
-
-* Username: `admin`
-* Password: `admin`
-
-You can now interact with Stroom and set breakpoints in Java code.
-Note that setting breakpoints in any of the java code in modules suffixed with `-client` (i.e. client side GWT Java code) does not have any effect, as these components are compiled to static JavaScript.
-Breakpoints in modules ending `-shared` will only have an effect **if** you are debugging server side code.
-
-{{% note %}}
-Stroom has been written with Google's Chrome browser in mind so has only been tested on Chrome.
-Behaviour in other browsers may vary.
-We would like to improve cross-browser support so please let us know about any browser incompatibilities that you find.
-{{% /note %}}
-
-
-### Starting the Super Dev Mode Compiler
-
-With the Stroom application running you need to also run a draft GWT compile and run the Super Dev Mode compiler.
-
-On first use it is recomended to run:
-
-{{< command-line "dev" >}}
-./gradlew gwtClean :stroom-app-gwt:gwtDraftCompile :stroom-app-gwt:gwtSuperDevMode
+{{< command-line "dev" "localhost" >}}
+./gradlew ":stroom-app:Stroom Node 1 (GWT Super Dev)"
 {{</ command-line >}}
 
-This will ensure a clean state of the GWT compiled javascript.
-It may be necessary to re-run the clean, and draft compile if there have been significant changes to the Java code or if there are problems running Stroom in Super Dev Mode.
+The quotes on the last one matter, because the task name has spaces in it.
+Add `--debug-jvm` to have it wait for a debugger to attach on port 5005.
 
-Normally however you can just run:
-
-{{< command-line "dev" >}}
-./gradlew :stroom-app-gwt:gwtSuperDevMode
-{{</ command-line >}}
-
-When this gradle task runs it will echo some instructions for how to set up your browser.
-Once the browser is all set up with the dev mode favorites you can visit Stroom at
-
-* http://localhost:8080 (bypassing Nginx)
-* https//localhost (via Nginx)
-
-Running without Nginx is simpler but can hide problems with the Stroom/Nginx configuration/integration.
+`buildNoIntTestsDraftAppGwt.sh` in the root of the repository does a full build without tests or the full user interface compile, followed by the draft compile, in one go.
 
 
-### Authentication
+### Sign in
 
-In development you can either run Stroom with authentication on or off.
-It is a quicker development experience with authentication turned off but this can hide any problems with authentication flow.
+Watch the output until Stroom logs that it has started, and shows a large **super dev mode** banner, then go to:
 
-To run Stroom with authentication turned off set the following in `local.yml`:
+**`https://localhost`**
 
-```yaml
-stroom:
-  security:
-    authentication:
-      authenticationRequired: false
-```
+The certificate is a development one that your browser will not trust, so accept the warning.
 
-If you want to run with authentication but don't want to be prompted to change the password on first boot you can set:
+Sign in as `admin`, password `admin`.
+`dev.yml` turns on `autoCreateAdminAccountOnBoot`, so on a new database the account is created for you.
+
+You are asked to change the password on first sign-in.
+To skip that, set this in `local.yml` before the first start:
 
 ```yaml
 stroom:
@@ -288,14 +167,71 @@ stroom:
         forcePasswordChangeOnFirstLogin: false
 ```
 
-Alternatively you can run the IntelliJ Run Configuration _Stroom Reset Admin Password_, which will reset the password to `admin` and prevent further prompts to change it.
+Alternatively run the IntelliJ run configuration **Stroom Reset Admin Password**, which sets the password back to `admin` and stops further prompts to change it.
+
+Stroom logging that it has started is not proof that it works.
+The server starts happily without a compiled user interface, and only the browser shows you that one is missing.
+You are up when you can sign in and the explorer tree on the left loads.
+
+{{% note %}}
+Stroom is developed and tested mostly in Chrome.
+Behaviour in other browsers may vary; please let us know about any incompatibilities you find.
+{{% /note %}}
 
 
-### Right click behaviour
+## Sample data
 
-Stroom overrides the default right click behaviour in the browser with its own context menu.
-For UI development it is often required to have access to the browser's context menu for example to inspect elements.
-To enable the browser's context menu you need to ensure this is property is set to null in `dev.yml`:
+Stroom starts empty.
+`SetupSampleData` loads pre-defined content and data into the database and file system: feeds, XSLTs, pipelines, dashboards and data in those feeds.
+It is the quickest way to have something to exercise in development.
+
+Run the IntelliJ run configuration **SetupSampleData**, or `./gradlew setupSampleData`, against an empty database and before starting Stroom.
+When Stroom next starts, it processes the data with the pre-defined pipelines.
+
+
+## Changing the user interface
+
+The user interface is written in Java and compiled to JavaScript with {{< external-link "GWT" "https://www.gwtproject.org/" >}}.
+
+With only a draft compile, a change to user interface code means another draft compile and a browser refresh.
+For a lot of interface work it is quicker to run the GWT code server alongside Stroom, which recompiles only what changed each time you refresh:
+
+{{< command-line "dev" "localhost" >}}
+./gradlew :stroom-app-gwt:gwtSuperDevMode
+{{</ command-line >}}
+
+In IntelliJ, this is the **gwtSuperDevMode** run configuration.
+
+When it starts it prints instructions for setting up your browser.
+Visit the code server it links to, and drag its **Dev Mode On** bookmark into your browser's bookmarks.
+Then, on the Stroom page, click **Dev Mode On** to load the code server's output.
+
+From then on, a change to code in a `-client` or `-shared` module is picked up by refreshing the browser.
+
+If you have made larger changes, such as moving or renaming classes, GWT can get confused.
+Run `./gradlew gwtClean`, then the draft compile, then start the code server again.
+
+
+### Debugging user interface code
+
+Breakpoints in IntelliJ have no effect on code in `-client` modules, because it runs in the browser as JavaScript.
+Breakpoints in `-shared` modules only take effect when that code is running on the server.
+
+Debug the user interface in Chrome Dev Tools (`shift+ctrl+i`) instead.
+Super Dev Mode creates source maps that link the running JavaScript back to the Java source, so you can set breakpoints in the Java.
+
+To find the Java source, open the **Sources** tab, then in the **Page** navigator on the left select:
+
+**top** → **ui** → **stroom (ui)** → **127.0.0.1:9876** → **sourcemaps/stroom** → **stroom**
+
+That folder contains all the Stroom Java packages.
+
+
+### Right-click behaviour
+
+Stroom replaces the browser's right-click menu with its own.
+For interface work you often want the browser's menu back, for example to inspect an element.
+Set this in `local.yml`:
 
 ```yaml
 stroom:
@@ -303,25 +239,86 @@ stroom:
     oncontextmenu: null
 ```
 
-To return it to its defualt value, set it to `"return false;"`.
-
-### Hot loading GWT UI code changes
-
-If you make any changes to the Java code in `-client` or `-shared` modules then in order for them to be hot loaded into the Javascript code you simply need to refresh the brower.
-This will trigger Super Dev Mode to recompile any changed code.
-
-If you have make significant code changes, e.g. moving/renaming classes then GWT can get confused so you may need to run the _gwtDraftCompile_ and/or _gwtClean_ gradle tasks followed by _gwtSuperDevMode_.
+Remove it, or set it to `"return false;"`, to go back to the default.
 
 
-### Debugging GWT UI code
+## Tests and checks
 
-To debug the GWT UI code you will need to use Chrome Dev Tools (`shift+ctrl+i`).
-Setting breakpoints in the UI code in IntelliJ will have no effect.
-SuperDevMode creates source maps that link the running javascript back to Java code that you can set break points in.
+Tests that need a database use the `stroom-all-dbs` container, so keep the `stroom-resources` stack running while you test.
 
-To find the Java source in Chrome Dev Tools open the _Sources_ tab then in the left hand navigator pane (_Page_ tab) select:
+Run the tests for one module:
 
-_Top_ => _ui_ => _stroom (ui)_ => _127.0.0.1:9876_ => _sourcemaps/stroom_ => _stroom_
+{{< command-line "dev" "localhost" >}}
+./gradlew :stroom-index:stroom-index-impl:test
+{{</ command-line >}}
 
-This folder then contains all the stroom java packages.
+Run one test class, or one method:
 
+{{< command-line "dev" "localhost" >}}
+./gradlew :stroom-index:stroom-index-impl:test --tests "stroom.index.impl.TestActiveShards"
+{{</ command-line >}}
+
+In IntelliJ, the green arrow beside a test class or method runs just that, and **Debug** works the same way as for the application.
+
+Run every test:
+
+{{< command-line "dev" "localhost" >}}
+./gradlew test
+{{</ command-line >}}
+
+This takes a long time, well over twenty minutes, so most people run the modules they have changed and leave the full run to the CI build.
+
+Check the code style against the rules in `config/checkstyle/checkstyle.xml`:
+
+{{< command-line "dev" "localhost" >}}
+./gradlew checkstyleMain checkstyleTest
+{{</ command-line >}}
+
+Checkstyle failures fail the build, so run this before pushing.
+
+To run everything the CI build does, compile, tests, checkstyle and the full user interface compile together:
+
+{{< command-line "dev" "localhost" >}}
+./gradlew clean build
+{{</ command-line >}}
+
+Add `-x test` to skip the tests when all you want to know is that it compiles.
+Some parts of the build run inside Docker containers, so the first build spends time building those images; later builds use the cached layers.
+
+
+## When it goes wrong
+
+* **Stroom will not start and the log mentions the database.**
+  The stack is not up, or not on port 3307.
+  Run `./bounceIt.sh -y` again and check `docker ps`.
+* **`https://localhost` gives a 502 or will not connect.**
+  Nginx is up but Stroom is not, or has not finished starting.
+* **The page loads but the user interface does not appear, or behaves like an older version.**
+  The draft compile is missing or stale.
+  Run `gwtDraftCompile` again.
+* **The build fails with a Java version error.**
+  IntelliJ, or `JAVA_HOME` on the command line, is pointing at something other than Java 25.
+* **Tests fail on database connections.**
+  They need `stroom-all-dbs` running, the same as the application.
+
+
+## Starting again from nothing
+
+To work from a clean slate, run this from `stroom-resources/bin`:
+
+{{% warning %}}
+`clean.sh` stops and removes the stack's containers, and with them the database.
+It matches containers by name, so any other container of yours with `nginx` or `kafka` in its name goes too, and it also removes unused Docker images and volumes.
+Read the script before running it on a machine you use for anything else.
+
+The `rm` commands delete all the Stroom state held on the file system, including the stream store and index shards.
+{{% /warning %}}
+
+{{< command-line "dev" "localhost" >}}
+./clean.sh \
+&& rm -rf ~/.stroom/v7 \
+&& rm -rf /tmp/stroom/v7
+{{</ command-line >}}
+
+`~/.stroom/v7` and `/tmp/stroom/v7` are the home and temp directories set in `dev.yml`, one subdirectory per node.
+Run `./bounceIt.sh -y` afterwards for a fresh, empty database.
