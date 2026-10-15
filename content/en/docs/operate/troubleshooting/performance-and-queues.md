@@ -15,8 +15,8 @@ They need opposite responses.
 A backlog needs capacity or patience; a stall needs a fix.
 Telling them apart is most of this page.
 
-**A backlog is progressing, just not fast enough.
-A stall is not progressing at all.**
+**A backlog is progressing, just not fast enough.**
+**A stall is not progressing at all.**
 Everything below is a way of establishing which you have.
 
 {{< timing mode="async" >}}

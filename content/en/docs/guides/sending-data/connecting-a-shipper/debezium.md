@@ -17,8 +17,8 @@ Neither [Vector]({{< relref "vector.md" >}}) nor [Fluent Bit]({{< relref "fluent
 Read [The datafeed contract]({{< relref "../../../reference/the-datafeed-contract.md" >}}) first.
 
 {{< trap severity="silent" >}}
-**Debezium Server cannot post to Stroom directly.
-It needs a hop in front.**
+**Debezium Server cannot post to Stroom directly.**
+**It needs a hop in front.**
 
 Its HTTP sink cannot set arbitrary static headers.
 The only header-related properties control how the **change event's own** headers are rendered onto the request: a prefix, and whether to base64-encode.

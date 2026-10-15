@@ -16,10 +16,10 @@ The tracker only moves forward, though, and editing the filter does not reset it
 If you change a filter's criteria after its tracker has moved past older streams, it never goes back to them: a filter can be enabled, correct, and happily processing new arrivals while never revisiting the streams its new criteria match.
 
 The symptom is specific.
-**The filter's criteria were changed.
-New data processes.
-Older data that the new criteria match does not.
-Nothing reports an error.**
+**The filter's criteria were changed.**
+**New data processes.**
+**Older data that the new criteria match does not.**
+**Nothing reports an error.**
 
 
 ## The procedure
