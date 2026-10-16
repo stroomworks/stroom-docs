@@ -86,6 +86,17 @@ random()
 ```
 
 
+## random-integer()
+
+Get a system generated random integer between 0 (inclusive) and `upperBound` (exclusive).
+
+```text
+random-integer(Integer upperBound)
+```
+
+If `upperBound` is 0 or less, an error is recorded and the function returns an empty sequence.
+
+
 ## search-id()
 
 Get the id of the batch search when a pipeline is processing as part of a batch search

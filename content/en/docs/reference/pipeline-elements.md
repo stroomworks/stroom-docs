@@ -2,7 +2,7 @@
 title: "Pipeline Elements"
 linkTitle: "Pipeline Elements"
 weight: 40
-date: 2026-10-14
+date: 2026-10-15
 tags:
 description: >
   Every element you can put in a pipeline, by category, with its properties.
@@ -216,7 +216,7 @@ A filter consuming XML events in the `records:2` namespace to index/store the fi
 
 {{< pipe-elm "HttpPostFilter" >}}
 
-This element is deprecated, you should instead use the much more flexible .
+This element is deprecated, you should instead use the much more flexible {{< pipe-elm "HTTPAppender" >}}.
 This element will simply POST the output of the XML events to the configured URL.
 
 | Property | Description | Default | Type |
@@ -476,13 +476,13 @@ If multiple paths are specified in the 'outputPaths' property it will pick one a
 
 | Property | Description | Default | Type |
 |---|---|---|---|
-| `compressionMethod` | Compression method to apply, if compression is enabled. Supported values: . | `DEFAULT_COMPRESSION_METHOD_PROP_VALUE` | String |
+| `compressionMethod` | Compression method to apply, if compression is enabled. Supported values: bzip2, deflate, gz, lz4-block, lz4-framed, lzma, pack200, snappy-framed, xz, zip, zstd. | `gz` | String |
 | `filePermissions` | Set file system permissions of finished files (example: 'rwxr--r--') | - | String |
 | `outputPaths` | One or more destination paths for output files separated with commas. Replacement variables can be used in path strings such as ${feed}. | - | String |
 | `rollSize` | When the current output file exceeds this size it will be closed and a new one created. | - | String |
 | `splitAggregatedStreams` | Choose if you want to split aggregated streams into separate output files. | `false` | Boolean |
 | `splitRecords` | Choose if you want to split individual records into separate output files. | `false` | Boolean |
-| `useCompression` | Apply compression to output files. | `true` | Boolean |
+| `useCompression` | Apply compression to output files. | `false` | Boolean |
 
 
 ### HDFSFileAppender
@@ -507,11 +507,11 @@ If multiple paths are specified in the 'outputPaths' property it will pick one a
 {{< pipe-elm "HTTPAppender" >}}
 
 A destination used to write an output stream to a remote HTTP(S) server.
-This element should be preferred over the deprecated .
+This element should be preferred over the deprecated {{< pipe-elm "HttpPostFilter" >}}.
 
 | Property | Description | Default | Type |
 |---|---|---|---|
-| `compressionMethod` | Compression method to apply, if compression is enabled. Supported values: . | `DEFAULT_COMPRESSION_METHOD_PROP_VALUE` | String |
+| `compressionMethod` | Compression method to apply, if compression is enabled. Supported values: bzip2, deflate, gz, lz4-block, lz4-framed, lzma, pack200, snappy-framed, xz, zip, zstd. | `gz` | String |
 | `connectionRequestTimeout` | Returns the connection lease request timeout used when requesting a connection from the connection manager. Default: 3 minutes. The timeout is specified as either milliseconds, e.g. '60000' or with a duration suffix, e.g. '500ms', '2s', '1m', etc. | - | String |
 | `connectionTimeout` | Determines the timeout until a new connection is fully established. This may also include transport security negotiation exchanges such as SSL or TLS protocol negotiation. A timeout value of zero is interpreted as an infinite timeout. Default: 3 minutes. The timeout is specified as either milliseconds, e.g. '60000' or with a duration suffix, e.g. '500ms', '2s', '1m', etc. | - | String |
 | `contentType` | The content type | `application/json` | String |
@@ -556,7 +556,7 @@ On system shutdown all active files will be rolled.
 
 | Property | Description | Default | Type |
 |---|---|---|---|
-| `compressionMethod` | Compression method to apply, if compression is enabled. Supported values: . | `CompressorStreamFactory.GZIP` | String |
+| `compressionMethod` | Compression method to apply, if compression is enabled. Supported values: bzip2, deflate, gz, lz4-block, lz4-framed, lzma, pack200, snappy-framed, xz, zip, zstd. | `gz` | String |
 | `fileName` | Choose the name of the file to write. | - | String |
 | `filePermissions` | Set file system permissions of finished files (example: 'rwxr--r--') | - | String |
 | `frequency` | Choose how frequently files are rolled. | `1h` | String |
@@ -596,7 +596,7 @@ A destination used to write an output stream to an S3 bucket.
 |---|---|---|---|
 | `bucketNamePattern` | Set the bucket name pattern if you want to override the one provided by the S3 config. | - | String |
 | `cacheControl` | A general header field used to specify caching policies. | - | String |
-| `compressionMethod` | Compression method to apply, if compression is enabled. Supported values: . | `DEFAULT_COMPRESSION_METHOD_PROP_VALUE` | String |
+| `compressionMethod` | Compression method to apply, if compression is enabled. Supported values: bzip2, deflate, gz, lz4-block, lz4-framed, lzma, pack200, snappy-framed, xz, zip, zstd. | `gz` | String |
 | `contentDisposition` | Object presentational information. | - | String |
 | `contentEncoding` | The content encodings (like compression) that have been applied to the object's data. | - | String |
 | `contentType` | The object type. | - | String |

@@ -28,7 +28,7 @@ Stroom supports two ways of defining the index schema:
 In a static index, you explicitly define all fields in the **Fields** tab of the Lucene Index document.
 
 * **Pros**: Precise control over data types and storage settings; better performance for known schemas.
-* **Cons**: Any fields present in the XML but not defined in the index will be ignored.
+* **Cons**: Any fields present in the XML but not defined in the index will be ignored, with a warning.
 
 
 ### Dynamic indexing
@@ -50,7 +50,7 @@ The `DynamicIndexingFilter` consumes XML using a `<document>` structure rather t
 <document>
   <field>
     <name>client_ip</name>
-    <type>IP Address</type>
+    <type>IpV4Address</type>
     <value>192.168.1.50</value>
     <indexed>true</indexed>
     <stored>true</stored>
@@ -149,9 +149,9 @@ Resetting an index is performed by deleting its physical shards:
 1. **Disable processing**: First, disable the [Processor Filter]({{< relref "processing/_index.md" >}}) associated with the index to prevent new data from being written during the reset.
 1. **Delete shards**:
    * Open the Lucene Index document.
-   * Navigate to the **Shards** tab.
-   * Select all shards (use `Ctrl+A`).
-   * Click the **Delete** button.
+   * On the **Settings** tab, click **Reset Data** and confirm.
+     This deletes all the index's shards across all nodes in the cluster.
+   * Alternatively, navigate to the **Shards** tab, tick the header check box to select all shards, and click the **Delete** button.
    * The shards will be marked for deletion and eventually removed from disk by the system.
 1. **Clear processor filter**: If you intend to re-index the same data that was already processed, you must **Delete and Recreate** the Processor Filter on your pipeline.
    This forces Stroom to scan the source data from the beginning again.
@@ -170,7 +170,7 @@ The specialised element used for this is the **IndexingFilter** (for static inde
 The `IndexingFilter` consumes XML events in the `records:2` namespace.
 It reads the `name` and `value` pairs from the incoming XML and maps them to the fields defined in your Lucene Index document.
 
-* **Role**: Target / Destination.
+* **Role**: Target.
 * **Visibility**: Simple.
 * **Input**: XML in the `records:2` namespace.
 
@@ -225,9 +225,10 @@ Controls the physical storage and maintenance of the index.
 * **Shards per partition**: Allows multiple shards to be written to simultaneously for higher ingest throughput.
 * **Main Time Field Name**: The date field that a dashboard's time range, or a StroomQL time condition, is applied to (Default: `EventTime`).
   It must name a field that exists and is **Indexed**; if it does not, every search with a time range returns nothing.
-* **Retention day age**: How long (in days) to keep data in this index.
+* **Retention Period**: How long to keep data in this index.
   Shards older than this will be automatically deleted.
-* **Volume group name**: The group of disk [volumes]({{< relref "volumes.md" >}}) where the index shards will be stored.
+* **Volume Group**: The group of disk [volumes]({{< relref "volumes.md" >}}) where the index shards will be stored.
+* **Reset Data**: Deletes all the index's shards across all nodes in the cluster (see [How to reset](#how-to-reset)).
 
 
 ### Fields tab
@@ -235,10 +236,12 @@ Controls the physical storage and maintenance of the index.
 Defines the schema of the index.
 
 * **Name**: The name of the field (must match the `name` attribute in your XML).
-* **Type**: The data type (e.g., ID, Text, Long, Date, IP Address).
+* **Type**: The data type (e.g., Id, Text, Long, Date, IpV4Address).
 * **Indexed**: If true, this field can be used in query criteria.
 * **Stored**: If true, the value is stored in the index itself and can be displayed in a dashboard without needing an extraction pipeline.
-* **Term Vector**: Stores term positions for advanced Lucene features like highlighting or phrase matching.
+* **Positions**: Stores term positions for advanced Lucene features like highlighting or phrase matching.
+* **Analyser**: How the field's text is split into terms for indexing and searching.
+* **Case Sensitive**: If true, matching on this field is case sensitive.
 
 
 ### Shards tab

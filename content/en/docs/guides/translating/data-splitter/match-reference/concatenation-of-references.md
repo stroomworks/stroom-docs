@@ -30,7 +30,7 @@ Here the following `<regex>` could be used to extract the relevant date, time gr
 The match groups from this expression can be concatenated with the following value output pattern in the data element:
 
 ```xml
-<data name="dateTime" value="$3+’-‘+$2+’-‘+$1+’-‘+’T’+$4+’:’+$5+’:’+$6+’.000Z’" />
+<data name="dateTime" value="$3+'-'+$2+'-'+$1+'T'+$4+':'+$5+':'+$6+'.000Z'" />
 ```
 
 Using the original example, this would result in the output:
@@ -46,11 +46,11 @@ This also allows fixed strings to contain `$` and `+` characters.
 As single quotes are used for this purpose, a single quote needs to be escaped with another single quote if one is desired in a fixed string, e.g.
 
 ```text
-‘this ‘’is quoted text’’’
+'this ''is quoted text'''
 ```
 
 This will result in:
 
 ```text
-this ‘is quoted text’
+this 'is quoted text'
 ```

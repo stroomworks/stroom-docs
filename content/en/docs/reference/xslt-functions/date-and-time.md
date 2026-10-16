@@ -472,15 +472,15 @@ The following are the possible forms of the `parse-dateTime` function.
 parse-dateTime(String inputDate)
 
 <!-- Converts inputDate to a dateTime using a custom date format -->
-parse-dateTime(DateTime inputDate, String pattern)
+parse-dateTime(String inputDate, String pattern)
 
 <!-- Converts inputDate to a dateTime using a custom date format in the specified time zone -->
-parse-dateTime(DateTime inputDate, String pattern, String timeZone)
+parse-dateTime(String inputDate, String pattern, String timeZone)
 ```
 
 * `inputDate` - The input string.
 * `pattern` - The pattern that defines the format of the input string (see [Custom Date Formats]({{< relref "../dates.md#custom-date-formats" >}})).
-* `timeZone` - Optional time zone of the output.
+* `timeZone` - Optional time zone of `inputDate`, used when `inputDate` does not include a time zone of its own.
   If `null` then the UTC/Zulu time zone will be used.
 
 

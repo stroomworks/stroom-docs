@@ -12,6 +12,7 @@ verification: required
 
 A scheduled query rule does not have one schedule.
 It has a list of **execution schedules**, each running the rule independently, on the **Execution** tab.
+**Monitoring** → **Execution Schedule Manager** lists every schedule across all rules and reports in one place.
 The same machinery drives [reports]({{< relref "../searching/_index.md" >}}).
 
 Having more than one is genuinely useful.
@@ -96,6 +97,9 @@ Check the run-as user can read every feed and index the query touches, and prefe
 {{< diagnose >}}
 1. **Does the history show runs?**
    If not, the schedule is not running, whatever the enabled flag says.
+1. **Did the last run end in `Error`?**
+   An error disables the schedule.
+   Fix the cause, then tick **Enabled** again.
 1. **What effective times do those runs have?**
    Compare them with the period your data is in.
    This is where catch-up and start-time mistakes become visible.

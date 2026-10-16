@@ -2,18 +2,21 @@
 title: "Configuration Properties"
 linkTitle: "Configuration Properties"
 weight: 140
-date: 2026-10-14
+date: 2026-10-15
 tags:
 description: >
-  Every setting in the configuration file, what it defaults to, and how to decide where to set it.
+  Every Stroom setting in the configuration file, what it defaults to, and how to decide where to set it.
 pageKind: reference
 ---
 
 Stroom reads its settings from a YAML file on each node.
 Most of them you will never touch; the ones you do are easier to get right knowing what the defaults already are.
 
-There are **1122** settings in total.
-589 of those are the database and cache blocks that repeat for every module, so they are explained once below rather than 589 times, leaving **533** distinct settings.
+This page covers Stroom itself.
+Stroom Proxy has its own configuration file, under `proxyConfig`, and its settings are not listed here: see [Running a Proxy]({{< relref "../operate/install/a-proxy.md" >}}).
+
+There are **1098** settings in total.
+589 of those are the database and cache blocks that repeat for every module, so they are explained once below rather than 589 times, leaving **509** distinct settings.
 
 
 ## Two names for the same setting
@@ -55,21 +58,20 @@ Putting a value in the file because it is the same everywhere is the common mist
 * Settings marked **Needs a restart** are read once while a node starts.
   Changing one stores the new value without changing how the running node behaves.
   83 of the settings below are marked this way.
-* Where the description says the source does not describe it, that is a gap upstream rather than something we have left out.
-  343 of 533 carry one.
 
 
 ## Value formats
 
 | Kind | Written as | Example |
 |---|---|---|
-| Duration | ISO-8601 | `PT30S` is thirty seconds, `PT10M` ten minutes, `P7D` seven days |
+| Duration | ISO-8601, or a number with a unit (`ms`, `s`, `m`, `h`, `d`) | `PT30S` or `30s` is thirty seconds, `PT10M` or `10m` ten minutes, `P7D` or `7d` seven days |
 | Size | A number with a unit | `32KiB`, `1GiB` |
 | Boolean | `true` or `false` | `true` |
 | List | A YAML list | one `- value` per line |
 | Unset | Omit it, or `null` | |
 
-A duration written without the `P` is the most common mistake, and it stops the node starting rather than being quietly ignored, which is the better of the two outcomes.
+A duration with no unit at all is read as milliseconds, so `30` is thirty milliseconds, not thirty seconds.
+A value that fits neither form, such as `T30S`, is rejected rather than being quietly ignored.
 
 
 ## Settings every module's database block has
@@ -82,19 +84,19 @@ Otherwise set `commonDbDetails` once and leave these alone.
 
 | Setting | Default | What it does |
 |---|---|---|
-| `db.connection.jdbcDriverClassName` | *unset* | The class name for the JDBC database connection, e.g. com.mysql.cj.jdbc.Driver. |
-| `db.connection.jdbcDriverPassword` | *unset* | The password to connect to the database with. |
-| `db.connection.jdbcDriverUrl` | *unset* | The URL for the JDBC database connection, e.g. jdbc:mysql://some-host:3306/db-name?useUnicode=yes&characterEncoding=UTF-8. |
-| `db.connection.jdbcDriverUsername` | *unset* | The username to connect to the database with. |
-| `db.connectionPool.cachePrepStmts` | `false` | Sets the cachePrepStmts property on the at the JDBC driver level. Set to true to enable caching of prepared statements at the JDBC driver level. |
-| `db.connectionPool.connectionTimeout` | `PT30S` | The maximum amount of time that a client will wait for a connection from the pool. |
-| `db.connectionPool.idleTimeout` | `PT10M` | The maximum amount of time that a connection can sit idle in the pool. Only applies when minimumIdle is defined to be less than maximumPoolSize. |
-| `db.connectionPool.leakDetectionThreshold` | `PT0S` | The amount of time that a connection can be out of the pool before a message is logged indicating a possible connection leak. A value of 0 means leak detection is disabled. Lowest acceptable value for enabling leak detection is 2 seconds. |
-| `db.connectionPool.maxLifetime` | `PT30M` | The maximum lifetime of a connection in the pool. |
-| `db.connectionPool.maxPoolSize` | `30` | The maximum size that the pool is allowed to reach, including both idle and in-use connections. |
-| `db.connectionPool.minimumIdle` | `10` | The minimum number of idle connections that Hikari tries to maintain in the pool. |
-| `db.connectionPool.prepStmtCacheSize` | `25` | Sets the prepStmtCacheSize property on the at the JDBC driver level. The number of prepared statements that the driver will cache per connection. |
-| `db.connectionPool.prepStmtCacheSqlLimit` | `256` | Sets the prepStmtCacheSqlLimit property on the at the JDBC driver level. The maximum length for a prepared SQL statement that can be cached. |
+| `db.connection.jdbcDriverClassName` | *unset* | The class name for the JDBC database connection, e.g. com.mysql.cj.jdbc.Driver. Should only be set in the application YAML config file. Connection details can be set in one place using 'stroom.commonDbDetails.*', individually for each service area or a mixture of the two. |
+| `db.connection.jdbcDriverPassword` | *unset* | The password to connect to the database with. Should only be set in the application YAML config file. Connection details can be set in one place using 'stroom.commonDbDetails.*', individually for each service area or a mixture of the two. |
+| `db.connection.jdbcDriverUrl` | *unset* | The URL for the JDBC database connection, e.g. jdbc:mysql://some-host:3306/db-name?useUnicode=yes&characterEncoding=UTF-8. Should only be set in the application YAML config file. Connection details can be set in one place using 'stroom.commonDbDetails.*', individually for each service area or a mixture of the two. |
+| `db.connection.jdbcDriverUsername` | *unset* | The username to connect to the database with. Should only be set in the application YAML config file. Connection details can be set in one place using 'stroom.commonDbDetails.*', individually for each service area or a mixture of the two. |
+| `db.connectionPool.cachePrepStmts` | `false` | Sets the cachePrepStmts property on the at the JDBC driver level. Set to true to enable caching of prepared statements at the JDBC driver level. See https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration for further details on configuring the MySQL JDBC driver properties. |
+| `db.connectionPool.connectionTimeout` | `PT30S` | The maximum amount of time that a client will wait for a connection from the pool. See https://github.com/brettwooldridge/HikariCP for further details on configuring the connection pool. |
+| `db.connectionPool.idleTimeout` | `PT10M` | The maximum amount of time that a connection can sit idle in the pool. Only applies when minimumIdle is defined to be less than maximumPoolSize. See https://github.com/brettwooldridge/HikariCP for further details on configuring the connection pool. |
+| `db.connectionPool.leakDetectionThreshold` | `PT0S` | The amount of time that a connection can be out of the pool before a message is logged indicating a possible connection leak. A value of 0 means leak detection is disabled. Lowest acceptable value for enabling leak detection is 2 seconds.See https://github.com/brettwooldridge/HikariCP for further details on configuring the connection pool. |
+| `db.connectionPool.maxLifetime` | `PT30M` | The maximum lifetime of a connection in the pool. See https://github.com/brettwooldridge/HikariCP for further details on configuring the connection pool. |
+| `db.connectionPool.maxPoolSize` | `30` | The maximum size that the pool is allowed to reach, including both idle and in-use connections. See https://github.com/brettwooldridge/HikariCP for further details on configuring the connection pool. |
+| `db.connectionPool.minimumIdle` | `10` | The minimum number of idle connections that Hikari tries to maintain in the pool. See https://github.com/brettwooldridge/HikariCP for further details on configuring the connection pool. |
+| `db.connectionPool.prepStmtCacheSize` | `25` | Sets the prepStmtCacheSize property on the at the JDBC driver level. The number of prepared statements that the driver will cache per connection. See https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration for further details on configuring the MySQL JDBC driver properties. |
+| `db.connectionPool.prepStmtCacheSqlLimit` | `256` | Sets the prepStmtCacheSqlLimit property on the at the JDBC driver level. The maximum length for a prepared SQL statement that can be cached. See https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration for further details on configuring the MySQL JDBC driver properties. |
 
 
 ## Settings every cache has
@@ -186,14 +188,14 @@ By section, as the file nests them.
 | `duplicateCheckStore.lmdb.maxReaders` | `10` | The maximum number of concurrent readers/threads that can use the off-heap store. **Needs a restart.** |
 | `duplicateCheckStore.lmdb.maxStoreSize` | `10G` | The maximum size for the off heap store. There must be available space on the disk to accommodate this size. It can be larger than the amount of available RAM and will only be allocated as it is needed. Can be expressed in IEC units (multiples of 1024), e.g. 1024, 1024B, 1024bytes, 1KiB, 1KB, 1K, etc. **Needs a restart.** |
 | `duplicateCheckStore.lmdb.readAheadEnabled` | `true` | Read ahead means the OS will pre-fetch additional data from the disk in the expectation that it will be used at some point. This generally improves performance as more data is available in the page cache. Read ahead is enabled by default. It may be worth disabling it if the actively used data is larger than the available RAM, as this will stop it evicting hot entries to make space for pre-fetched data. **Needs a restart.** |
-| `emailConfig.fromAddress` | `noreply@stroom` | *Not described in the source.* |
-| `emailConfig.fromName` | `Stroom Analytics` | *Not described in the source.* |
-| `emailConfig.smtp.host` | `localhost` | *Not described in the source.* |
-| `emailConfig.smtp.password` | *unset* | *Not described in the source.* |
-| `emailConfig.smtp.port` | `2525` | *Not described in the source.* |
-| `emailConfig.smtp.transport` | `plain` | *Not described in the source.* |
-| `emailConfig.smtp.username` | *unset* | *Not described in the source.* |
-| `executionHistoryRetention` | `P10D` | *Not described in the source.* |
+| `emailConfig.fromAddress` | `noreply@stroom` | The from email address to use in password reset emails. |
+| `emailConfig.fromName` | `Stroom Analytics` | The from name to use in password reset emails. |
+| `emailConfig.smtp.host` | `localhost` | The fully qualified hostname of the SMTP server. |
+| `emailConfig.smtp.password` | *unset* | The password to authenticate with on the SMTP server. |
+| `emailConfig.smtp.port` | `2525` | The port for the SMTP server. |
+| `emailConfig.smtp.transport` | `plain` | The transport type for communicating with the SMTP server. |
+| `emailConfig.smtp.username` | *unset* | The username to authenticate with on the SMTP server. |
+| `executionHistoryRetention` | `P10D` | How long should we retain analytic execution history? |
 | `resultStore.lmdb.localDir` | `lmdb/analytic_store` | The path relative to the home directory to use for storing the data stores. It MUST be on local disk, NOT network storage, due to use of memory mapped files. The directory will be created if it doesn't exist.If the value is a relative path then it will be treated as being relative to stroom.path.home. **Needs a restart.** |
 | `resultStore.lmdb.maxReaders` | `10` | The maximum number of concurrent readers/threads that can use the off-heap store. **Needs a restart.** |
 | `resultStore.lmdb.maxStoreSize` | `10G` | The maximum size for the off heap store. There must be available space on the disk to accommodate this size. It can be larger than the amount of available RAM and will only be allocated as it is needed. Can be expressed in IEC units (multiples of 1024), e.g. 1024, 1024B, 1024bytes, 1KiB, 1KB, 1K, etc. **Needs a restart.** |
@@ -205,7 +207,7 @@ By section, as the file nests them.
 | `resultStore.minPayloadSize` | `1M` | The minimum byte size of a payload buffer. |
 | `resultStore.offHeapResults` | `true` | Should search results be stored off heap (experimental feature). |
 | `resultStore.valueQueueSize` | `10000` | The size of the value queue. |
-| `timezone` | `UTC` | *Not described in the source.* |
+| `timezone` | `UTC` | Name of timezone (ZoneId) that will be used during alert generation. |
 
 
 ### annotation
@@ -259,13 +261,13 @@ By section, as the file nests them.
 | Property | Default | What it does |
 |---|---|---|
 | `blockOnExhaustedPool` | `false` | Whether the thread should be blocked when requesting a buffer from the pool and the limit for that buffer size has been reached. If false new buffers will be created and excess buffers will have to be destroyed when no longer needed which may have a performance/memory penalty. |
-| `pooledByteBufferCounts.1` | `50` | *Not described in the source.* |
-| `pooledByteBufferCounts.10` | `50` | *Not described in the source.* |
-| `pooledByteBufferCounts.100` | `50` | *Not described in the source.* |
-| `pooledByteBufferCounts.1000` | `50` | *Not described in the source.* |
-| `pooledByteBufferCounts.10000` | `50` | *Not described in the source.* |
-| `pooledByteBufferCounts.100000` | `10` | *Not described in the source.* |
-| `pooledByteBufferCounts.1000000` | `3` | *Not described in the source.* |
+| `pooledByteBufferCounts.1` | `50` | An entry in the `pooledByteBufferCounts` map. Defines the maximum number of byte buffers that will be held in the pool, keyed by the size of the buffer. Configured buffer sizes must be a power of ten (i.e. 1, 10, 100, etc.) or they will be ignored. Values should be greater than or equal to zero. Set the count to zero to indicate that a buffer size should not be pooled. An empty or null map means no buffers will be pooled. Keys should be contiguous powers of ten from one upwards, else any gaps will be assigned a default value of 50. |
+| `pooledByteBufferCounts.10` | `50` | An entry in the `pooledByteBufferCounts` map. |
+| `pooledByteBufferCounts.100` | `50` | An entry in the `pooledByteBufferCounts` map. |
+| `pooledByteBufferCounts.1000` | `50` | An entry in the `pooledByteBufferCounts` map. |
+| `pooledByteBufferCounts.10000` | `50` | An entry in the `pooledByteBufferCounts` map. |
+| `pooledByteBufferCounts.100000` | `10` | An entry in the `pooledByteBufferCounts` map. |
+| `pooledByteBufferCounts.1000000` | `3` | An entry in the `pooledByteBufferCounts` map. |
 | `warningThresholdPercentage` | `90` | When the number of created buffers for any size reaches this threshold a warning will be logged. **Needs a restart.** |
 
 
@@ -290,19 +292,19 @@ By section, as the file nests them.
 
 | Property | Default | What it does |
 |---|---|---|
-| `connection.jdbcDriverClassName` | `com.mysql.cj.jdbc.Driver` | The class name for the JDBC database connection, e.g. com.mysql.cj.jdbc.Driver. **Needs a restart.** |
-| `connection.jdbcDriverPassword` | `stroompassword1` | The password to connect to the database with. **Needs a restart.** |
-| `connection.jdbcDriverUrl` | `jdbc:mysql://localhost:3307/stroom?useUnicode=yes&characterEncoding=UTF-8` | The URL for the JDBC database connection, e.g. jdbc:mysql://some-host:3306/db-name?useUnicode=yes&characterEncoding=UTF-8. **Needs a restart.** |
-| `connection.jdbcDriverUsername` | `stroomuser` | The username to connect to the database with. **Needs a restart.** |
-| `connectionPool.cachePrepStmts` | `false` | Sets the cachePrepStmts property on the at the JDBC driver level. Set to true to enable caching of prepared statements at the JDBC driver level. **Needs a restart.** |
-| `connectionPool.connectionTimeout` | `PT30S` | The maximum amount of time that a client will wait for a connection from the pool. **Needs a restart.** |
-| `connectionPool.idleTimeout` | `PT10M` | The maximum amount of time that a connection can sit idle in the pool. Only applies when minimumIdle is defined to be less than maximumPoolSize. **Needs a restart.** |
-| `connectionPool.leakDetectionThreshold` | `PT0S` | The amount of time that a connection can be out of the pool before a message is logged indicating a possible connection leak. A value of 0 means leak detection is disabled. Lowest acceptable value for enabling leak detection is 2 seconds. **Needs a restart.** |
-| `connectionPool.maxLifetime` | `PT30M` | The maximum lifetime of a connection in the pool. **Needs a restart.** |
-| `connectionPool.maxPoolSize` | `30` | The maximum size that the pool is allowed to reach, including both idle and in-use connections. **Needs a restart.** |
-| `connectionPool.minimumIdle` | `10` | The minimum number of idle connections that Hikari tries to maintain in the pool. **Needs a restart.** |
-| `connectionPool.prepStmtCacheSize` | `25` | Sets the prepStmtCacheSize property on the at the JDBC driver level. The number of prepared statements that the driver will cache per connection. **Needs a restart.** |
-| `connectionPool.prepStmtCacheSqlLimit` | `256` | Sets the prepStmtCacheSqlLimit property on the at the JDBC driver level. The maximum length for a prepared SQL statement that can be cached. **Needs a restart.** |
+| `connection.jdbcDriverClassName` | `com.mysql.cj.jdbc.Driver` | The class name for the JDBC database connection, e.g. com.mysql.cj.jdbc.Driver. Should only be set in the application YAML config file. Connection details can be set in one place using 'stroom.commonDbDetails.*', individually for each service area or a mixture of the two. **Needs a restart.** |
+| `connection.jdbcDriverPassword` | `stroompassword1` | The password to connect to the database with. Should only be set in the application YAML config file. Connection details can be set in one place using 'stroom.commonDbDetails.*', individually for each service area or a mixture of the two. **Needs a restart.** |
+| `connection.jdbcDriverUrl` | `jdbc:mysql://localhost:3307/stroom?useUnicode=yes&characterEncoding=UTF-8` | The URL for the JDBC database connection, e.g. jdbc:mysql://some-host:3306/db-name?useUnicode=yes&characterEncoding=UTF-8. Should only be set in the application YAML config file. Connection details can be set in one place using 'stroom.commonDbDetails.*', individually for each service area or a mixture of the two. **Needs a restart.** |
+| `connection.jdbcDriverUsername` | `stroomuser` | The username to connect to the database with. Should only be set in the application YAML config file. Connection details can be set in one place using 'stroom.commonDbDetails.*', individually for each service area or a mixture of the two. **Needs a restart.** |
+| `connectionPool.cachePrepStmts` | `false` | Sets the cachePrepStmts property on the at the JDBC driver level. Set to true to enable caching of prepared statements at the JDBC driver level. See https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration for further details on configuring the MySQL JDBC driver properties. **Needs a restart.** |
+| `connectionPool.connectionTimeout` | `PT30S` | The maximum amount of time that a client will wait for a connection from the pool. See https://github.com/brettwooldridge/HikariCP for further details on configuring the connection pool. **Needs a restart.** |
+| `connectionPool.idleTimeout` | `PT10M` | The maximum amount of time that a connection can sit idle in the pool. Only applies when minimumIdle is defined to be less than maximumPoolSize. See https://github.com/brettwooldridge/HikariCP for further details on configuring the connection pool. **Needs a restart.** |
+| `connectionPool.leakDetectionThreshold` | `PT0S` | The amount of time that a connection can be out of the pool before a message is logged indicating a possible connection leak. A value of 0 means leak detection is disabled. Lowest acceptable value for enabling leak detection is 2 seconds.See https://github.com/brettwooldridge/HikariCP for further details on configuring the connection pool. **Needs a restart.** |
+| `connectionPool.maxLifetime` | `PT30M` | The maximum lifetime of a connection in the pool. See https://github.com/brettwooldridge/HikariCP for further details on configuring the connection pool. **Needs a restart.** |
+| `connectionPool.maxPoolSize` | `30` | The maximum size that the pool is allowed to reach, including both idle and in-use connections. See https://github.com/brettwooldridge/HikariCP for further details on configuring the connection pool. **Needs a restart.** |
+| `connectionPool.minimumIdle` | `10` | The minimum number of idle connections that Hikari tries to maintain in the pool. See https://github.com/brettwooldridge/HikariCP for further details on configuring the connection pool. **Needs a restart.** |
+| `connectionPool.prepStmtCacheSize` | `25` | Sets the prepStmtCacheSize property on the at the JDBC driver level. The number of prepared statements that the driver will cache per connection. See https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration for further details on configuring the MySQL JDBC driver properties. **Needs a restart.** |
+| `connectionPool.prepStmtCacheSqlLimit` | `256` | Sets the prepStmtCacheSqlLimit property on the at the JDBC driver level. The maximum length for a prepared SQL statement that can be cached. See https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration for further details on configuring the MySQL JDBC driver properties. **Needs a restart.** |
 
 
 ### contentIndex
@@ -348,29 +350,33 @@ By section, as the file nests them.
 | `filesystemVolume.defaultStreamVolumePaths` | `volumes/default_stream_volume` | The paths used if the default stream volumes are created on application start.If a path is a relative path then it will be treated as being relative to stroom.path.home. |
 | `filesystemVolume.findOrphanedMetaBatchSize` | `7000` | Number of meta records to check in each batch. |
 | `filesystemVolume.maxVolumeStateAge` | `PT30S` | When refreshing the local cache of volumes, the state will only be updated in the database if it is older then this threshold age. Value must be less than the period of the job 'File System Volume Status'. |
-| `filesystemVolume.metaTypeExtensions.Detections` | `dtxn` | *Not described in the source.* |
-| `filesystemVolume.metaTypeExtensions.Error` | `err` | *Not described in the source.* |
-| `filesystemVolume.metaTypeExtensions.Events` | `evt` | *Not described in the source.* |
-| `filesystemVolume.metaTypeExtensions.Records` | `rec` | *Not described in the source.* |
-| `filesystemVolume.metaTypeExtensions.Reference` | `ref` | *Not described in the source.* |
+| `filesystemVolume.metaTypeExtensions.Detections` | `dtxn` | An entry in the `metaTypeExtensions` map. Map of meta type names to their file extension. You should only change this property if you need to support legacy file extensions used before Stroom v7. If a meta type does not have an entry in this map then the extension 'dat' will be used. The extension is entered without the leading dot. Changing the extension for a meta type would require manual renaming of existing files on the file system. Only do this if you understand the consequences. |
+| `filesystemVolume.metaTypeExtensions.Error` | `err` | An entry in the `metaTypeExtensions` map. |
+| `filesystemVolume.metaTypeExtensions.Events` | `evt` | An entry in the `metaTypeExtensions` map. |
+| `filesystemVolume.metaTypeExtensions.Raw Events` | `revt` | An entry in the `metaTypeExtensions` map. |
+| `filesystemVolume.metaTypeExtensions.Raw Reference` | `rref` | An entry in the `metaTypeExtensions` map. |
+| `filesystemVolume.metaTypeExtensions.Records` | `rec` | An entry in the `metaTypeExtensions` map. |
+| `filesystemVolume.metaTypeExtensions.Reference` | `ref` | An entry in the `metaTypeExtensions` map. |
+| `filesystemVolume.metaTypeExtensions.Test Events` | `tevt` | An entry in the `metaTypeExtensions` map. |
+| `filesystemVolume.metaTypeExtensions.Test Reference` | `tref` | An entry in the `metaTypeExtensions` map. |
 | `filesystemVolume.volumeSelector` | `RoundRobin` | How should volumes be selected for use? Possible volume selectors include ('MostFreePercent', 'MostFree', 'Random', 'RoundRobinIgnoreLeastFreePercent', 'RoundRobinIgnoreLeastFree', 'RoundRobin', 'WeightedFreePercentRandom', 'WeightedFreeRandom') default is 'RoundRobin' |
 | `meta.dataFormats` | `CSV, CSV_NO_HEADER, FIXED_WIDTH, FIXED_WIDTH_NO_HEADER, INI, JSON, JSON_LINES, PSV, PSV_NO_HEADER, SYSLOG, TEXT, TOML, TSV, TSV_NO_HEADER, XML, XML_FRAGMENT, YAML` | Set of data format names. This set must contain all of the names in the default value for this property but can contain additional names. |
 | `meta.metaStatusUpdateBatchSize` | `0` | The number of streams to delete/restore using a filter in a single batch. Each batch will run in a separate transaction. A value of zero means a single batch will be used. |
 | `meta.metaTypes` | `Context, Detections, Error, Events, Meta Data, Raw Events, Raw Reference, Records, Reference, Test Events, Test Reference` | Set of supported meta type names. This set must contain all of the names in the default value for this property but can contain additional names. Any custom types added here that are used for raw data must also be added to the property 'rawMetaTypes'. **Needs a restart.** |
-| `meta.metaValue.addAsync` | `true` | *Not described in the source.* |
-| `meta.metaValue.deleteAge` | `P30D` | *Not described in the source.* |
-| `meta.metaValue.deleteBatchSize` | `500` | *Not described in the source.* |
-| `meta.metaValue.flushBatchSize` | `500` | *Not described in the source.* |
+| `meta.metaValue.addAsync` | `true` | If true, stream attributes will be queued in memory until the queue reaches 'flushBatchSize'. If false, stream attributes will be written to the database immediately and synchronously. |
+| `meta.metaValue.deleteAge` | `P30D` | The age of streams that we store meta data in the database for. In ISO-8601 duration format, e.g. 'P1DT12H' |
+| `meta.metaValue.deleteBatchSize` | `500` | How many stream attributes we want to try and delete in a single batch. |
+| `meta.metaValue.flushBatchSize` | `500` | The number of stream attributes to queue before flushing to the database. Only applicable if property 'addAsync' is true. |
 | `meta.rawMetaTypes` | `Raw Events, Raw Reference` | Set of meta type names that are used for received raw data. Types defined here will be read using the Data Encoding set on the Feed's settings.Any custom types added to the 'metaTypes' property that are used for raw data must also be added here.This set must contain all of the names in the default value for this property but can contain additional names. |
-| `retention.deleteBatchSize` | `1000` | *Not described in the source.* |
-| `retention.useQueryOptimisation` | `true` | *Not described in the source.* |
+| `retention.deleteBatchSize` | `1000` | The number of records that will be logically deleted in each pass of the data retention deletion process. This number can be reduced to limit the time database locks are held for. |
+| `retention.useQueryOptimisation` | `true` | If true stroom will add additional clauses to the data retention deletion SQL in order to make use of other database indexes in order to improve performance. Due to the varied nature of possible retention rules and data held on the system, this optimisation may be counter productive. |
 | `store.deleteBatchSize` | `1000` | How many logically deleted data records we want to try and physically delete in a single batch |
-| `store.deleteFailureThreshold` | `100` | The number of streams to accept file delete failures for before aborting the '' job. This job deletes a stream's files before removing its records from the database. Deletion of files may fail due to network connectivity. A value of zero means it will abort on the first stream with errors. A value of 100 means it will abort on the 101st stream that errors. Due to concurrent processing, the number of streams processed may go some way beyond this value. |
+| `store.deleteFailureThreshold` | `100` | The number of streams to accept file delete failures for before aborting the 'Data Delete' job. This job deletes a stream's files before removing its records from the database. Deletion of files may fail due to network connectivity. A value of zero means it will abort on the first stream with errors. A value of 100 means it will abort on the 101st stream that errors. Due to concurrent processing, the number of streams processed may go some way beyond this value. |
 | `store.deletePurgeAge` | `P7D` | How long data records are left logically deleted before they are deleted from the database |
 | `store.fileSystemCleanBatchSize` | `20` | Set child jobs to be created by the file system clean sub task |
 | `store.fileSystemCleanDeleteOut` | `false` | Write a delete out in the root of the volume rather than physically deleting the files |
 | `store.fileSystemCleanOldAge` | `P1D` | Duration until a file is deemed old |
-| `store.fsyncMode` | `ENABLED` | Controls whether a stream's files, directories, or both are forced to durable storage before its metadata is marked as unlocked. Note that this covers the file system only. Whether the matching database commit itself survives a power failure is governed by the database, for MySQL by 'innodb_flush_log_at_trx_commit', which Stroom does not set. |
+| `store.fsyncMode` | `ENABLED` | Controls whether a stream's files, directories, or both are forced to durable storage before its metadata is marked as unlocked. Note that this covers the file system only. Whether the matching database commit itself survives a power failure is governed by the database, for MySQL by 'innodb_flush_log_at_trx_commit', which Stroom does not set. One of `DISABLED`, `FILE_ONLY`, `DIR_ONLY`, `ENABLED`. Replaced the true/false `fsyncEnabled` in Stroom 7.14, so a configuration file that sets `fsyncEnabled` needs changing. |
 
 
 ### docstore
@@ -384,55 +390,55 @@ By section, as the file nests them.
 
 | Property | Default | What it does |
 |---|---|---|
-| `aceEditorModes.css` | `CSS` | *Not described in the source.* |
-| `aceEditorModes.htm` | `HTML` | *Not described in the source.* |
-| `aceEditorModes.html` | `HTML` | *Not described in the source.* |
-| `aceEditorModes.js` | `JAVASCRIPT` | *Not described in the source.* |
-| `aceEditorModes.svg` | `XML` | *Not described in the source.* |
-| `aceEditorModes.txt` | `TEXT` | *Not described in the source.* |
-| `aceEditorModes.xml` | `XML` | *Not described in the source.* |
+| `aceEditorModes.css` | `CSS` | An entry in the `aceEditorModes` map. The editor mode map from extension to mode name for the asset manager |
+| `aceEditorModes.htm` | `HTML` | An entry in the `aceEditorModes` map. |
+| `aceEditorModes.html` | `HTML` | An entry in the `aceEditorModes` map. |
+| `aceEditorModes.js` | `JAVASCRIPT` | An entry in the `aceEditorModes` map. |
+| `aceEditorModes.svg` | `XML` | An entry in the `aceEditorModes` map. |
+| `aceEditorModes.txt` | `TEXT` | An entry in the `aceEditorModes` map. |
+| `aceEditorModes.xml` | `XML` | An entry in the `aceEditorModes` map. |
 | `assetCacheDir` | `asset_cache` | The path relative to the home directory to use for storing cached assets. **Needs a restart.** |
 | `clearAssetCacheOnStartup` | `false` | Whether to clear the asset cache on startup **Needs a restart.** |
 | `default` | `application/octet-stream` | Mimetype to use if nothing else matches **Needs a restart.** |
 | `defaultAceEditorMode` | `TEXT` | The default editor mode if nothing else matches **Needs a restart.** |
 | `maxUploadSize` | `50M` | The largest asset upload accepted, e.g. "50MiB". Enforced before the data is streamed into the database. Note this is separate from the 512KiB limit on editing an asset's content in the UI. **Needs a restart.** |
-| `mimetypes.apng` | `image/apng` | *Not described in the source.* |
-| `mimetypes.avif` | `image/avif` | *Not described in the source.* |
-| `mimetypes.bmp` | `image/bmp` | *Not described in the source.* |
-| `mimetypes.css` | `text/css` | *Not described in the source.* |
-| `mimetypes.gif` | `image/gif` | *Not described in the source.* |
-| `mimetypes.htm` | `text/html` | *Not described in the source.* |
-| `mimetypes.html` | `text/html` | *Not described in the source.* |
-| `mimetypes.ico` | `image/vnd.microsoft.icon` | *Not described in the source.* |
-| `mimetypes.jpeg` | `image/jpeg` | *Not described in the source.* |
-| `mimetypes.jpg` | `image/jpeg` | *Not described in the source.* |
-| `mimetypes.js` | `text/javascript` | *Not described in the source.* |
-| `mimetypes.png` | `image/png` | *Not described in the source.* |
-| `mimetypes.svg` | `image/svg+xml` | *Not described in the source.* |
-| `mimetypes.tif` | `image/tiff` | *Not described in the source.* |
-| `mimetypes.tiff` | `image/tiff` | *Not described in the source.* |
-| `mimetypes.txt` | `text/plain` | *Not described in the source.* |
-| `mimetypes.webp` | `image/webp` | *Not described in the source.* |
-| `mimetypes.xml` | `application/xml` | *Not described in the source.* |
+| `mimetypes.apng` | `image/apng` | An entry in the `mimetypes` map. The mimetypes map from extension to mimetype for the asset manager |
+| `mimetypes.avif` | `image/avif` | An entry in the `mimetypes` map. |
+| `mimetypes.bmp` | `image/bmp` | An entry in the `mimetypes` map. |
+| `mimetypes.css` | `text/css` | An entry in the `mimetypes` map. |
+| `mimetypes.gif` | `image/gif` | An entry in the `mimetypes` map. |
+| `mimetypes.htm` | `text/html` | An entry in the `mimetypes` map. |
+| `mimetypes.html` | `text/html` | An entry in the `mimetypes` map. |
+| `mimetypes.ico` | `image/vnd.microsoft.icon` | An entry in the `mimetypes` map. |
+| `mimetypes.jpeg` | `image/jpeg` | An entry in the `mimetypes` map. |
+| `mimetypes.jpg` | `image/jpeg` | An entry in the `mimetypes` map. |
+| `mimetypes.js` | `text/javascript` | An entry in the `mimetypes` map. |
+| `mimetypes.png` | `image/png` | An entry in the `mimetypes` map. |
+| `mimetypes.svg` | `image/svg+xml` | An entry in the `mimetypes` map. |
+| `mimetypes.tif` | `image/tiff` | An entry in the `mimetypes` map. |
+| `mimetypes.tiff` | `image/tiff` | An entry in the `mimetypes` map. |
+| `mimetypes.txt` | `text/plain` | An entry in the `mimetypes` map. |
+| `mimetypes.webp` | `image/webp` | An entry in the `mimetypes` map. |
+| `mimetypes.xml` | `application/xml` | An entry in the `mimetypes` map. |
 
 
 ### documentAssetDb
 
 | Property | Default | What it does |
 |---|---|---|
-| `connection.jdbcDriverClassName` | *unset* | The class name for the JDBC database connection, e.g. com.mysql.cj.jdbc.Driver. **Needs a restart.** |
-| `connection.jdbcDriverPassword` | *unset* | The password to connect to the database with. **Needs a restart.** |
-| `connection.jdbcDriverUrl` | *unset* | The URL for the JDBC database connection, e.g. jdbc:mysql://some-host:3306/db-name?useUnicode=yes&characterEncoding=UTF-8. **Needs a restart.** |
-| `connection.jdbcDriverUsername` | *unset* | The username to connect to the database with. **Needs a restart.** |
-| `connectionPool.cachePrepStmts` | `false` | Sets the cachePrepStmts property on the at the JDBC driver level. Set to true to enable caching of prepared statements at the JDBC driver level. **Needs a restart.** |
-| `connectionPool.connectionTimeout` | `PT30S` | The maximum amount of time that a client will wait for a connection from the pool. **Needs a restart.** |
-| `connectionPool.idleTimeout` | `PT10M` | The maximum amount of time that a connection can sit idle in the pool. Only applies when minimumIdle is defined to be less than maximumPoolSize. **Needs a restart.** |
-| `connectionPool.leakDetectionThreshold` | `PT0S` | The amount of time that a connection can be out of the pool before a message is logged indicating a possible connection leak. A value of 0 means leak detection is disabled. Lowest acceptable value for enabling leak detection is 2 seconds. **Needs a restart.** |
-| `connectionPool.maxLifetime` | `PT30M` | The maximum lifetime of a connection in the pool. **Needs a restart.** |
-| `connectionPool.maxPoolSize` | `30` | The maximum size that the pool is allowed to reach, including both idle and in-use connections. **Needs a restart.** |
-| `connectionPool.minimumIdle` | `10` | The minimum number of idle connections that Hikari tries to maintain in the pool. **Needs a restart.** |
-| `connectionPool.prepStmtCacheSize` | `25` | Sets the prepStmtCacheSize property on the at the JDBC driver level. The number of prepared statements that the driver will cache per connection. **Needs a restart.** |
-| `connectionPool.prepStmtCacheSqlLimit` | `256` | Sets the prepStmtCacheSqlLimit property on the at the JDBC driver level. The maximum length for a prepared SQL statement that can be cached. **Needs a restart.** |
+| `connection.jdbcDriverClassName` | *unset* | The class name for the JDBC database connection, e.g. com.mysql.cj.jdbc.Driver. Should only be set in the application YAML config file. Connection details can be set in one place using 'stroom.commonDbDetails.*', individually for each service area or a mixture of the two. **Needs a restart.** |
+| `connection.jdbcDriverPassword` | *unset* | The password to connect to the database with. Should only be set in the application YAML config file. Connection details can be set in one place using 'stroom.commonDbDetails.*', individually for each service area or a mixture of the two. **Needs a restart.** |
+| `connection.jdbcDriverUrl` | *unset* | The URL for the JDBC database connection, e.g. jdbc:mysql://some-host:3306/db-name?useUnicode=yes&characterEncoding=UTF-8. Should only be set in the application YAML config file. Connection details can be set in one place using 'stroom.commonDbDetails.*', individually for each service area or a mixture of the two. **Needs a restart.** |
+| `connection.jdbcDriverUsername` | *unset* | The username to connect to the database with. Should only be set in the application YAML config file. Connection details can be set in one place using 'stroom.commonDbDetails.*', individually for each service area or a mixture of the two. **Needs a restart.** |
+| `connectionPool.cachePrepStmts` | `false` | Sets the cachePrepStmts property on the at the JDBC driver level. Set to true to enable caching of prepared statements at the JDBC driver level. See https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration for further details on configuring the MySQL JDBC driver properties. **Needs a restart.** |
+| `connectionPool.connectionTimeout` | `PT30S` | The maximum amount of time that a client will wait for a connection from the pool. See https://github.com/brettwooldridge/HikariCP for further details on configuring the connection pool. **Needs a restart.** |
+| `connectionPool.idleTimeout` | `PT10M` | The maximum amount of time that a connection can sit idle in the pool. Only applies when minimumIdle is defined to be less than maximumPoolSize. See https://github.com/brettwooldridge/HikariCP for further details on configuring the connection pool. **Needs a restart.** |
+| `connectionPool.leakDetectionThreshold` | `PT0S` | The amount of time that a connection can be out of the pool before a message is logged indicating a possible connection leak. A value of 0 means leak detection is disabled. Lowest acceptable value for enabling leak detection is 2 seconds.See https://github.com/brettwooldridge/HikariCP for further details on configuring the connection pool. **Needs a restart.** |
+| `connectionPool.maxLifetime` | `PT30M` | The maximum lifetime of a connection in the pool. See https://github.com/brettwooldridge/HikariCP for further details on configuring the connection pool. **Needs a restart.** |
+| `connectionPool.maxPoolSize` | `30` | The maximum size that the pool is allowed to reach, including both idle and in-use connections. See https://github.com/brettwooldridge/HikariCP for further details on configuring the connection pool. **Needs a restart.** |
+| `connectionPool.minimumIdle` | `10` | The minimum number of idle connections that Hikari tries to maintain in the pool. See https://github.com/brettwooldridge/HikariCP for further details on configuring the connection pool. **Needs a restart.** |
+| `connectionPool.prepStmtCacheSize` | `25` | Sets the prepStmtCacheSize property on the at the JDBC driver level. The number of prepared statements that the driver will cache per connection. See https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration for further details on configuring the MySQL JDBC driver properties. **Needs a restart.** |
+| `connectionPool.prepStmtCacheSqlLimit` | `256` | Sets the prepStmtCacheSqlLimit property on the at the JDBC driver level. The maximum length for a prepared SQL statement that can be cached. See https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration for further details on configuring the MySQL JDBC driver properties. **Needs a restart.** |
 
 
 ### elastic
@@ -547,7 +553,7 @@ By section, as the file nests them.
 | Property | Default | What it does |
 |---|---|---|
 | `name` | `tba` | The name of the node to identify it in the cluster. Should only be set per node in the application YAML config file. The node name should not be changed once set. This node name will be used in the 'receiptId' meta attribute so if a stroom cluster is forwarding to another stroom cluster, then the node name should be unique across all clusters involved. |
-| `status.heapHistogram.classNameMatchRegex` | `^stroom\\..*$` | A single regex that will be used to filter classes from the heap histogram internal statistic based on their name. e.g '^(stroom\..*)$'. If no value is supplied all classes will be included. If a value is supplied only those class names matching the regex will be included. |
+| `status.heapHistogram.classNameMatchRegex` | `^stroom\..*$` | A single regex that will be used to filter classes from the heap histogram internal statistic based on their name. e.g '^(stroom\..*)$'. If no value is supplied all classes will be included. If a value is supplied only those class names matching the regex will be included. |
 | `status.heapHistogram.classNameReplacementRegex` | *A long value; see the file.* | A single regex that will be used to replace all matches in the class name with '--REPLACED--'. This is to prevent ids for anonymous inner classes and lambdas from being included in the class name. E.g '....DocRefResourceHttpClient$$Lambda$46/1402766141' becomes '....DocRefResourceHttpClient$$Lambda$--REPLACED--'. |
 
 
@@ -584,7 +590,7 @@ By section, as the file nests them.
 | `referenceData.loadingLockStripes` | `2048` | The number of lock stripes used for preventing multiple pipeline processes from loading the same reference stream at the same time. Values should be a power of 2. Lower values will mean it is more likely for two different streams from blocking one another. **Needs a restart.** |
 | `referenceData.maxPurgeDeletesBeforeCommit` | `200000` | The maximum number of entries in one reference stream to purge before the transaction is committed. A value high enough to purge all entries in one transaction is preferable but for large reference streams this may result in errors due to the transaction being too large. |
 | `referenceData.maxPutsBeforeCommit` | `200000` | The maximum number of puts into the store (in a single load) before the transaction is committed. There is only one write transaction available at a time so reducing this value allows multiple loads to potentially each load a chunk at a time. However, load times increase rapidly with values below around 2,000. For maximum performance of a single load set this value to 0 to only commit at the very end of the load. |
-| `referenceData.purgeAge` | `P30D` | The time to retain reference data for in the off heap store. The time is taken from the time that the reference stream was last accessed, e.g. a lookup was made against it. In ISO-8601 duration format, e.g. 'P1DT12H'. Used by job ''. |
+| `referenceData.purgeAge` | `P30D` | The time to retain reference data for in the off heap store. The time is taken from the time that the reference stream was last accessed, e.g. a lookup was made against it. In ISO-8601 duration format, e.g. 'P1DT12H'. Used by job 'Ref Data Off-heap Store Purge'. |
 | `referenceData.stagingLmdb.localDir` | `reference_staging_data` | The path to store temporary reference staging data stores in. It will contain one sub directory per staging store. It MUST be on local disk, NOT network storage, due to use of memory mapped files. Use the fastest disk you can, but using a tmpfs file system is not advised. A staging store only exists for the life of a reference stream load. The directory will be created if it doesn't exist.If the value is a relative path then it will be treated as being relative to stroom.path.home. **Needs a restart.** |
 | `referenceData.stagingLmdb.maxReaders` | `5` | The maximum number of concurrent readers/threads that can use the off-heap store. **Needs a restart.** |
 | `referenceData.stagingLmdb.maxStoreSize` | `10G` | The maximum size for the off heap store. There must be available space on the disk to accommodate this size. It can be larger than the amount of available RAM and will only be allocated as it is needed. Can be expressed in IEC units (multiples of 1024), e.g. 1024, 1024B, 1024bytes, 1KiB, 1KB, 1K, etc. **Needs a restart.** |
@@ -609,14 +615,14 @@ By section, as the file nests them.
 
 | Property | Default | What it does |
 |---|---|---|
-| `defaultShardCounts.HISTOGRAM` | `16` | *Not described in the source.* |
-| `defaultShardCounts.METRIC` | `16` | *Not described in the source.* |
-| `defaultShardCounts.RANGED_STATE` | `16` | *Not described in the source.* |
-| `defaultShardCounts.SESSION` | `32` | *Not described in the source.* |
-| `defaultShardCounts.STATE` | `16` | *Not described in the source.* |
-| `defaultShardCounts.TEMPORAL_RANGED_STATE` | `32` | *Not described in the source.* |
-| `defaultShardCounts.TEMPORAL_STATE` | `32` | *Not described in the source.* |
-| `defaultShardCounts.TRACE` | `64` | *Not described in the source.* |
+| `defaultShardCounts.HISTOGRAM` | `16` | An entry in the `defaultShardCounts` map. Default shard counts by state type. |
+| `defaultShardCounts.METRIC` | `16` | An entry in the `defaultShardCounts` map. |
+| `defaultShardCounts.RANGED_STATE` | `16` | An entry in the `defaultShardCounts` map. |
+| `defaultShardCounts.SESSION` | `32` | An entry in the `defaultShardCounts` map. |
+| `defaultShardCounts.STATE` | `16` | An entry in the `defaultShardCounts` map. |
+| `defaultShardCounts.TEMPORAL_RANGED_STATE` | `32` | An entry in the `defaultShardCounts` map. |
+| `defaultShardCounts.TEMPORAL_STATE` | `32` | An entry in the `defaultShardCounts` map. |
+| `defaultShardCounts.TRACE` | `64` | An entry in the `defaultShardCounts` map. |
 | `mergedCheckpointCacheTtl` | `PT10M` | How long to keep a large split-trace's in-memory merged DFS checkpoint index (used for random-access/last-page paging across the live shard and archive buckets) after last use before evicting it. Defaults to 10 minutes. |
 | `mergeStatusRetention` | `P30D` | How long to keep the per source merge status records that stop additive stores (histogram and metric) double counting when a merge is rerun after interruption. Records are only pruned once no replayable copy of the source data remains, so this only needs to exceed any realistic replay delay. |
 | `minTimeToKeepSnapshotEnv` | `PT20M` | How long snapshot data remains useful. This bounds both how stale a snapshot may be and still be served, measured from when the store node last confirmed it was current, and how long an inactive snapshot shard is kept before being cleaned up. Should be at least twice minTimeToKeepSnapshots. |
@@ -675,32 +681,35 @@ By section, as the file nests them.
 | Property | Default | What it does |
 |---|---|---|
 | `obfuscatedFields` | `AccountId, AccountName, Component, Feed, ReceivedPath, RemoteDN, RemoteHost, System, UploadUserId, UploadUsername, X-Forwarded-For` | The set of field names used in receipt data policy that need to be obfuscated (using a hash function) when transferred to stroom-proxy. |
-| `obfuscationHashAlgorithm` | `SHA2_512` | The hash algorithm to use for obfuscating fields defined in obfuscatedFields. Possible values are SHA3_256, SHA2_256, BCRYPT, ARGON_2. |
-| `receiptRulesInitialFields.AccountId` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.Component` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.Compression` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.ContextEncoding` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.ContextFormat` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.EffectiveTime` | `Date` | *Not described in the source.* |
-| `receiptRulesInitialFields.Encoding` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.Environment` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.Feed` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.Format` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.ReceiptId` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.ReceiptIdPath` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.ReceivedPath` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.ReceivedTime` | `Date` | *Not described in the source.* |
-| `receiptRulesInitialFields.ReceivedTimeHistory` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.RemoteAddress` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.RemoteCertExpiry` | `Date` | *Not described in the source.* |
-| `receiptRulesInitialFields.RemoteDN` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.RemoteHost` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.Schema` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.SchemaVersion` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.System` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.Type` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.UploadUserId` | `Text` | *Not described in the source.* |
-| `receiptRulesInitialFields.UploadUsername` | `Text` | *Not described in the source.* |
+| `obfuscationHashAlgorithm` | `SHA2_512` | The hash algorithm to use for obfuscating fields defined in obfuscatedFields. Possible values are SHA3_256, SHA2_256, BCRYPT, ARGON_2. One of `SHA3_256`, `SHA2_256`, `BCRYPT`, `ARGON_2`, `SHA2_512`. |
+| `receiptRulesInitialFields.AccountId` | `Text` | An entry in the `receiptRulesInitialFields` map. A map of field name to field type to use as the initial set of fields in the Data Receipt Rules screen. Case-insensitive. Valid field types are (Id\|Boolean\|Integer\|Long\|Float\|Double\|Date\|Text\|IpV4Address). |
+| `receiptRulesInitialFields.Component` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.Compression` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.content-length` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.ContextEncoding` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.ContextFormat` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.EffectiveTime` | `Date` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.Encoding` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.Environment` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.Feed` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.Format` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.ReceiptId` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.ReceiptIdPath` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.ReceivedPath` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.ReceivedTime` | `Date` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.ReceivedTimeHistory` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.RemoteAddress` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.RemoteCertExpiry` | `Date` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.RemoteDN` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.RemoteHost` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.Schema` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.SchemaVersion` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.System` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.Type` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.UploadUserId` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.UploadUsername` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.user-agent` | `Text` | An entry in the `receiptRulesInitialFields` map. |
+| `receiptRulesInitialFields.X-Forwarded-For` | `Text` | An entry in the `receiptRulesInitialFields` map. |
 
 
 ### receive
@@ -712,15 +721,16 @@ By section, as the file nests them.
 | `dataFeedIdentitiesDir` | `data_feed_identities` | The directory where Stroom will look for datafeed identity files. Only used if enabledAuthenticationTypes contains DATA_FEED_KEY or .If the value is a relative path then it will be treated as being relative to stroom.path.home. Data feed key files must have the extension .json. Files in sub-directorieswill be ignored. |
 | `dataFeedOwnerMetaKey` | `AccountId` | The meta key that is used to identify the owner of a Data Feed Key. This may be an AccountId or similar. It must be provided as a header when sending data using the associated Data Feed Key, and its value will be checked against the value held with the hashed Data Feed Key by Stroom. Default value is 'AccountId'. Case does not matter. |
 | `enabledAuthenticationTypes` | `TOKEN, CERTIFICATE` | The types of authentication that are enabled for data receipt. |
-| `fallbackReceiveAction` | `RECEIVE` | If receiptCheckMode is RECEIPT_POLICY or FEED_STATUS and stroom/proxy is unable to perform the receipt check, then this action will be used as a fallback until the receipt check can be successfully performed. |
+| `fallbackReceiveAction` | `RECEIVE` | If receiptCheckMode is RECEIPT_POLICY or FEED_STATUS and stroom/proxy is unable to perform the receipt check, then this action will be used as a fallback until the receipt check can be successfully performed. One of `RECEIVE`, `REJECT`, `DROP`. |
 | `feedNameGenerationEnabled` | `false` | If true the client is not required to set the 'Feed' header. If Feed is not present a feed name will be generated based on the template specified by the 'feedNameTemplate' property. If false (the default), a populated 'Feed' header will be required. |
 | `feedNameGenerationMandatoryHeaders` | `AccountId, Component, Format, Schema` | The set of header keys are mandatory if feedNameGenerationEnabled is set to true. Should be set to complement the header keys used in 'feedNameTemplate', but may be a sub-set of those in the template to allow for optional headers. |
 | `feedNameTemplate` | `${accountid}-${component}-${format}-${schema}` | A template for generating a feed name from a set of headers. The value of each header referenced in the template will have any unsuitable characters replaced with '_'. If this property is set in the YAML file, use single quotes to prevent the variables being expanded when the config file is loaded. |
 | `maxRequestSize` | *unset* | If defined then states the maximum size of a request (uncompressed for gzip requests). Will return a 413 Content Too Long response code for any requests exceeding this value. If undefined then there is no limit to the size of the request. |
 | `metaTypes` | `Context, Detections, Error, Events, Meta Data, Raw Events, Raw Reference, Records, Reference, Test Events, Test Reference` | Set of supported meta type names. This set must contain all of the names in the default value for this property but can contain additional names. |
-| `receiptCheckMode` | `FEED_STATUS` | Controls how or whether data is checked on receipt. Valid values (FEED_STATUS\|RECEIPT_POLICY\|RECEIVE_ALL\|REJECT_ALL\|DROP_ALL). |
+| `receiptCheckMode` | `FEED_STATUS` | Controls how or whether data is checked on receipt. Valid values (FEED_STATUS\|RECEIPT_POLICY\|RECEIVE_ALL\|REJECT_ALL\|DROP_ALL). One of `FEED_STATUS`, `RECEIPT_POLICY`, `FEED_EXISTENCE`, `RECEIVE_ALL`, `DROP_ALL`, `REJECT_ALL`. |
 | `s3Event.rePollDuration` | `PT5M` | This is the time to keep polling for. Once reached polling will stop and will begin again at the next scheduled execution time for the job. |
-| `s3Event.sqs` | *unset* | *Not described in the source.* |
+| `s3Event.sleepDurationPostFailure` | `PT1M` | The sleep time after a poll failure occurs. |
+| `s3Event.sqs` | *unset* | The configuration for the AWS SQS queue that will be used to receive S3 events. |
 | `x509CertificateDnFormat` | `LDAP` | The format of the Distinguished Name used in the certificate. Valid values are LDAP and OPEN_SSL, where LDAP is the default. |
 | `x509CertificateDnHeader` | `X-SSL-CLIENT-S-DN` | The HTTP header key used to extract the distinguished name (DN) as obtained from an X509 certificate. This is used when a load balancer does the SSL/mTLS termination and passes the client DN though in a header. Only used for authentication if a value is set and 'enabledAuthenticationTypes' includes CERTIFICATE. |
 | `x509CertificateHeader` | `X-SSL-CERT` | The HTTP header key used to extract an X509 certificate. This is used when a load balancer does the SSL/mTLS termination and passes the client certificate though in a header. Only used for authentication if a value is set and 'enabledAuthenticationTypes' includes CERTIFICATE. |
@@ -779,7 +789,7 @@ By section, as the file nests them.
 | `authentication.openId.expectedSignerPrefixes` | *empty* | If using an AWS load balancer to handle the authentication, set this to the Amazon Resource Names (ARN) of the load balancer(s) fronting stroom, which will be something like 'arn:aws:elasticloadbalancing:region-code:account-id:loadbalancer/app/load-balancer-name/load-balancer-id'. This config value will be used to verify the 'signer' in the JWT header. Each value is the first N characters of the ARN and as a minimum must include up to the colon after the account-id, i.e. 'arn:aws:elasticloadbalancing:region-code:account-id:'.See https://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-authenticate-users.html#user-claims-encoding |
 | `authentication.openId.formTokenRequest` | `true` | Some OpenId providers, e.g. AWS Cognito, require a form to be used for token requests. |
 | `authentication.openId.fullNameClaimTemplate` | `${name}` | A template to build the user's full name using claim values as variables in the template. E.g '${firstName} ${lastName}' or '${name}'. If this property is set in the YAML file, use single quotes to prevent the variables being expanded when the config file is loaded. Note: claim names are case sensitive. |
-| `authentication.openId.identityProviderType` | `INTERNAL_IDP` | The type of Open ID Connect identity provider that stroom/proxywill use for authentication. Valid values are: INTERNAL_IDP - Stroom's own built in IDP (not valid for stroom-proxy),EXTERNAL_IDP - An external IDP such as KeyCloak/Cognito (stroom's internal IDP can be used as stroom-proxy's external IDP). Changing this property will require a restart of the application. |
+| `authentication.openId.identityProviderType` | `INTERNAL_IDP` | The type of Open ID Connect identity provider that stroom/proxywill use for authentication. Valid values are: INTERNAL_IDP - Stroom's own built in IDP (not valid for stroom-proxy),EXTERNAL_IDP - An external IDP such as KeyCloak/Cognito (stroom's internal IDP can be used as stroom-proxy's external IDP). Changing this property will require a restart of the application. One of `INTERNAL_IDP`, `EXTERNAL_IDP`, `NO_IDP`. |
 | `authentication.openId.issuer` | *unset* | The issuer used in OpenId authentication.Should only be set if not using a configuration endpoint. |
 | `authentication.openId.jwksUri` | *unset* | The URI to obtain the JSON Web Key Set from in OpenId authentication.Should only be set if not using a configuration endpoint. |
 | `authentication.openId.logoutEndpoint` | *unset* | The logout endpoint for the identity provider.This is not typically provided by the configuration endpoint. |
@@ -799,36 +809,36 @@ By section, as the file nests them.
 | `identity.allowLockedAccountPasswordReset` | `false` | If true, a user whose account has been locked by exceeding 'failedLoginLockThreshold' may unlock it themselves by completing the 'Forgot password' flow. Successfully setting a new password clears the locked state so the user can sign in again. This does not weaken the protection that locking gives against password guessing because completing a reset requires possession of the short lived token that is sent to the account's email address. Requires 'passwordPolicy.allowPasswordResets' and email to be configured. Only applies when using the internal identity provider. The default value for this property is false. |
 | `identity.autoCreateAdminAccountOnBoot` | `false` | If true, then on boot, Stroom will ensure the presence of a local user account called 'admin' and a group called 'Administrators' with the app permission 'Administrator'. If the 'admin' user account is created then its password will be set to 'admin'. This feature also requires that the 'identityProviderType' property is set to INTERNAL_IDP. The default value for this property is false. If false it is possible to create administrator users/groups using the 'manage_users' CLI command. **Needs a restart.** |
 | `identity.certificateCnCaptureGroupIndex` | `1` | Used in conjunction with property certificateCnPattern. This property value is the number of the regex capture group that represents the portion of certificate Common Name (CN) value that is the user identity. If all of the CN value is the user identity then set this property to 0 to capture the whole CN value. |
-| `identity.certificateCnPattern` | `.*\\((.*)\\)` | The regular expression pattern that represents the Common Name (CN) value in an X509 certificate. The pattern should include a capture group for extracting the user identity from the CN value. For example the CN may be of the form 'Joe Bloggs [jbloggs]' in which case the pattern would be '.*?\[([^]]*)\].*'. The only capture group surrounds the user identity part. |
-| `identity.email.fromAddress` | `noreply@stroom` | *Not described in the source.* |
-| `identity.email.fromName` | `Stroom User Accounts` | *Not described in the source.* |
-| `identity.email.passwordResetSubject` | `Password reset for Stroom` | *Not described in the source.* |
-| `identity.email.passwordResetText` | *A long value; see the file.* | *Not described in the source.* |
-| `identity.email.smtp.host` | `localhost` | *Not described in the source.* |
-| `identity.email.smtp.password` | *unset* | *Not described in the source.* |
-| `identity.email.smtp.port` | `2525` | *Not described in the source.* |
-| `identity.email.smtp.transport` | `plain` | *Not described in the source.* |
-| `identity.email.smtp.username` | *unset* | *Not described in the source.* |
+| `identity.certificateCnPattern` | `.*\((.*)\)` | The regular expression pattern that represents the Common Name (CN) value in an X509 certificate. The pattern should include a capture group for extracting the user identity from the CN value. For example the CN may be of the form 'Joe Bloggs [jbloggs]' in which case the pattern would be '.*?\[([^]]*)\].*'. The only capture group surrounds the user identity part. |
+| `identity.email.fromAddress` | `noreply@stroom` | The from email address to use in password reset emails. |
+| `identity.email.fromName` | `Stroom User Accounts` | The from name to use in password reset emails. |
+| `identity.email.passwordResetSubject` | `Password reset for Stroom` | The subject to use in password reset emails. |
+| `identity.email.passwordResetText` | *A long value; see the file.* | The email body text to use in password reset emails. |
+| `identity.email.smtp.host` | `localhost` | The fully qualified hostname of the SMTP server. |
+| `identity.email.smtp.password` | *unset* | The password to authenticate with on the SMTP server. |
+| `identity.email.smtp.port` | `2525` | The port for the SMTP server. |
+| `identity.email.smtp.transport` | `plain` | The transport type for communicating with the SMTP server. |
+| `identity.email.smtp.username` | *unset* | The username to authenticate with on the SMTP server. |
 | `identity.failedLoginLockDuration` | `PT30M` | How long an account locked by reaching 'failedLoginLockThreshold' failed logins stays locked before it is unlocked automatically, so that a lockout is temporary and cannot be used to deny a user access indefinitely. Set to zero (e.g. 'PT0S') to disable automatic unlocking, in which case a locked account stays locked until an administrator unlocks it or the user completes the 'Forgot password' flow. A lock set manually by an administrator is never affected by this and never expires. Only applies when using the internal identity provider. |
 | `identity.failedLoginLockThreshold` | `3` | If the number of failed logins is greater than or equal to this value then the account  will be locked. |
-| `identity.passwordPolicy.allowPasswordResets` | `true` | *Not described in the source.* |
-| `identity.passwordPolicy.forcePasswordChangeOnFirstLogin` | `true` | *Not described in the source.* |
-| `identity.passwordPolicy.mandatoryPasswordChangeDuration` | `P90D` | *Not described in the source.* |
-| `identity.passwordPolicy.minimumPasswordLength` | `8` | *Not described in the source.* |
-| `identity.passwordPolicy.minimumPasswordStrength` | `3` | *Not described in the source.* |
-| `identity.passwordPolicy.neverUsedAccountDeactivationThreshold` | `P30D` | *Not described in the source.* |
-| `identity.passwordPolicy.passwordPolicyMessage` | *A long value; see the file.* | *Not described in the source.* |
-| `identity.passwordPolicy.unusedAccountDeactivationThreshold` | `P90D` | *Not described in the source.* |
+| `identity.passwordPolicy.allowPasswordResets` | `true` | Whether users may reset their own password by email. This is the only switch for the feature: it governs both what the UI offers and whether a reset is honoured. Sending the email needs the identity 'email' section configured as well, so turning this on without working SMTP settings will issue reset links that never arrive. |
+| `identity.passwordPolicy.forcePasswordChangeOnFirstLogin` | `true` | If true, on first login the user will be forced to change their password. |
+| `identity.passwordPolicy.mandatoryPasswordChangeDuration` | `P90D` | The age after which a password will have to be changed. The frequency of checks is controlled by the job 'Account Maintenance'. |
+| `identity.passwordPolicy.minimumPasswordLength` | `8` | The minimum number of characters that new passwords need to contain. |
+| `identity.passwordPolicy.minimumPasswordStrength` | `3` | The minimum strength password that is allowed. |
+| `identity.passwordPolicy.neverUsedAccountDeactivationThreshold` | `P30D` | Unused user accounts with a duration since account creation greater than this value will be locked. The frequency of checks is controlled by the job 'Account Maintenance'. |
+| `identity.passwordPolicy.passwordPolicyMessage` | *A long value; see the file.* | A message informing users of the password policy |
+| `identity.passwordPolicy.unusedAccountDeactivationThreshold` | `P90D` | User accounts with a duration since last login greater than this value will be locked. The frequency of checks is controlled by the job 'Account Maintenance'. |
 | `identity.passwordResetRequestCooldown` | `PT1M` | How long a user must wait between requesting one password reset email and the next. This stops the unauthenticated 'Forgot password' endpoint being used to send mail to someone's address over and over. Requests for an address that has no account are not limited here because no mail is sent for them. Only applies when using the internal identity provider. |
 | `identity.reactivateInactiveAccountsOnLogin` | `false` | If true, an account that has been marked as inactive by the 'Account Maintenance' job will be automatically made active again when the user next authenticates successfully with the correct password. Reactivation only happens on a successful authentication, so resetting a password does not by itself make an inactive account active again. Accounts that are locked, disabled or are processing accounts are never reactivated this way. Only applies when using the internal identity provider. The default value for this property is false. |
-| `identity.token.accessTokenExpiration` | `PT1H` | *Not described in the source.* |
-| `identity.token.algorithm` | `RS256` | *Not described in the source.* |
-| `identity.token.defaultApiKeyExpiration` | `P365D` | *Not described in the source.* |
-| `identity.token.emailResetTokenExpiration` | `PT10M` | *Not described in the source.* |
-| `identity.token.idTokenExpiration` | `PT1H` | *Not described in the source.* |
-| `identity.token.jwkRotationInterval` | `P30D` | *Not described in the source.* |
-| `identity.token.jwsIssuer` | `stroom` | *Not described in the source.* |
-| `identity.token.refreshTokenExpiration` | `P30D` | *Not described in the source.* |
+| `identity.token.accessTokenExpiration` | `PT1H` | The time before an access token will expire. |
+| `identity.token.algorithm` | `RS256` | The cryptographic algorithm used in the Json Web Signatures. Valid values can be found at https://openid.net/specs/draft-jones-json-web-signature-04.html#Signing |
+| `identity.token.defaultApiKeyExpiration` | `P365D` | The default API key expiry time |
+| `identity.token.emailResetTokenExpiration` | `PT10M` | The time before an email reset token will expire. |
+| `identity.token.idTokenExpiration` | `PT1H` | The time before an ID token will expire. |
+| `identity.token.jwkRotationInterval` | `P30D` | How often the internal identity provider replaces its signing key. A retired key stays published, so it can still verify tokens it signed, for as long as the longest token lifetime; keeping this at or above that lifetime means only two or three keys are ever published at once, whereas a much shorter interval accumulates keys. |
+| `identity.token.jwsIssuer` | `stroom` | The Issuer value used in Json Web Tokens. |
+| `identity.token.refreshTokenExpiration` | `P30D` | The time before a refresh token will expire. |
 | `webContent.contentSecurityPolicy` | *A long value; see the file.* | The content security policy (HTTP header 'Content-Security-Policy') |
 | `webContent.contentTypeOptions` | `nosniff` | The content type options (HTTP header 'X-Content-Type-Options') |
 | `webContent.frameOptions` | `sameorigin` | The frame options (HTTP header 'X-Frame-Options') |
@@ -847,9 +857,9 @@ By section, as the file nests them.
 
 | Property | Default | What it does |
 |---|---|---|
-| `httpOnly` | `true` | *Not described in the source.* |
-| `sameSite` | `STRICT` | *Not described in the source.* |
-| `secure` | `true` | *Not described in the source.* |
+| `httpOnly` | `true` | Marks the session cookies as 'HttpOnly' so that we are inaccessible to client-side javascript code. |
+| `sameSite` | `STRICT` | The same site attribute for the cookie, e.g. "Strict", "Lax" or "None". |
+| `secure` | `true` | Marks the session cookies with the secure flag, indicating they should only be transmitted over a secure connection. |
 
 
 ### solr
@@ -864,63 +874,31 @@ By section, as the file nests them.
 
 | Property | Default | What it does |
 |---|---|---|
-| `internal.benchmarkCluster` | `type: StatisticStore` | the statistics produced by the Benchmark Cluster Test job. |
-| `internal.benchmarkCluster.name` | `Benchmark-Cluster Test` | *Not described in the source.* |
-| `internal.benchmarkCluster.uuid` | `946a88c6-a59a-11e6-bdc4-0242ac110002` | *Not described in the source.* |
-| `internal.cpu` | `type: StatisticStore` | various statistic values relating to the CPU load on the node. |
-| `internal.cpu.name` | `CPU` | *Not described in the source.* |
-| `internal.cpu.uuid` | `af08c4a7-ee7c-44e4-8f5e-e9c6be280434` | *Not described in the source.* |
-| `internal.enabledStoreTypes` | `StatisticStore` | Determines which statistic store(s) internal statistic events will be sent to. Valid values are "". An empty list means all internal statistic events will be dropped. |
-| `internal.eventsPerSecond` | `type: StatisticStore` | the number of events processed per second by a node. |
-| `internal.eventsPerSecond.name` | `EPS` | *Not described in the source.* |
-| `internal.eventsPerSecond.uuid` | `a9936548-2572-448b-9d5b-8543052c4d92` | *Not described in the source.* |
-| `internal.heapHistogramBytes` | `type: StatisticStore` | values from a Java heap histogram based on the number of bytes used by each class. |
-| `internal.heapHistogramBytes.name` | `Heap Histogram Bytes` | *Not described in the source.* |
-| `internal.heapHistogramBytes.uuid` | `934a1600-b456-49bf-9aea-f1e84025febd` | *Not described in the source.* |
-| `internal.heapHistogramInstances` | `type: StatisticStore` | values from a Java heap histogram based on the number of instances used by each class. |
-| `internal.heapHistogramInstances.name` | `Heap Histogram Instances` | *Not described in the source.* |
-| `internal.heapHistogramInstances.uuid` | `e4f243b8-2c70-4d6e-9d5a-16466bf8764f` | *Not described in the source.* |
-| `internal.memory` | `type: StatisticStore` | various values relating to the memory use on a node. |
-| `internal.memory.name` | `Memory` | *Not described in the source.* |
-| `internal.memory.uuid` | `77c09ccb-e251-4ca5-bca0-56a842654397` | *Not described in the source.* |
-| `internal.metaDataStreamSize` | `type: StatisticStore` | the volume of data (in bytes) received by a feed. |
-| `internal.metaDataStreamSize.name` | `Meta Data-Stream Size` | *Not described in the source.* |
-| `internal.metaDataStreamSize.uuid` | `946a8814-a59a-11e6-bdc4-0242ac110002` | *Not described in the source.* |
-| `internal.metaDataStreamsReceived` | `type: StatisticStore` | the number of streams received by a feed. |
-| `internal.metaDataStreamsReceived.name` | `Meta Data-Streams Received` | *Not described in the source.* |
-| `internal.metaDataStreamsReceived.uuid` | `946a87bc-a59a-11e6-bdc4-0242ac110002` | *Not described in the source.* |
-| `internal.pipelineStreamProcessor` | `type: StatisticStore` | the number of streams processed by a pipeline. |
-| `internal.pipelineStreamProcessor.name` | `PipelineStreamProcessor` | *Not described in the source.* |
-| `internal.pipelineStreamProcessor.uuid` | `946a80fc-a59a-11e6-bdc4-0242ac110002` | *Not described in the source.* |
-| `internal.refDataStoreEntryCount` | `type: StatisticStore` | the total number of map entries in the off heap reference data store. |
-| `internal.refDataStoreEntryCount.name` | `Reference Data Store Entry Count` | *Not described in the source.* |
-| `internal.refDataStoreEntryCount.uuid` | `f1587262-9cbc-46b4-80eb-51deb011b2c1` | *Not described in the source.* |
-| `internal.refDataStoreSize` | `type: StatisticStore` | the total size in bytes of the off heap reference data store. |
-| `internal.refDataStoreSize.name` | `Reference Data Store Size` | *Not described in the source.* |
-| `internal.refDataStoreSize.uuid` | `e57959bf-0b2d-4008-98a7-ffcae4bbc4bb` | *Not described in the source.* |
-| `internal.refDataStoreStreamCount` | `type: StatisticStore` | the total number of streams in the off heap reference data store. |
-| `internal.refDataStoreStreamCount.name` | `Reference Data Store Stream Count` | *Not described in the source.* |
-| `internal.refDataStoreStreamCount.uuid` | `0dfd4e00-e068-4667-9c60-d3f6163a6c04` | *Not described in the source.* |
-| `internal.searchResultsStoreCount` | `type: StatisticStore` | the total number of off heap search results stores. |
-| `internal.searchResultsStoreCount.name` | `Search Results Store Count` | *Not described in the source.* |
-| `internal.searchResultsStoreCount.uuid` | `35d60e7d-f11a-45c9-981d-16d8ddda081e` | *Not described in the source.* |
-| `internal.searchResultsStoreSize` | `type: StatisticStore` | the total size in bytes of the off heap search results stores. |
-| `internal.searchResultsStoreSize.name` | `Search Results Store Size` | *Not described in the source.* |
-| `internal.searchResultsStoreSize.uuid` | `de5b831d-3b7e-4bb5-836f-2f438ec30568` | *Not described in the source.* |
-| `internal.streamTaskQueueSize` | `type: StatisticStore` | the number of items on the stream task queue. |
-| `internal.streamTaskQueueSize.name` | `Stream Task Queue Size` | *Not described in the source.* |
-| `internal.streamTaskQueueSize.uuid` | `946a7f0f-a59a-11e6-bdc4-0242ac110002` | *Not described in the source.* |
-| `internal.volumes` | `type: StatisticStore` | the number of items on the stream task queue. |
-| `internal.volumes.name` | `Volumes` | *Not described in the source.* |
-| `internal.volumes.uuid` | `ac4d8d10-6f75-4946-9708-18b8cb42a5a3` | *Not described in the source.* |
+| `internal.benchmarkCluster` | `{type: StatisticStore, uuid: 946a88c6-a59a-11e6-bdc4-0242ac110002, name: Benchmark-Cluster Test}` | A list of DocRefs, one for each statistic store that events for this internal statistic will be sent to. This internal statistic describes the statistics produced by the Benchmark Cluster Test job. |
+| `internal.cpu` | `{type: StatisticStore, uuid: af08c4a7-ee7c-44e4-8f5e-e9c6be280434, name: CPU}` | A list of DocRefs, one for each statistic store that events for this internal statistic will be sent to. This internal statistic describes various statistic values relating to the CPU load on the node. |
+| `internal.enabledStoreTypes` | `StatisticStore` | Determines which statistic store(s) internal statistic events will be sent to. Valid values are "StatisticStore". An empty list means all internal statistic events will be dropped. |
+| `internal.eventsPerSecond` | `{type: StatisticStore, uuid: a9936548-2572-448b-9d5b-8543052c4d92, name: EPS}` | A list of DocRefs, one for each statistic store that events for this internal statistic will be sent to. This internal statistic describes the number of events processed per second by a node. |
+| `internal.heapHistogramBytes` | `{type: StatisticStore, uuid: 934a1600-b456-49bf-9aea-f1e84025febd, name: Heap Histogram Bytes}` | A list of DocRefs, one for each statistic store that events for this internal statistic will be sent to. This internal statistic describes values from a Java heap histogram based on the number of bytes used by each class. |
+| `internal.heapHistogramInstances` | `{type: StatisticStore, uuid: e4f243b8-2c70-4d6e-9d5a-16466bf8764f, name: Heap Histogram Instances}` | A list of DocRefs, one for each statistic store that events for this internal statistic will be sent to. This internal statistic describes values from a Java heap histogram based on the number of instances used by each class. |
+| `internal.memory` | `{type: StatisticStore, uuid: 77c09ccb-e251-4ca5-bca0-56a842654397, name: Memory}` | A list of DocRefs, one for each statistic store that events for this internal statistic will be sent to. This internal statistic describes various values relating to the memory use on a node. |
+| `internal.metaDataStreamSize` | `{type: StatisticStore, uuid: 946a8814-a59a-11e6-bdc4-0242ac110002, name: Meta Data-Stream Size}` | A list of DocRefs, one for each statistic store that events for this internal statistic will be sent to. This internal statistic describes the volume of data (in bytes) received by a feed. |
+| `internal.metaDataStreamsReceived` | `{type: StatisticStore, uuid: 946a87bc-a59a-11e6-bdc4-0242ac110002, name: Meta Data-Streams Received}` | A list of DocRefs, one for each statistic store that events for this internal statistic will be sent to. This internal statistic describes the number of streams received by a feed. |
+| `internal.pipelineStreamProcessor` | `{type: StatisticStore, uuid: 946a80fc-a59a-11e6-bdc4-0242ac110002, name: PipelineStreamProcessor}` | A list of DocRefs, one for each statistic store that events for this internal statistic will be sent to. This internal statistic describes the number of streams processed by a pipeline. |
+| `internal.refDataStoreEntryCount` | `{type: StatisticStore, uuid: f1587262-9cbc-46b4-80eb-51deb011b2c1, name: Reference Data Store Entry Count}` | A list of DocRefs, one for each statistic store that events for this internal statistic will be sent to. This internal statistic describes the total number of map entries in the off heap reference data store. |
+| `internal.refDataStoreSize` | `{type: StatisticStore, uuid: e57959bf-0b2d-4008-98a7-ffcae4bbc4bb, name: Reference Data Store Size}` | A list of DocRefs, one for each statistic store that events for this internal statistic will be sent to. This internal statistic describes the total size in bytes of the off heap reference data store. |
+| `internal.refDataStoreStreamCount` | `{type: StatisticStore, uuid: 0dfd4e00-e068-4667-9c60-d3f6163a6c04, name: Reference Data Store Stream Count}` | A list of DocRefs, one for each statistic store that events for this internal statistic will be sent to. This internal statistic describes the total number of streams in the off heap reference data store. |
+| `internal.searchResultsStoreCount` | `{type: StatisticStore, uuid: 35d60e7d-f11a-45c9-981d-16d8ddda081e, name: Search Results Store Count}` | A list of DocRefs, one for each statistic store that events for this internal statistic will be sent to. This internal statistic describes the total number of off heap search results stores. |
+| `internal.searchResultsStoreSize` | `{type: StatisticStore, uuid: de5b831d-3b7e-4bb5-836f-2f438ec30568, name: Search Results Store Size}` | A list of DocRefs, one for each statistic store that events for this internal statistic will be sent to. This internal statistic describes the total size in bytes of the off heap search results stores. |
+| `internal.streamTaskQueueSize` | `{type: StatisticStore, uuid: 946a7f0f-a59a-11e6-bdc4-0242ac110002, name: Stream Task Queue Size}` | A list of DocRefs, one for each statistic store that events for this internal statistic will be sent to. This internal statistic describes the number of items on the stream task queue. |
+| `internal.volumes` | `{type: StatisticStore, uuid: ac4d8d10-6f75-4946-9708-18b8cb42a5a3, name: Volumes}` | A list of DocRefs, one for each statistic store that events for this internal statistic will be sent to. This internal statistic describes the number of items on the stream task queue. |
 | `sql.docRefType` | `StatisticStore` | The entity type for the sql statistics service |
 | `sql.inMemAggregatorPoolSize` | `10` | Number of pooled in-memory aggregators in the pool.This pool of aggregators is the first stage of in-memory statistic aggregation. **Needs a restart.** |
 | `sql.inMemFinalAggregatorSizeThreshold` | `1000000` | Maximum size (number of entries) of the final in-memory aggregator map.Once an aggregator has reached this size it will be flushed to the database.If statistic flush tasks are delaying shutdown of stroom you can reduce this value to make the flushes smaller, at the cost of efficiency.This aggregator is the final stage of in-memory statistic aggregation. |
 | `sql.inMemPooledAggregatorAgeThreshold` | `PT5M` | Maximum age of each aggregator in the pool of in-memory aggregator maps. Once an aggregator has reached this age it will be merged into the final stage of in-memory aggregation.This pool of aggregators is the first stage of in-memory statistic aggregation. |
 | `sql.inMemPooledAggregatorSizeThreshold` | `1000000` | Maximum size (number of entries) of each aggregator in the pool of in-memory aggregator maps. Once an aggregator has reached this size it will be merged into the final stage of in-memory aggregation.This pool of aggregators is the first stage of in-memory statistic aggregation. |
 | `sql.maxProcessingAge` | *unset* | The maximum age of statistics to process and retain, i.e. any statistics with an statistic event time older than the current time minus maxProcessingAge will be silently dropped.  Existing statistic data over this age will be purged during statistic aggregation. Set to null to process/retain all data. |
-| `sql.search.fetchSize` | `5000` | *Not described in the source.* |
-| `sql.search.maxResults` | `100000` | *Not described in the source.* |
+| `sql.search.fetchSize` | `5000` | Gives the JDBC driver a hint as to the number of rows that should be fetched from the database when more rows are needed for ResultSet objects generated by this Statement. Depends on 'useCursorFetch=true' being set in the JDBC connect string. If not set, the JDBC driver's default will be used. |
+| `sql.search.maxResults` | `100000` | The maximum number of records that can be returned from the statistics DB in a single query prior to aggregation |
 | `sql.slowQueryWarningThreshold` | `PT1S` | A warning will be logged for any statistics database queries that take longer than this threshold to complete. A value of '0' or 'PT0' means no warnings will be logged at all. |
 | `sql.statisticAggregationBatchSize` | `1000000` | Number of SQL_STAT_VAL_SRC records to merge into SQL_STAT_VAL in one batchTypically a larger number is more efficient but means it will take longer which can delay a clean shutdown of stroom. Higher numbers may also lead to database lock contention and lock wait errors. |
 | `sql.statisticAggregationStageTwoBatchSize` | `200000` | Number of SQL_STAT_VAL records to move to a coarser aggregation level in one batch. Typically a larger number is more efficient but means it will take longer which can delay a clean shutdown of stroom. Higher numbers may also lead to database lock contention and lock wait errors. |
@@ -931,51 +909,51 @@ By section, as the file nests them.
 
 | Property | Default | What it does |
 |---|---|---|
-| `aboutHtml` | *A long value; see the file.* | *Not described in the source.* |
-| `activity.chooseOnStartup` | `false` | *Not described in the source.* |
-| `activity.editorBody` | *A long value; see the file.* | *Not described in the source.* |
-| `activity.editorTitle` | `Edit Activity` | *Not described in the source.* |
-| `activity.enabled` | `false` | *Not described in the source.* |
-| `activity.managerTitle` | `Choose Activity` | *Not described in the source.* |
-| `analyticUiDefaultConfig.defaultBodyTemplate` | *A long value; see the file.* | *Not described in the source.* |
-| `analyticUiDefaultConfig.defaultSubjectTemplate` | `Detector '{{ detectorName \| escape }}' Alert` | *Not described in the source.* |
-| `defaultApiKeyHashAlgorithm` | `SHA3_256` | *Not described in the source.* |
-| `defaultMaxResults` | `1000000,100,10,1` | *Not described in the source.* |
-| `helpSubPathDocumentation` | `/user-guide/content/documentation/` | *Not described in the source.* |
-| `helpSubPathExpressions` | `/reference-section/expressions/` | *Not described in the source.* |
-| `helpSubPathJobs` | `/reference-section/jobs/` | *Not described in the source.* |
-| `helpSubPathProperties` | `/user-guide/properties/` | *Not described in the source.* |
-| `helpSubPathQuickFilter` | `/user-guide/content/finding-things/` | *Not described in the source.* |
-| `helpSubPathStroomQueryLanguage` | `/user-guide/search/queries/stroom-query-language/` | *Not described in the source.* |
-| `helpUrl` | `https://gchq.github.io/stroom-docs/7.13/docs` | *Not described in the source.* |
-| `htmlTitle` | `Stroom` | *Not described in the source.* |
-| `maxEditorCompletionEntries` | `1000` | *Not described in the source.* |
-| `namePattern` | `^[a-zA-Z0-9_\\- \\.\\(\\)]{1,}$` | *Not described in the source.* |
-| `nestedIndexFieldsDelimiterPattern` | `[.:]` | *Not described in the source.* |
-| `nodeMonitoring.pingMaxThreshold` | `500` | *Not described in the source.* |
-| `nodeMonitoring.pingWarnThreshold` | `100` | *Not described in the source.* |
-| `oncontextmenu` | `return false;` | *Not described in the source.* |
-| `process.defaultRecordLimit` | `1000000` | *Not described in the source.* |
-| `process.defaultTimeLimit` | `30` | *Not described in the source.* |
+| `aboutHtml` | *A long value; see the file.* | The about message that is displayed when selecting Help -> About. The about message is in HTML format. |
+| `activity.chooseOnStartup` | `false` | Set to true if users should be prompted to choose an activity on login. |
+| `activity.editorBody` | *A long value; see the file.* | The HTML to display in the activity editor popup. |
+| `activity.editorTitle` | `Edit Activity` | The title of the activity editor popup. |
+| `activity.enabled` | `false` | If you would like users to be able to record some info about the activity they are performing set this property to true. |
+| `activity.managerTitle` | `Choose Activity` | The title of the activity manager popup. |
+| `analyticUiDefaultConfig.defaultBodyTemplate` | *A long value; see the file.* | The default email body template to use for analytic rule emails. The template uses a sub-set of the Jinja templating language. If this property is not set, the user will not be presented with an initial body template value. |
+| `analyticUiDefaultConfig.defaultSubjectTemplate` | `Detector '{{ detectorName \| escape }}' Alert` | The default email subject template to use for analytic rule emails. The template uses a sub-set of the Jinja templating language. If this property is not set, the user will not be presented with an initial subject template value. |
+| `defaultApiKeyHashAlgorithm` | `SHA3_256` | The default hash algorithm for hashing API keys. API keys are not stored, only their hash and prefix are. Different hash algorithm offer different levels of performance and security. If not set 'SHA3_256' will be used. Possible values are 'SHA3_256', 'SHA2_256', 'BCRYPT' and 'ARGON2'. This property controls the default value of a selection box, but the user select a different one. One of `SHA3_256`, `SHA2_256`, `BCRYPT`, `ARGON_2`, `SHA2_512`. |
+| `defaultMaxResults` | `1000000,100,10,1` | The default maximum number of search results that new dashboard tables will request. |
+| `helpSubPathDocumentation` | `/user-guide/content/documentation/` | The sub-path for the help page for documentation. Appended to helpUrl. |
+| `helpSubPathExpressions` | `/reference-section/expressions/` | The sub-path for the help page for the dashboard expressions. Appended to helpUrl. |
+| `helpSubPathJobs` | `/reference-section/jobs/` | The sub-path for the help page for stroom jobs. Appended to helpUrl. |
+| `helpSubPathProperties` | `/user-guide/properties/` | The sub-path for the help page for the properties. Appended to helpUrl. |
+| `helpSubPathQuickFilter` | `/user-guide/content/finding-things/` | The sub-path for the help page for the quick filter. Appended to helpUrl. |
+| `helpSubPathStroomQueryLanguage` | `/user-guide/search/queries/stroom-query-language/` | The sub-path for the help page for Stroom Query Language. Appended to helpUrl. |
+| `helpUrl` | `https://gchq.github.io/stroom-docs/7.13/docs` | The URL of hosted help files. The default is the upstream (gchq) Stroom documentation, not these pages, so Stroom's Help menu and help links open that site unless this is changed. The `helpSubPath*` settings are paths on that site. |
+| `htmlTitle` | `Stroom` | The title to use for the application in the browser. |
+| `maxEditorCompletionEntries` | `1000` | The maximum number of code completion entries to show in the popup when using ctrl-space or live autocompletion. |
+| `namePattern` | `^[a-zA-Z0-9_\- \.\(\)]{1,}$` | The regex pattern for entity names. |
+| `nestedIndexFieldsDelimiterPattern` | `[.:]` | This regex pattern defines the delimiter to use for nesting index fields in the query helper. This is useful when dealing with large numbers of dynamic fields. e.g. if every element is made into a field with its name being something similar to its xpath. For example, if the delimiter is '.', then the field 'Events.Event.EventTime.TimeCreated' would be displayed as 'TimeCreated' within three nested categories. The default pattern is '[:.]' to also categorise the special 'annotation:XXX' fields. Set it to null or an empty string prevent nesting. |
+| `nodeMonitoring.pingMaxThreshold` | `500` | The maximum number of milliseconds that the node monitoring ping bar can display. Above this value the ping bar will be displayed in a different colour to indicate it has exceeded the maximum threshold. This value should be greater than or equal to pingWarnThreshold |
+| `nodeMonitoring.pingWarnThreshold` | `100` | The threshold in milliseconds, above which a node ping response time is considered to have a severity of warning and the ping bar will be coloured accordingly. Must be lest then or equal to pingMaxThreshold. |
+| `oncontextmenu` | `return false;` | Determines the behaviour of the browser built-in context menu. This property is for developer use only. Set to 'return false;' to see Stroom's context menu. Set to 'return true;' to see the standard browser menu. |
+| `process.defaultRecordLimit` | `1000000` | The default number of records that batch search processing will be limited by. |
+| `process.defaultTimeLimit` | `30` | The default number of minutes that batch search processing will be limited by. |
 | `query.dashboardPipelineSelectorIncludedTags` | `extraction` | Set of explorer tags to use as a filter on the Dashboard screen's Extraction Pipeline selector. Explorer nodes will only be included if they have at least all the tags in this property. This property should contain a sub set of the tags in property stroom.explorer.suggestedTags |
 | `query.indexPipelineSelectorIncludedTags` | `extraction` | Set of explorer tags to use as a filter on the Index screen's Pipeline selector. Explorer nodes will only be included if they have at least all the tags in this property. This property should contain a sub set of the tags in property stroom.explorer.suggestedTags |
-| `query.infoPopup.enabled` | `false` | *Not described in the source.* |
-| `query.infoPopup.title` | `Please Provide Query Info` | *Not described in the source.* |
-| `query.infoPopup.validationRegex` | `^[\\s\\S]{3,}$` | *Not described in the source.* |
+| `query.infoPopup.enabled` | `false` | If you would like users to provide some query info when performing a query set this property to true. |
+| `query.infoPopup.title` | `Please Provide Query Info` | The title of the query info popup. |
+| `query.infoPopup.validationRegex` | `^[\s\S]{3,}$` | A regex used to validate query info. |
 | `query.viewPipelineSelectorIncludedTags` | `extraction` | Set of explorer tags to use as a filter on the View screen's Pipeline selector. Explorer nodes will only be included if they have at least all the tags in this property. This property should contain a sub set of the tags in property stroom.explorer.suggestedTags |
-| `referencePipelineSelectorIncludedTags` | `reference-loader` | *Not described in the source.* |
-| `reportUiDefaultConfig.defaultBodyTemplate` | *A long value; see the file.* | *Not described in the source.* |
-| `reportUiDefaultConfig.defaultSubjectTemplate` | `Report '{{ reportName \| escape }}'` | *Not described in the source.* |
-| `source.maxCharactersInPreviewFetch` | `30000` | *Not described in the source.* |
-| `source.maxCharactersPerFetch` | `80000` | *Not described in the source.* |
-| `source.maxCharactersToCompleteLine` | `10000` | *Not described in the source.* |
-| `source.maxHexDumpLines` | `1000` | *Not described in the source.* |
-| `splash.body` | *A long value; see the file.* | *Not described in the source.* |
-| `splash.enabled` | `false` | *Not described in the source.* |
-| `splash.title` | `Splash Screen` | *Not described in the source.* |
-| `splash.version` | `v0.1` | *Not described in the source.* |
-| `theme.labelColours` | `TEST1=#FF0000,TEST2=#FF9900` | *Not described in the source.* |
-| `welcomeHtml` | *A long value; see the file.* | *Not described in the source.* |
+| `referencePipelineSelectorIncludedTags` | `reference-loader` | Set of explorer tags to use as a filter on the Reference Pipeline selector of an XSLTFilter within a pipeline.Explorer nodes will only be included if they have at least all the tags in this property. This property should contain a sub set of the tags in property stroom.explorer.suggestedTags |
+| `reportUiDefaultConfig.defaultBodyTemplate` | *A long value; see the file.* | The default email body template to use for report emails. The template uses a sub-set of the Jinja templating language. If this property is not set, the user will not be presented with an initial body template value. |
+| `reportUiDefaultConfig.defaultSubjectTemplate` | `Report '{{ reportName \| escape }}'` | The default email subject template to use for report emails. The template uses a sub-set of the Jinja templating language. If this property is not set, the user will not be presented with an initial subject template value. |
+| `source.maxCharactersInPreviewFetch` | `30000` | The maximum number of characters of data to display in the Data Preview pane. |
+| `source.maxCharactersPerFetch` | `80000` | The maximum number of characters of data to display in the Source View editor at at time. |
+| `source.maxCharactersToCompleteLine` | `10000` | When displaying multi-line data in the Data Preview or Source views, the viewer will attempt to always show complete lines. It will go past the requested range by up to this many characters in order to complete the line. |
+| `source.maxHexDumpLines` | `1000` | The maximum number of lines of hex dump to display when viewing data as hex. A single line displays 32 bytes. |
+| `splash.body` | *A long value; see the file.* | The HTML to display in the splash screen. |
+| `splash.enabled` | `false` | If you would like users to see a splash screen on login. |
+| `splash.title` | `Splash Screen` | The title of the splash screen popup. |
+| `splash.version` | `v0.1` | The version of the splash screen message. |
+| `theme.labelColours` | `TEST1=#FF0000,TEST2=#FF9900` | A comma separated list of key/value pairs to provide colours for classification banners. Various screens in Stroom can show a data classification banner, e.g. the data view for a feed. The classification banners can be coloured according to the classification label. For example: 'OFFICIAL SENSITIVE=red,OFFICIAL=#eed202'. The colour values should be valid HTMLcolour codes or names. Classification labels with no corresponding colour in this property will be given a default grey colour. |
+| `welcomeHtml` | *A long value; see the file.* | The welcome message that is displayed in the welcome tab when logging in to Stroom. The welcome message is in HTML format. |
 
 
 ### uiUri

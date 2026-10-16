@@ -69,12 +69,16 @@ It is an easy state to end up in after maintenance, and it is worth checking bef
 1. **Are tasks being created at all?**
    If no tasks exist for the filter, nothing will run however much capacity there is.
    That is a filter problem: see [Is data processing?]({{< relref "../checking-it-works/is-data-processing.md" >}}).
+   Some delay is normal: a new stream waits up to one task creation run before it gets a task, and a filter that keeps producing no tasks is retried less often, from every 10 seconds up to once a minute (`stroom.processor.skipNonProducingFiltersDuration` and `skipNonProducingFiltersMaxDuration`).
 1. **Are tasks queued but not picked up?**
    That points at the nodes: one that is unhealthy, disabled, or cannot reach the database will not take work.
    Check each node individually.
 1. **Is one filter starving the others?**
    Filters have priorities, and a large [reprocess]({{< relref "../resetting/reprocess-data.md" >}}) at a high priority will crowd out live processing.
    Check what else is running before assuming the system is undersized.
+1. **Is one processing profile getting no work?**
+   Task creation has a separate budget for each [processing profile]({{< relref "../../concepts/processing/_index.md#processing-profiles" >}}) (`stroom.processor.tasksToCreate`), so a busy profile cannot use up every run.
+   If one profile's nodes still sit idle, check that its filters are enabled, that one of its periods matches the current day and time, and that its node group is enabled and holds the nodes you expect.
 1. **Is it the database?**
    Stroom's metadata is relational, and a slow or contended database slows everything above it in a way that looks like general sluggishness.
 1. **Is disk the limit?**

@@ -43,7 +43,10 @@ Convert a hostname into an IP address.
 
 ```text
 host-address(String hostname)
+host-address(String hostname, Boolean ignoreWarnings)
 ```
+
+Set `ignoreWarnings` to `true` to suppress the warning raised when the hostname cannot be resolved.
 
 
 ## host-name()
@@ -52,7 +55,10 @@ Convert an IP address into a hostname.
 
 ```text
 host-name(String ipAddress)
+host-name(String ipAddress, Boolean ignoreWarnings)
 ```
+
+Set `ignoreWarnings` to `true` to suppress the warning raised when the IP address cannot be resolved.
 
 
 ## ip-in-cidr()

@@ -68,7 +68,7 @@ Pipelines can also "push" data out of Stroom entirely:
 | Destination | Primary Use Case | Element Type |
 | :--- | :--- | :--- |
 | **Stream Store** | Long-term storage, further processing. | `StreamAppender` |
-| **Lucene/Elastic** | Fast keyword and structured search. | `IndexingFilter` |
+| **Lucene/Elastic** | Fast keyword and structured search. | `IndexingFilter` / `ElasticIndexingFilter` |
 | **Plan B** | High-speed state/reference lookups. | `PlanBFilter` |
 | **Remote API** | Real-time alerting or external integration. | `HTTPAppender` |
 | **Local Disk** | Debugging or manual data export. | `FileAppender` |

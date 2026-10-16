@@ -23,7 +23,7 @@ A search returns the identity of each matching event: which stream, and where in
 The extraction pipeline re-reads those events from the data store, runs them through a translation, and emits them through {{< pipe-elm "SearchResultOutputFilter" >}}, which turns them into the fields the dashboard asked for.
 
 The pipeline is a normal one: a parser, usually an {{< pipe-elm "XSLTFilter" >}}, then the output filter.
-It reads `records:2` and is given the events the search matched rather than a whole stream.
+It reads the translated events, the XSLT converts them to `records:2` for the output filter, and it is given the events the search matched rather than a whole stream.
 
 {{< image src="guides/searching/finding-the-original-event/indexed-and-stored.svg" alt="A search reaches the index, which matches on indexed fields. From there a stored field returns at once because its value is in the index, while a field that is not stored goes through an extraction pipeline that reads the source stream back. A note records that if retention has removed that stream, the column comes back empty." >}}A stored field costs index size and returns immediately. An unstored one keeps the index small and makes the result depend on the source stream still being there.{{< /image >}}
 
@@ -32,7 +32,7 @@ It reads `records:2` and is given the events the search matched rather than a wh
 
 1. **Create the extraction pipeline**, ending in {{< pipe-elm "SearchResultOutputFilter" >}}.
 1. **Point the table at it.**
-   The table component names the extraction pipeline to use.
+   In the table component's settings, leave **Extract Values** ticked, then either name the pipeline in **Extraction Pipeline** or tick **Use Default Extraction Pipeline** to use the one set on the index.
 1. **Add the columns** for the fields you want extracted.
    They must be fields the index defines, because the field definitions are what the output filter maps onto.
 
@@ -75,6 +75,8 @@ If extracted values matter for a period, the retention on the source data has to
 {{< diagnose >}}
 1. **Is an extraction pipeline set on the table?**
    Without one, only stored fields populate, and the rest are silently blank.
+1. **Is Extract Values ticked on the table?**
+   Unticked, extracted columns stay blank even with a pipeline set.
 1. **Is the column a field the index defines?**
    The output filter maps onto index fields; a column naming something else gets nothing.
 1. **Does the extraction pipeline produce that field?**

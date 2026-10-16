@@ -35,7 +35,8 @@ A sender that records none of them will cheerfully discard data Stroom refused.
 |---|---|---|
 | `200` | `0` | Accepted. |
 | `406` | `100` | No `Feed` header was supplied. |
-| `406` | `110` | The feed is not set to receive data, **or does not exist at all**. A direct post cannot tell the two apart. |
+| `406` | `101` | The feed does not exist. Only when `stroom.receive.receiptCheckMode` is `RECEIPT_POLICY` or `FEED_EXISTENCE`. |
+| `406` | `110` | The feed is not set to receive data, **or does not exist at all**. With the default `receiptCheckMode`, `FEED_STATUS`, a direct post cannot tell the two apart. |
 | `406` | `113` | Rejected by a data receipt policy rule. |
 | `401` | `300` to `304` | No credential was supplied. `302`, *Client token or certificate required*, is the usual one. |
 | `401` | `310` to `315` | A credential was supplied but was not accepted, for example an expired data feed key (`314`). |
@@ -99,7 +100,7 @@ If data is vanishing with no errors anywhere, check the feed's status first.
    Check the rules under the receipt configuration, not the feed.
 1. **Was the `Feed` header right?**
    Feed names are exact.
-   A typo in a direct post gives `110`, exactly as if the feed were set to **Reject**, not a helpful message about a near match.
+   With the default `FEED_STATUS` check mode, a typo in a direct post gives `110`, exactly as if the feed were set to **Reject**, not a helpful message about a near match; under `RECEIPT_POLICY` it gives `101`.
    If the status is **Receive** and you still get `110`, check the spelling of the `Feed` header against the feed's name.
 1. **If you are posting through a proxy, is it forwarding?**
    Look at the proxy's repository: data that arrived but has not been forwarded is still on its disk.

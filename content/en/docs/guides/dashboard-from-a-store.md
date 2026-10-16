@@ -137,9 +137,9 @@ Every column comes from the store, and which columns exist depends on the state 
 | Session | `Key`, `Start`, `End` | `Start` |
 | Histogram | `Key`, `Time`, `Resolution`, `Value` | `Time` |
 | Metric | `Key`, `Time`, `Resolution`, then `Value`, `Min`, `Max`, `Count`, `Sum` and `Average` as the value schema stores them | `Time` |
-| Trace | `TraceId`, `ParentSpanId`, `SpanId`, `StartTime`, `EndTime`, `InsertTime` | `StartTime` |
 
 For a Metric store, each value column exists only if the **Value Schema** stores it (**Store Latest Value**, **Store Min Value** and so on); `Average` needs both count and sum.
+Trace data is not a Plan B state type in 7.14: it is held in a separate **Traces** document, which is not a dashboard data source (see [Plan B]({{< relref "../concepts/planb.md#state-type" >}})).
 
 The dashboard's query pane offers the key and time fields as terms.
 `Value` and `ValueType` are returned but not offered as terms; to narrow on a value, filter the table column or use `filter` in StroomQL.

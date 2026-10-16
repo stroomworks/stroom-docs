@@ -25,7 +25,7 @@ For a new deployment with no existing preference, built-in Lucene indexing is th
 * A **Solr Index** document represents an index on a Solr cluster and holds the connection to it.
 * A pipeline ending in {{< pipe-elm "SolrIndexingFilter" >}} writes to it.
 
-The pipeline is shaped exactly as for any other index: a parser reading `records:2`, an {{< pipe-elm "XSLTFilter" >}} producing the fields, then the indexing filter.
+The pipeline is shaped exactly as for any other index: a parser reading the translated events, an {{< pipe-elm "XSLTFilter" >}} that converts them to `records:2` fields, then the indexing filter.
 
 
 ## The two jobs

@@ -22,12 +22,13 @@ A backup of one without the other restores a system that believes things about i
 | Stream metadata, processing state, users, permissions, jobs | The database | No |
 | Content: pipelines, XSLTs, indexes, dashboards, feeds | The database | No |
 | Stream data | Data volumes | No |
+| Stream data on S3 volumes | The S3 bucket, which a volume snapshot does not cover | No. The database must stay consistent with the bucket in the same way as with a file system volume |
 | Index shards | Index volumes | Yes, by reprocessing |
 | Reference data store | Each node's off-heap store | Yes, loaded on demand from reference streams |
 | Plan B shards | The store on each node listed in `stroom.planb.nodeList`; other nodes hold snapshots | Snapshots yes, fetched again from a storing node. The stored shards only by reprocessing the data that wrote them |
 | Configuration | The configuration file on each node | No, but small and worth keeping in version control |
 
-The first four rows are the ones that matter.
+The first five rows are the ones that matter.
 The rebuildable ones are worth backing up only if rebuilding them would take longer than you can afford to be without them, which for a large index is a real consideration.
 
 

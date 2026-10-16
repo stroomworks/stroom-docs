@@ -685,26 +685,40 @@ function configDefaults() {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]
     if (!line.trim() || line.trim().startsWith('#')) continue
-    const m = /^(\s*)([A-Za-z0-9_]+):\s*(.*)$/.exec(line)
+    // Map keys may hold spaces and hyphens: metaTypeExtensions has `Raw Events`, and
+    // receiptRulesInitialFields `X-Forwarded-For`. A narrower pattern dropped all eight.
+    const m = /^(\s*)([A-Za-z0-9_][A-Za-z0-9_ -]*):(?:\s+(.*))?$/.exec(line)
     if (!m) continue
     const depth = m[1].length / 2
     stack.length = depth
     stack[depth] = m[2]
+    m[3] ??= ''
     if (m[3] === '') {
       // A key with no value on its line is a branch, unless what follows is a block
       // sequence: `metaTypes:` then `- "Context"` and so on. Those are properties with a
       // list value, and treating them as branches dropped 35 of them from the page,
       // among them data.meta.metaTypes and the OpenID request scopes.
+      //
+      // An item may itself be a map, as each of statistics.internal's DocRefs is: `- type:`
+      // with `uuid:` and `name:` indented beneath it. Those lines belong to the item, and
+      // reading them as properties of their own published 32 rows that do not exist.
       const items = []
+      let dash = -1
       let j = i + 1
-      while (j < lines.length && (!lines[j].trim() || /^\s*-\s/.test(lines[j]))) {
-        if (lines[j].trim()) items.push(lines[j].trim().replace(/^-\s*/, ''))
-        j++
+      for (; j < lines.length; j++) {
+        const l = lines[j]
+        if (!l.trim()) continue
+        const indent = l.length - l.trimStart().length
+        if (/^\s*-\s/.test(l)) {
+          dash = indent
+          items.push([l.trim().replace(/^-\s*/, '')])
+        } else if (dash >= 0 && indent > dash) items.at(-1).push(l.trim())
+        else break
       }
       if (!items.length) continue
       leaves.push({
         path: stack.slice(1).join('.'),
-        value: `[${items.join(', ')}]`,
+        value: `[${items.map((it) => (it.length > 1 ? `{${it.join(', ')}}` : it[0])).join(', ')}]`,
         list: true,
       })
       i = j - 1
@@ -746,12 +760,23 @@ function configDescriptions(files) {
   }
   const consts = stringConstants(files)
   const cache = new Map()
-  const sourceOf = (cls) => {
-    if (!cache.has(cls)) {
-      const fs = byClass.get(cls) ?? []
-      cache.set(cls, fs.length ? readFileSync(fs[0], 'utf8') : null)
-    }
-    return cache.get(cls)
+  const sourceOf = (file) => {
+    if (!cache.has(file)) cache.set(file, file ? readFileSync(file, 'utf8') : null)
+    return cache.get(file)
+  }
+  /**
+   * The file a class name refers to, from the file that names it. Several config class
+   * names exist more than once (ActivityConfig, SearchConfig, EmailConfig), and taking the
+   * first one found read the wrong class, so its settings came out undescribed. An import
+   * decides it; failing that, the same package; failing that, the first.
+   */
+  const resolveClass = (cls, from) => {
+    const fs = byClass.get(cls) ?? []
+    if (fs.length < 2 || !from) return fs[0]
+    const src = sourceOf(from)
+    const imp = new RegExp(`^import\\s+([\\w.]+)\\.${cls}\\s*;`, 'm').exec(src)?.[1]
+    const byImport = imp && fs.find((f) => f.endsWith(`/${imp.replace(/\./g, '/')}/${cls}.java`))
+    return byImport ?? fs.find((f) => dirname(f) === dirname(from)) ?? fs[0]
   }
 
   /**
@@ -765,6 +790,10 @@ function configDescriptions(files) {
    * parentheses and string literals are walked properly.
    */
   const GETTER_AT = /^public\s+(?:final\s+)?([\w<>,.[\] ]+?)\s+(?:get|is)([A-Z]\w*)\s*\(\s*\)/
+  // An instance field. Many classes (UiConfig, PasswordPolicyConfig, the token and email
+  // settings) put @JsonPropertyDescription on the field rather than the getter, and reading
+  // getters alone marked about ninety described settings "Not described in the source".
+  const FIELD_AT = /^(?:private|protected)\s+(?:final\s+)?([\w<>,.?[\] ]+?)\s+(\w+)\s*;/
 
   function gettersOf(src) {
     const out = []
@@ -820,6 +849,15 @@ function configDescriptions(files) {
           annStart = i
           continue
         }
+        const f = FIELD_AT.exec(src.slice(i))
+        if (f) {
+          const anns = src.slice(annStart, i)
+          if (anns.includes('@JsonProperty'))
+            out.push({ type: f[1].trim(), rest: f[2][0].toUpperCase() + f[2].slice(1), anns, field: true })
+          i += f[0].length
+          annStart = i
+          continue
+        }
       }
       if (c === ';' || c === '{' || c === '}') annStart = i + 1
       i++
@@ -832,18 +870,22 @@ function configDescriptions(files) {
    * is not optional — every module's `db` block comes from AbstractDbConfig, so without
    * it two thirds of the tree goes missing.
    */
-  const members = (cls, depth = 0) => {
-    const src = sourceOf(cls)
+  const members = (cls, file, depth = 0) => {
+    const src = sourceOf(file)
     if (!src || depth > 4) return []
     const out = []
     const ext = new RegExp(`class\\s+${cls}\\b[^{]*?\\bextends\\s+([A-Z]\\w+)`).exec(src)
-    if (ext && byClass.has(ext[1])) out.push(...members(ext[1], depth + 1))
+    if (ext && byClass.has(ext[1])) out.push(...members(ext[1], resolveClass(ext[1], file), depth + 1))
 
-    for (const { type, rest, anns } of gettersOf(src)) {
+    // Constants in a description are resolved, preferring the class's own: dropping them
+    // left "before aborting the '' job" and "Valid values are \"\"".
+    const local = scoped(consts, file)
+    const fields = new Map()
+    for (const { type, rest, anns, field } of gettersOf(src)) {
       const jp = /@JsonProperty\s*\(\s*(?:"([^"]+)"|([\w.]+))\s*\)/.exec(anns)
       const name =
         jp?.[1] ??
-        (jp?.[2] ? consts.get(jp[2]) ?? consts.get(jp[2].split('.').slice(-2).join('.')) : null) ??
+        (jp?.[2] ? constant(local, jp[2]) : null) ??
         rest[0].toLowerCase() + rest.slice(1)
 
       let description = ''
@@ -851,31 +893,61 @@ function configDescriptions(files) {
       if (at >= 0) {
         const open = anns.indexOf('(', at)
         const arg = open < 0 ? null : balanced(anns, open)
-        if (arg)
-          for (const lit of arg.match(/"(?:[^"\\\n]|\\.)*"/g) ?? [])
-            description += lit
-              .slice(1, -1)
-              .replace(/\\(["'\\nrt])/g, (_, c) => ({ n: '\n', r: '\r', t: '\t' })[c] ?? c)
+        if (arg) description = stringExpr(arg, local)
       }
+      const restart = /@RequiresRestart/.test(anns)
 
-      out.push({ name, type, description, restart: /@RequiresRestart/.test(anns) })
+      if (field) fields.set(name, { description, restart })
+      else out.push({ name, type, description, restart, values: enumValues(type, file) })
+    }
+    // A getter takes its field's description when it has none of its own.
+    for (const m of out) {
+      const f = fields.get(m.name)
+      if (!f) continue
+      m.description ||= f.description
+      m.restart ||= f.restart
     }
     return out
   }
 
+  /**
+   * The constants of an enum-typed setting, so a row can say what values it takes:
+   * data.store.fsyncMode's description named none of DISABLED, FILE_ONLY, DIR_ONLY or
+   * ENABLED.
+   */
+  function enumValues(type, from) {
+    if (!/^[A-Z]\w*$/.test(type)) return null
+    const file = resolveClass(type, from)
+    if (!file) return null
+    const body = classBody(sourceOf(file), type)
+    if (!new RegExp(`\\benum\\s+${type}\\b`).test(sourceOf(file))) return null
+    // The constants run to the first `;`, or the end of the body.
+    let head = body
+      .replace(/\/\/.*$/gm, '')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/"(?:[^"\\]|\\.)*"/g, '""')
+    // Constructor arguments may hold commas, so they go before the list is split.
+    while (/\([^()]*\)/.test(head)) head = head.replace(/\([^()]*\)/g, '')
+    head = head.split(';')[0]
+    const names = [...head.matchAll(/(?:^|,)\s*(?:@\w+(?:\([^)]*\))?\s*)*([A-Z][A-Z0-9_]*)\b/g)].map((m) => m[1])
+    return names.length ? names : null
+  }
+
   const found = new Map()
   const seen = new Set()
-  const walk = (cls, path, depth) => {
-    if (depth > 8 || seen.has(`${cls}|${path}`)) return
-    seen.add(`${cls}|${path}`)
-    for (const m of members(cls)) {
+  const walk = (file, cls, path, depth) => {
+    if (depth > 8 || seen.has(`${file}|${path}`)) return
+    seen.add(`${file}|${path}`)
+    for (const m of members(cls, file)) {
       const p = path ? `${path}.${m.name}` : m.name
       const bare = m.type.replace(/<.*>/, '').trim()
-      if (/Config$/.test(bare) && byClass.has(bare)) walk(bare, p, depth + 1)
-      else found.set(p, m)
+      // A nested config is recorded as well as walked: one left unset, such as
+      // receive.s3Event.sqs, is a single row on the page and needs its description.
+      found.set(p, m)
+      if (/Config$/.test(bare) && byClass.has(bare)) walk(resolveClass(bare, file), bare, p, depth + 1)
     }
   }
-  walk('AppConfig', '', 0)
+  walk(findOne(files, 'stroom/config/app/AppConfig.java'), 'AppConfig', '', 0)
   return found
 }
 
@@ -923,6 +995,24 @@ const DB_NOTES = {
     'The longest statement that will be cached, in characters.',
 }
 
+/**
+ * Notes added to a setting's own description, where the source's says too little for
+ * these docs. Each is `[note, check]`: the check is run on the default, and generation
+ * fails when it no longer holds, so a note cannot outlive the fact it describes.
+ */
+const CONFIG_NOTES = {
+  'ui.helpUrl': [
+    "The default is the upstream (gchq) Stroom documentation, not these pages, so Stroom's " +
+      'Help menu and help links open that site unless this is changed. The `helpSubPath*` ' +
+      'settings are paths on that site.',
+    (v) => /gchq\.github\.io/.test(v),
+  ],
+  'data.store.fsyncMode': [
+    'Replaced the true/false `fsyncEnabled` in Stroom 7.14, so a configuration file that ' +
+      'sets `fsyncEnabled` needs changing.',
+  ],
+}
+
 /** The two shapes that repeat across modules, explained once instead of hundreds of times. */
 const isDbBoilerplate = (p) => /(^|\.)db\.(connection|connectionPool)\./.test(p)
 const isCacheBoilerplate = (p) =>
@@ -947,9 +1037,13 @@ const defaultCell = (v, wrapped) => {
     const pretty = items.replace(/"/g, '').replace(/\|/g, '\\|')
     return pretty.length > MAX_DEFAULT * 2 ? '*A long value; see the file.*' : `\`${pretty}\``
   }
-  const unquoted = /^"([\s\S]*)"$/.exec(v)?.[1]
+  // A double-quoted YAML scalar is escaped: the file's `^stroom\\..*$` is the regex
+  // `^stroom\..*$`, and showing the escaped form would give anyone who pastes it into the
+  // Properties screen a different regex.
+  const unquoted = /^"([\s\S]*)"$/.exec(v)?.[1]?.replace(/\\(.)/g, (_, c) => ({ n: '\n', t: '\t' })[c] ?? c)
   if (unquoted === '') return '*empty*'
   const text = unquoted ?? v
+  if (text.includes('\n')) return '*A long value; see the file.*'
   if (wrapped || text.length > MAX_DEFAULT) return '*A long value; see the file.*'
   return `\`${text.replace(/\|/g, '\\|')}\``
 }
@@ -981,9 +1075,16 @@ function configurationProperties() {
     sections.get(top).push(l)
   }
 
-  const describedCount = real.filter((l) => described.get(l.path)?.description).length
   const restartCount = real.filter((l) => described.get(l.path)?.restart).length
 
+  const noted = Object.keys(CONFIG_NOTES).filter((p) => !real.some((l) => l.path === p))
+  if (noted.length)
+    throw new Error(`gen-docs-reference: CONFIG_NOTES names settings that do not exist: ${noted.join(', ')}`)
+
+  // A map's entries are keys of one setting, not settings the source describes one by one.
+  // The first of each carries the map's own description.
+  const introduced = new Set()
+  let undescribed = 0
   const row = (path, label) => {
     const meta = described.get(path)
     // commonDbDetails and documentAssetDb are the same standard connection settings, but
@@ -992,11 +1093,27 @@ function configurationProperties() {
     const dbNote = DB_NOTES[label]
     const leaf = leaves.find((l) => l.path === path)
     const value = leaf?.value ?? 'null'
-    let what = meta?.description
-      ? cell(meta.description)
-      : dbNote
-        ? cell(dbNote)
-        : '*Not described in the source.*'
+    const parent = path.split('.').slice(0, -1).join('.')
+    const map = !meta && /^(?:java\.util\.)?Map\b/.test(described.get(parent)?.type ?? '') ? described.get(parent) : null
+    let what
+    if (meta?.description) what = cell(meta.description)
+    else if (dbNote) what = cell(dbNote)
+    else if (map) {
+      what = `An entry in the \`${parent.split('.').pop()}\` map.`
+      if (!introduced.has(parent) && map.description) what += ` ${cell(map.description)}`
+      introduced.add(parent)
+    } else {
+      what = '*Not described in the source.*'
+      undescribed++
+    }
+    if (meta?.values && !meta.values.every((v) => what.includes(v)))
+      what += ` One of ${meta.values.map((v) => `\`${v}\``).join(', ')}.`
+    if (CONFIG_NOTES[path]) {
+      const [note, holds] = CONFIG_NOTES[path]
+      if (holds && !holds(value))
+        throw new Error(`gen-docs-reference: the CONFIG_NOTES entry for ${path} no longer holds (default ${value}); re-read it.`)
+      what += ` ${cell(note)}`
+    }
     if (meta?.restart) what += ' **Needs a restart.**'
     return `| \`${label}\` | ${defaultCell(value, leaf?.wrapped)} | ${what} |\n`
   }
@@ -1049,10 +1166,13 @@ function configurationProperties() {
     FRONT_MATTER(
       'Configuration properties',
       140,
-      'Every setting in the configuration file, what it defaults to, and how to decide where to set it.',
+      'Every Stroom setting in the configuration file, what it defaults to, and how to decide where to set it.',
     ) +
     `\nStroom reads its settings from a YAML file on each node. Most of them you will never ` +
     `touch; the ones you do are easier to get right knowing what the defaults already are.\n\n` +
+    `This page covers Stroom itself. Stroom Proxy has its own configuration file, under ` +
+    `\`proxyConfig\`, and its settings are not listed here: see ` +
+    `[Running a Proxy](../operate/install/a-proxy.md).\n\n` +
     `There are **${leaves.length}** settings in total. ` +
     `${leaves.length - real.length} of those are the database and cache blocks that repeat ` +
     `for every module, so they are explained once below rather than ${leaves.length - real.length} ` +
@@ -1083,17 +1203,20 @@ function configurationProperties() {
     `*   Settings marked **Needs a restart** are read once while a node starts. Changing ` +
     `one stores the new value without changing how the running node behaves. ` +
     `${restartCount} of the settings below are marked this way.\n` +
-    `*   Where the description says the source does not describe it, that is a gap upstream ` +
-    `rather than something we have left out. ${describedCount} of ${real.length} carry one.\n\n` +
+    (undescribed
+      ? `*   ${undescribed} of the ${real.length} settings are marked *Not described in the ` +
+        `source*. That is a gap upstream rather than something we have left out.\n\n`
+      : '\n') +
     `## Value formats\n\n` +
     `| Kind | Written as | Example |\n|---|---|---|\n` +
-    `| Duration | ISO-8601 | \`PT30S\` is thirty seconds, \`PT10M\` ten minutes, \`P7D\` seven days |\n` +
+    `| Duration | ISO-8601, or a number with a unit (\`ms\`, \`s\`, \`m\`, \`h\`, \`d\`) | \`PT30S\` or \`30s\` is thirty seconds, \`PT10M\` or \`10m\` ten minutes, \`P7D\` or \`7d\` seven days |\n` +
     `| Size | A number with a unit | \`32KiB\`, \`1GiB\` |\n` +
     `| Boolean | \`true\` or \`false\` | \`true\` |\n` +
     `| List | A YAML list | one \`- value\` per line |\n` +
     `| Unset | Omit it, or \`null\` | |\n\n` +
-    `A duration written without the \`P\` is the most common mistake, and it stops the node ` +
-    `starting rather than being quietly ignored, which is the better of the two outcomes.\n` +
+    `A duration with no unit at all is read as milliseconds, so \`30\` is thirty milliseconds, ` +
+    `not thirty seconds. A value that fits neither form, such as \`T30S\`, is rejected ` +
+    `rather than being quietly ignored.\n` +
     body
   )
 }
@@ -1206,21 +1329,91 @@ function balanced(src, from, open = '(', close = ')') {
  * and `JSONParser.ELEMENT_TYPE`.
  */
 function stringConstants(files) {
-  const byName = new Map()
+  // Constants from libraries outside the Stroom tree that a default refers to. FileAppender
+  // and friends default compressionMethod to Commons Compress's GZIP, and without this the
+  // page showed the Java name instead of the value.
+  const byName = new Map(Object.entries(EXTERNAL_CONSTANTS))
+  // A constant may be built from literals and other constants: CompressionUtil's
+  // SUPPORTED_COMPRESSORS is a concatenation, and DEFAULT_COMPRESSION_METHOD_PROP_VALUE is
+  // another constant. Reading only single literals left both blank on the page.
+  const pending = []
   for (const file of files) {
     const cls = file.split('/').pop().replace('.java', '')
     const src = readFileSync(file, 'utf8')
-    for (const m of src.matchAll(/static\s+final\s+String\s+(\w+)\s*=\s*"((?:[^"\\]|\\.)*)"/g)) {
-      byName.set(m[1], m[2])
-      byName.set(`${cls}.${m[1]}`, m[2])
+    for (const m of src.matchAll(/static\s+final\s+String\s+(\w+)\s*=/g)) {
+      // The expression runs to the `;`, and is only read if it is nothing but literals,
+      // names and `+`. Tokenised rather than matched with one regex, which backtracks
+      // exponentially over a long identifier.
+      const tok = /\s*("(?:[^"\\\n]|\\.)*"|[A-Za-z_][\w.]*|\+|;)/y
+      tok.lastIndex = m.index + m[0].length
+      let t
+      let end = -1
+      while ((t = tok.exec(src))) if (t[1] === ';') { end = t.index; break }
+      if (end < 0) continue
+      m[2] = src.slice(m.index + m[0].length, end)
       // The constant may belong to a nested class and be referred to by that name —
       // `RefDataPurge.JOB_NAME` lives inside RefDataStoreModule.java. Without this the
       // Ref Data Off-heap Store Purge job cannot be resolved.
       const owner = [...src.slice(0, m.index).matchAll(/(?:class|interface|enum)\s+(\w+)/g)].pop()?.[1]
-      if (owner) byName.set(`${owner}.${m[1]}`, m[2])
+      // `file#NAME` lets a class's own constant win over a same-named one elsewhere:
+      // FileAppender's DEFAULT_USE_COMPRESSION_PROP_VALUE is "false", HTTPAppender's "true".
+      const keys = [m[1], `${cls}.${m[1]}`, `${file}#${m[1]}`, ...(owner ? [`${owner}.${m[1]}`] : [])]
+      pending.push({ keys, expr: m[2], file })
     }
   }
+  // Whole-number constants too, since descriptions quote them: "Up to a maximum of " +
+  // Joining.DEFAULT_LIMIT + " values." lost its number.
+  for (const file of files) {
+    const cls = file.split('/').pop().replace('.java', '')
+    const src = readFileSync(file, 'utf8')
+    for (const m of src.matchAll(/static\s+final\s+(?:int|long)\s+(\w+)\s*=\s*(-?[\d_]+)[lL]?\s*;/g))
+      for (const k of [`${cls}.${m[1]}`, `${file}#${m[1]}`])
+        if (!byName.has(k)) byName.set(k, m[2].replace(/_/g, ''))
+  }
+  // References are resolved in rounds, since a constant may name one defined later.
+  let todo = pending
+  for (let round = 0; round < 5 && todo.length; round++) {
+    const next = []
+    for (const p of todo) {
+      const value = stringExpr(p.expr, scoped(byName, p.file), true)
+      if (value === undefined) next.push(p)
+      else for (const k of p.keys) byName.set(k, value)
+    }
+    todo = next
+  }
   return byName
+}
+
+/** Library constants the Stroom source refers to but does not define. */
+const EXTERNAL_CONSTANTS = {
+  'CompressorStreamFactory.GZIP': 'gz',
+}
+
+/** A constant lookup that prefers the named file's own constants. */
+const scoped = (constants, file) => ({
+  get: (k) => constants.get(`${file}#${k}`) ?? constants.get(k),
+})
+
+/** Resolves a constant by name, as written, or by its last two segments (`Class.NAME`). */
+const constant = (constants, ref) =>
+  constants.get(ref) ?? constants.get(ref.split('.').slice(-2).join('.'))
+
+/**
+ * A Java string expression, literals and constants joined with `+`, as its value. With
+ * `strict`, an unresolved constant gives undefined rather than being dropped.
+ */
+function stringExpr(expr, constants, strict = false) {
+  const unescape = (t) => t.replace(/\\(["'\\nrt])/g, (_, c) => ({ n: '\n', r: '\r', t: '\t' })[c] ?? c)
+  let joined = ''
+  for (const tok of expr.matchAll(/"((?:[^"\\\n]|\\.)*)"|([A-Za-z_][\w.]*)/g)) {
+    if (tok[1] !== undefined) joined += unescape(tok[1])
+    else {
+      const v = constant(constants, tok[2])
+      if (v === undefined && strict) return undefined
+      joined += v ?? ''
+    }
+  }
+  return joined
 }
 
 /** A Java description, as Markdown. Upstream's Hugo shortcodes and links do not survive. */
@@ -1229,6 +1422,9 @@ function prose(raw) {
     .replace(/\\\n\s*/g, ' ') // a text block's line continuation
     .replace(/"\s*\+\s*"/g, '') // concatenated string literals
     .replace(/\[([^\]]*)\]\(\{\{[<%][\s\S]*?[>%]\}\}\)/g, '$1') // a link to an upstream page
+    // An element reference is kept, as Markdoc's element tag: stripping it left
+    // "use the much more flexible ." on HttpPostFilter.
+    .replace(/\{\{<\s*pipe-elm\s+"([^"]+)"\s*>\}\}/g, '{% element name="$1" /%}')
     .replace(/\{\{[<%][\s\S]*?[>%]\}\}/g, '')
     .split('\n')
     .map((l) => l.trim())
@@ -1261,13 +1457,9 @@ const JAVA_TYPES = {
 function annotationString(body, key, constants) {
   const textBlock = new RegExp(`\\b${key}\\s*=\\s*"""([\\s\\S]*?)"""`).exec(body)?.[1]
   if (textBlock !== undefined) return textBlock
-  const expr = new RegExp(`\\b${key}\\s*=\\s*([\\s\\S]*?)(?=,\\s*\\w+\\s*=|\\n\\s*\\w+\\s*=|\\n?\\s*\\)\\s*$)`).exec(body)?.[1]
+  const expr = new RegExp(`\\b${key}\\s*=\\s*([\\s\\S]*?)(?=,\\s*\\w+\\s*=|\\n\\s*\\w+\\s*=|\\n?\\s*\\)?\\s*$)`).exec(body)?.[1]
   if (!expr) return undefined
-  const unescape = (t) => t.replace(/\\(["'\\nrt])/g, (_, c) => ({ n: '\n', r: '\r', t: '\t' })[c] ?? c)
-  let joined = ''
-  for (const tok of expr.matchAll(/"((?:[^"\\\n]|\\.)*)"|([A-Za-z_][\w.]*)/g))
-    joined += tok[1] !== undefined ? unescape(tok[1]) : (constants.get(tok[2]) ?? constants.get(tok[2].split('.').slice(-2).join('.')) ?? '')
-  return joined || undefined
+  return stringExpr(expr, constants) || undefined
 }
 
 function parseElements(files) {
@@ -1276,6 +1468,7 @@ function parseElements(files) {
 
   for (const file of files) {
     const src = readFileSync(file, 'utf8')
+    const local = scoped(constants, file)
     let at = -1
     while ((at = src.indexOf('@ConfigurableElement(', at + 1)) !== -1) {
       const body = balanced(src, at + '@ConfigurableElement'.length)
@@ -1291,7 +1484,7 @@ function parseElements(files) {
       // Test-only elements exist in the main source tree but are not for users.
       if (/^Test/.test(type)) continue
 
-      const description = annotationString(body, 'description', constants)
+      const description = annotationString(body, 'description', local)
       const category = /category\s*=\s*(?:\w+\.)*Category\.(\w+)/.exec(body)?.[1] ?? 'INTERNAL'
 
       // Properties live on the setters of the same class.
@@ -1313,11 +1506,11 @@ function parseElements(files) {
           ? ''
           : defaultExpr.startsWith('"')
             ? defaultExpr.slice(1, -1)
-            : (constants.get(defaultExpr) ?? defaultExpr)
+            : (constant(local, defaultExpr) ?? defaultExpr)
 
         properties.push({
           name: setter[1][0].toLowerCase() + setter[1].slice(1),
-          description: prose(annotationString(pBody, 'description', constants) ?? ''),
+          description: prose(annotationString(pBody, 'description', local) ?? ''),
           defaultValue,
           valueType: JAVA_TYPES[setter[2]] ?? setter[2],
         })
@@ -1465,26 +1658,63 @@ function expressionFunctions(files) {
         : (constants.get(nameExpr) ?? constants.get(nameExpr.split('.').slice(-2).join('.')))
       if (!name) throw new Error(`${file}: cannot resolve function name from "${nameExpr}"`)
 
-      // Most declare commonCategory; the aggregates declare it per signature instead.
-      const category =
-        /commonCategory\s*=\s*(?:\w+\.)*FunctionCategory\.(\w+)/.exec(body)?.[1] ??
-        /category\s*=\s*(?:\w+\.)*FunctionCategory\.(\w+)/.exec(body)?.[1]
-      if (!category) throw new Error(`${file}: no category for function "${name}"`)
-
-      const aliasExpr = /aliases\s*=\s*([^,\n]+)/.exec(body)?.[1]?.trim()
-      const aliases = !aliasExpr
-        ? ''
-        : aliasExpr.startsWith('"')
-          ? aliasExpr.slice(1, -1)
-          : (constants.get(aliasExpr) ?? constants.get(aliasExpr.split('.').slice(-2).join('.')) ?? '')
-
-      functions.push({
-        name,
-        aliases,
-        category,
-        description: prose(annotationString(body, 'description', constants) ?? ''),
+      // A function's own description is commonDescription; failing that, each signature
+      // has one. A bare `description =` search finds whichever comes first, which is often
+      // an argument's: askAi was described as "The name or UUID of the OpenAI Model
+      // document to use.", and count, which only has commonDescription, as nothing.
+      const signatures = []
+      let sAt = -1
+      while ((sAt = body.indexOf('@FunctionSignature(', sAt + 1)) !== -1) {
+        let sig = balanced(body, sAt + '@FunctionSignature'.length) ?? ''
+        sAt += sig.length
+        // Drop the arguments, whose descriptions are not the signature's.
+        let aAt
+        while ((aAt = sig.indexOf('@FunctionArg(')) !== -1) {
+          const arg = balanced(sig, aAt + '@FunctionArg'.length) ?? ''
+          sig = sig.slice(0, aAt) + sig.slice(aAt + '@FunctionArg'.length + arg.length + 2)
+        }
+        signatures.push({
+          category: /\bcategory\s*=\s*(?:\w+\.)*FunctionCategory\.(\w+)/.exec(sig)?.[1],
+          description: prose(annotationString(sig, 'description', constants) ?? ''),
+          returns: prose(annotationString(sig, 'returnDescription', constants) ?? ''),
+        })
+      }
+      const common = {
+        category: /commonCategory\s*=\s*(?:\w+\.)*FunctionCategory\.(\w+)/.exec(body)?.[1],
+        description: prose(annotationString(body, 'commonDescription', constants) ?? ''),
         returns: prose(annotationString(body, 'commonReturnDescription', constants) ?? ''),
-      })
+      }
+
+      // Most declare commonCategory; the aggregates declare it per signature instead, and
+      // average, max, min and the like have a second, non-aggregate signature under
+      // Mathematics, so they are listed under each category a signature names.
+      // A signature's own category overrides commonCategory, as variance's does.
+      const categories = [
+        ...new Set(
+          (signatures.length ? signatures.map((s) => s.category ?? common.category) : [common.category])
+            .filter(Boolean),
+        ),
+      ]
+      if (!categories.length) throw new Error(`${file}: no category for function "${name}"`)
+
+      // `aliases = X.ALIAS` or `aliases = {X.ALIAS, X.SHORT_ALIAS}`.
+      const aliasExpr = /aliases\s*=\s*(\{[^}]*\}|[^,\n]+)/.exec(body)?.[1]?.trim()
+      const aliases = !aliasExpr
+        ? []
+        : [...aliasExpr.matchAll(/"((?:[^"\\]|\\.)*)"|([A-Za-z_][\w.]*)/g)]
+            .map((t) => t[1] ?? constant(constants, t[2]))
+            .filter(Boolean)
+
+      for (const category of categories) {
+        const sig = signatures.find((s) => s.category === category) ?? signatures[0] ?? {}
+        functions.push({
+          name,
+          aliases,
+          category,
+          description: common.description || sig.description || '',
+          returns: common.returns || sig.returns || '',
+        })
+      }
     }
   }
 
@@ -1501,11 +1731,14 @@ function expressionFunctions(files) {
     groups.get(f.category).push(f)
   }
 
+  const names = new Set(functions.map((f) => f.name))
+  const twice = [...names].filter((n) => functions.filter((f) => f.name === n).length > 1).sort()
+
   let body = ''
   for (const [category, rows] of [...groups].sort()) {
     body += `\n## ${title(category)}\n\n| Function | Does | Returns |\n|---|---|---|\n`
     for (const f of rows.sort((a, b) => a.name.localeCompare(b.name))) {
-      const names = f.aliases ? `\`${cell(f.name)}\`, \`${cell(f.aliases)}\`` : `\`${cell(f.name)}\``
+      const names = [f.name, ...f.aliases].map((n) => `\`${cell(n)}\``).join(', ')
       body += `| ${names} | ${cell(f.description) || '*Not described in the source.*'} | ${cell(f.returns) || '-'} |\n`
     }
   }
@@ -1517,8 +1750,13 @@ function expressionFunctions(files) {
       'Every function available in dashboard expressions and StroomQL, by category.',
     ) +
     `\nThese are the functions you can use in a dashboard's expression columns and in ` +
-    `StroomQL \`eval\` expressions.\n\nWhere a function has an alias, both names do the same ` +
-    `thing.\n\nThere are **${functions.length}** functions in **${groups.size}** categories.\n` +
+    `StroomQL \`eval\` expressions.\n\nWhere a function has aliases, every name does the same ` +
+    `thing.\n\nThere are **${names.size}** functions in **${groups.size}** categories.` +
+    (twice.length
+      ? ` A few, such as \`${twice[0]}\`, have both an aggregate form and one that works ` +
+        `across its arguments, so they appear in two categories.`
+      : '') +
+    `\n` +
     body
   )
 }

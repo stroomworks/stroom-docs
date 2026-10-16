@@ -36,7 +36,8 @@ This is configured under `stroom.security.authentication.edgeAuthentication`.
 
 ### Accounts and users
 
-An **account** is an identity in the internal identity provider: a user ID, a password and, optionally, an email address for password resets.
+An **account** is an identity in the internal identity provider: a user ID, a password and, optionally, an email address for password resets, which must be unique if set.
+Passwords set in Stroom, and by `create_account`, must pass the policy under `stroom.security.identity.passwordPolicy`: at least `minimumPasswordLength` characters (8 by default) and an estimated strength of at least `minimumPasswordStrength`, on a scale of 0 to 4 (3 by default).
 Accounts exist only when Stroom is its own identity provider, and are managed from **Security > Manage Accounts**.
 
 A **user** is Stroom's record of a person (or a service), whichever identity provider is in use.
@@ -152,6 +153,7 @@ Stroom copies permissions rather than looking them up the tree:
 Scripts and other systems call Stroom's API with an API key.
 Create one from **Security > Manage API Keys**, choose the user it belongs to and set an expiry date (365 days by default, set by `stroom.security.identity.token.defaultApiKeyExpiration`).
 Short expiry periods are safer if a key leaks.
+The expiry date shows in red once a key is within 30 days of expiring, followed by `(EXPIRED)` once it has, and Stroom logs a warning whenever such a key is used.
 
 The full key is shown once, when it is created.
 Stroom stores only a hash of it, so copy it straight away.

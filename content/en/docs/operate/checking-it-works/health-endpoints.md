@@ -26,7 +26,7 @@ The defaults:
 
 So, with the defaults, Stroom's health checks are at `http://localhost:8081/stroomAdmin/healthcheck`.
 
-Both are overridden by environment variables in a standard deployment: `STROOM_ADMIN_PORT` and `ADMIN_CONTEXT_PATH` for Stroom, `STROOM_PROXY_ADMIN_PORT` for the proxy.
+Your deployment may change either, for example through environment variables substituted into the configuration file.
 Check your own configuration before assuming the defaults.
 
 

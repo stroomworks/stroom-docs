@@ -98,7 +98,7 @@ where UserId in dictionary "Privileged Accounts"
 ## Expressions and functions
 
 `eval` and `select` take expressions built from Stroom's [expression functions]({{< relref "../reference/expression-functions.md" >}}), the same functions dashboard table columns use.
-They are grouped as aggregate, cast, date, link, logic, lookup, mathematics, parameter, selection, string, type checking, URI and value functions.
+They are grouped as aggregate, AI, cast, date, link, logic, lookup, mathematics, parameter, selection, string, type checking, URI and value functions.
 A few examples:
 
 | Expression | Result |
@@ -109,6 +109,7 @@ A few examples:
 | `upperCase(UserId)` | The value in upper case. |
 | `substringBefore(UserId, '.')` | The part of the value before the first `.`. |
 | `concat(FirstName, ' ', LastName)` | The values joined together. |
+| `askAi('My Model', concat('Summarise: ', Message))` | The answer from the named OpenAI Model document. It asks once per value, so use it on a small or grouped set of rows. |
 
 Functions nest, and a variable can be reused in a later `eval`.
 Every field in the data source is available as a variable without declaring it.
@@ -124,6 +125,8 @@ What it can return depends on the kind of source:
   Elasticsearch and Solr indexes are queried the same way.
 * **View**: a document that pairs a data source with an extraction pipeline (see below).
 * **Plan B**: a [Plan B]({{< relref "planb.md" >}}) state store.
+* **SQL Temporal Store**: a [SQL Temporal Store]({{< relref "sql-temporal-store.md" >}}), from Stroom 7.14.
+* **FloorMap Event Store**: the events behind a [floor map]({{< relref "floor-mapping.md" >}}), from Stroom 7.14.
 * **Statistics**: a statistics store.
 * **Internal data sources**: Stroom's own records, which appear at the root of the data source picker rather than in the explorer tree.
 

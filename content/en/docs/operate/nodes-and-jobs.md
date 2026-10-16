@@ -102,6 +102,8 @@ These are the ones you are most likely to adjust:
 |---|---|---|
 | **Data Processor** | Distributed | Runs pipeline processing tasks. **Max Tasks** sets how many the node runs at once. |
 | **Processor Task Creator** | Frequency (`10s`) | Creates processing tasks from processor filters. |
+| **Processor Task Heartbeat** | Frequency (`1m`) | Renews the status time of the tasks this node is processing, so a live long-running task can be told apart from one on a dead node. |
+| **Processor Task Reaper** | Frequency (`1m`) | Returns processing tasks whose status time has not been renewed within `stroom.processor.taskLeaseTimeout` (10 minutes by default) to be processed again. Replaces **Disown Dead Tasks**. |
 | **Policy Based Data Retention** | Cron (daily, midnight) | Deletes streams that are older than the data retention rules allow. |
 | **Data Delete** | Cron (daily, midnight) | Physically removes deleted streams and their files once they have been deleted for longer than `stroom.data.store.deletePurgeAge`. |
 | **Index Shard Retention** | Frequency (`10m`) | Marks index shards as deleted once they pass their index's retention period. |
@@ -110,6 +112,11 @@ These are the ones you are most likely to adjust:
 | **Git Repo Push** | Cron (every minute) | Pushes changes for Git Repos set to push automatically. |
 | **Account Maintenance** | Frequency (`1d`) | Marks unused accounts as inactive. |
 | **Property Cache Reload** | Frequency (`1m`) | Reloads property values across the cluster. |
+
+{{% warning %}}
+Do not disable **Processor Task Heartbeat** or **Processor Task Reaper** while tasks are being processed.
+Without the heartbeat, a node's long-running tasks look as though their node has died and are handed out again; without the reaper, tasks on a failed node are never recovered.
+{{% /warning %}}
 
 [Data retention]({{< relref "../concepts/streams/_index.md#data-retention" >}}) rules themselves are set on **Administration > Data Retention**, which needs the **Manage Policies** permission.
 

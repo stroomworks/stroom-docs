@@ -33,7 +33,7 @@ Between them these cover the two situations that matter: a first start on an emp
 Each command takes the configuration file, so it reads the same database as the application:
 
 ```bash
-java -jar stroom-app.jar <command> path/to/config.yml
+java -jar stroom-app-all.jar <command> path/to/config.yml
 ```
 
 Run them as the same user that runs Stroom.
@@ -46,6 +46,8 @@ Normally the application migrates on start.
 Running `migrate` separately is useful when you want the migration to be its own step: it can be run and checked before the application starts, which on a large database turns a long, silent startup into something you can watch and time.
 
 It is also the safer shape for a cluster, because migrations should happen once rather than being raced for by several nodes starting together.
+
+The distribution ships `migrate.sh`, which runs `migrate` with the right JVM options and `config/config.yml`, and tails the log until it completes.
 
 {{< timing mode="async" >}}
 A migration on a large database can take a long time, and the time is spent on whichever tables changed in that release.

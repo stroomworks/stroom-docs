@@ -50,7 +50,8 @@ It is sized for the sort of data a person could plausibly maintain, not for mill
 
 **In**, from a pipeline: an {{< pipe-elm "XSLTFilter" >}} produces the same `reference-data:2` format a reference loader produces, and {{< pipe-elm "SqlStoreFilter" >}} writes it to the store.
 
-**In**, by hand: the store's own screens let entries be added, changed and removed, including from the API.
+**In**, by hand: through the REST API, or through the floor map editor for floor-map facts.
+The store's own screens show and query its contents, and can reset it, but do not edit single entries.
 
 **Out**: `stroom:lookup()` from XSLT, exactly as for reference data and Plan B, resolving against the event's effective time.
 The store's **Data** tab also queries it directly, and has a **Create Dashboard** button that turns the query you are looking at into a dashboard.

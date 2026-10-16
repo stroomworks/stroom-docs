@@ -17,6 +17,8 @@ Two settings decide what happens to arriving data: the **receipt check mode**, w
 
 The property `receive.receiptCheckMode` selects the mechanism.
 The default is `FEED_STATUS`, which asks the feed.
+`RECEIPT_POLICY` uses receipt rules instead; both are described below.
+The other modes make no per-feed decision: `FEED_EXISTENCE` accepts data for any feed that exists, whatever its status, `RECEIVE_ALL` accepts everything, `REJECT_ALL` rejects everything, and `DROP_ALL` returns success and discards everything.
 
 The mode must be the same on Stroom and on **every** proxy in front of it.
 A chain where one hop checks differently from the next produces data accepted at one layer and discarded at another, which is very hard to see from either end.
@@ -91,6 +93,7 @@ Add a final rule with no terms once you know what you want the fallback to be, a
    This is the only question that distinguishes received from dropped, since both look like success to the sender.
 1. **What is the feed's status?**
    Receive, Reject or Drop, on the feed's Settings tab.
+   With the receipt check mode set to `DROP_ALL`, everything is dropped whatever the feed says.
 1. **What is the receipt check mode, here and on every proxy?**
    A mismatch along the chain gives data that vanishes between hops.
 1. **Which rule matched?**

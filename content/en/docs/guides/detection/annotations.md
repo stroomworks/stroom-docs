@@ -114,7 +114,8 @@ select Id, Title, Status, UpdatedOn
 ```
 
 Searches over an index can also show the annotations on each event.
-The same fields, prefixed `annotation:` (for example `annotation:Status` and `annotation:AssignedTo`), can be added as columns, and are listed under **Annotation Fields** in the Query help pane.
+The same fields apart from the event links (`StreamId`, `EventId` and `Feed`), prefixed `annotation:` (for example `annotation:Status` and `annotation:AssignedTo`), can be added as columns, and are listed under **Annotation Fields** in the Query help pane.
+The identifier is `annotation:Uuid`, not `annotation:UUID`.
 A table of events then shows which have already been looked at, and by whom.
 
 {{< image src="guides/detection/annotations/annotation-fields-on-index.png" alt="A Query document whose StroomQL reads from an index and selects StreamId, EventId, User, annotation:Title and annotation:Status. The help pane on the left lists Annotation Fields alongside Data Sources, Structure and Fields. In the results table, one event has its annotation's title filled in and the other rows have the annotation columns empty." >}}An index query with annotation columns. Events that have an annotation show its fields; events nobody has annotated show them empty, so the same table tells you what still needs looking at.{{< /image >}}

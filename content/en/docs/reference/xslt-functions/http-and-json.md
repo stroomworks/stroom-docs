@@ -37,7 +37,8 @@ The arguments are as follows:
   If not set `application/json; charset=utf-8` will be used.
 * `data` - The data to send.
   The data type should be consistent with `mediaType`.
-  Supplying the `data` argument means a POST request method will be used rather than the default GET.
+  The request is always sent as a POST, and `data`, if supplied, is sent as the request body.
+  Use `fetch-json()` to send a GET.
 * `clientConfig` - A JSON object containing the configuration for the HTTP client to use, including any SSL configuration.
 
 The function returns the response as XML with namespace `stroom-http`.
@@ -47,20 +48,12 @@ The XML includes the body of the response in addition to the status code, succes
 ### `clientConfig`
 
 The client can be configured using a JSON object containing various optional configuration items.
-The following is an example of the client configuration object with all keys populated.
+The following is an example of the client configuration object with all the keys that Stroom uses populated.
 
 ```json
 {
   "callTimeout": "PT30S",
   "connectionTimeout": "PT30S",
-  "followRedirects": false,
-  "followSslRedirects": false,
-  "httpProtocols": [
-    "http/2",
-    "http/1.1"
-  ],
-  "readTimeout": "PT30S",
-  "retryOnConnectionFailure": true,
   "sslConfig": {
     "keyStorePassword": "password",
     "keyStorePath": "/some/path/client.jks",
@@ -70,18 +63,12 @@ The following is an example of the client configuration object with all keys pop
     "trustStoreType": "JKS",
     "sslProtocol": "TLSv1.2",
     "hostnameVerificationEnabled": false
-  },
-  "writeTimeout": "PT30S"
+  }
 }
 ```
 
-If you are using two-way SSL then you may need to set the protocol to `HTTP/1.1`.
-
-```json
-  "httpProtocols": [
-    "http/1.1"
-  ],
-```
+If you supply a `clientConfig`, set both timeouts, as an omitted timeout defaults to 500 milliseconds.
+Other keys from older versions of this object, such as `followRedirects`, `httpProtocols`, `readTimeout`, `retryOnConnectionFailure` and `writeTimeout`, are accepted but ignored.
 
 
 ### Example output

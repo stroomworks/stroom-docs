@@ -119,9 +119,9 @@ Copy the name between the two XSLTs rather than typing it twice.
 1. **Did the translation emit any `<reference>` elements?**
    Step the loader pipeline and look at the XSLTFilter output, not the final result.
    An empty `<referenceData>` document is the most common cause of "nothing was loaded".
-1. **Is the namespace right?**
-   The output must be in `reference-data:2`.
-   A document in no namespace, or in an older one, is not loaded.
+1. **Is the output valid `reference-data:2`?**
+   {{< pipe-elm "ReferenceDataFilter" >}} matches elements by name and does not check the namespace or the structure.
+   Add a {{< pipe-elm "SchemaFilter" >}} before it to catch malformed output.
 1. **Does the map name match the lookup exactly?**
    Compare the two strings character by character.
    A mismatch warns `Map not found in effective streams` unless `ignoreWarnings` is set.

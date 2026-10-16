@@ -34,6 +34,8 @@ A new filter is created disabled, unless you tick **Enable new filters** when cr
 {{% note %}}
 Processing also depends on two jobs: **Processor Task Creator**, which creates tasks, and **Data Processor**, which runs them on each node.
 If both rows are enabled but nothing happens, check those jobs.
+From Stroom 7.14, two more jobs recover tasks stranded on a failed node: **Processor Task Heartbeat**, which runs on every node, and **Processor Task Reaper**.
+Keep both enabled.
 See [Nodes and jobs]({{< relref "../../operate/nodes-and-jobs.md" >}}).
 {{% /note %}}
 

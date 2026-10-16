@@ -7,13 +7,12 @@ tags:
 description: >
   Plot events for people, devices and assets on a floor plan, and replay who was where, and when.
 pageKind: concept
-status: beta
-betaNote: "Stroom issue #5834. Names, settings and limits may change before it ships."
 ---
 
 A floor map draws your events on a plan of a building.
 A badge scan shows up at the gate that read it, and a log from a device shows up at the desk the device sits on.
 A timeline then lets you replay the data, so you can see who was where, and when.
+Floor mapping is available from Stroom 7.14.
 
 
 ## How it fits together
@@ -41,11 +40,14 @@ Events are what the timeline plays back.
 ## Setting up a floor map
 
 1. Create a {{< stroom-icon "document/SqlTemporalStore.svg" "SQL Temporal Store" >}} SQL Temporal Store for facts and a {{< stroom-icon "document/FloorMapEventStore.svg" "FloorMap Event Store" >}} FloorMap Event Store for events.
+   As with Plan B, the event store's name may only contain lower-case letters, digits and underscores.
 1. Build [pipelines]({{< relref "pipelines.md" >}}) to load your facts and events into those stores.
    The event store's name must match the `<map>` element your ingest XSLT writes to.
 1. Create a {{< stroom-icon "document/FloorMap.svg" "Floor Map" >}} Floor Map.
    Stroom asks for its facts store and events store, and you can't finish until you have chosen both.
+   Cancelling deletes the new document.
    It then fills in default queries for events, the timeline histogram and the time range.
+1. Upload the background plan on the **Assets** tab, and save the document: an uploaded image is only served once the document is saved.
 1. Draw or correct the layout on the **Editor** tab.
 1. View and replay it on the **Map** tab.
 
@@ -58,8 +60,9 @@ If you rename the store, change both.
 ## Facts: the shape of the site
 
 Each fact is a value, in JSON (the default) or XML, stored against a key and the time it takes effect.
-A fact never changes in place.
-Instead, it gets a new version from a later time, so the store keeps a record of how the site has changed.
+A change that applies from a given time is a new version with that effective time, so the store keeps a record of how the site has changed.
+Moving, resizing or rotating a fact on the Editor tab, or editing its properties, changes the version in effect at the timeline position in place; **Add Time Version** records the change from that time instead.
+Loading a fact with the same key and effective time as an existing version replaces that version.
 
 On the **Settings** tab, the **Value Schema** tells the map where each part of a fact is.
 The default schema reads these JSON paths:
@@ -68,8 +71,8 @@ The default schema reads these JSON paths:
 |---|---|
 | `.type` | The object's type, such as `gate` or `camera`. `background`, `person` and `area` have special meanings. |
 | `.name` | The label shown on the map. |
-| `.coords` | Its position. |
-| `.img` | An image, such as the background plan. |
+| `.coords` | Its position, as `[x, y]`. |
+| `.img` | The URL of an image uploaded on the **Assets** tab, such as the background plan: `/assets/<floor map UUID>/<file name>`. |
 | `.tm-world-to-map` | The transform from real-world coordinates to the map. |
 | `.geometry` | The outline of an area. |
 | `.fill`, `.opacity` | How an area is filled. |
@@ -87,16 +90,20 @@ On the **Events Query** tab you choose which result column plays each role:
 
 * **Entity ID** (required): who or what the event is about.
 * **Location**: literal `x, y` coordinates, fixed when the event was loaded.
-* **Location ref**: the key of a fact, such as a desk or gate.
+* **Location Ref**: the key of a fact, such as a desk or gate.
   It is looked up at the time shown on the timeline, so if the desk moves, its occupants move with it.
 * **Type**: which layer the entity is drawn on, and how.
   If no type is given, an ID containing `@` is drawn as a person.
 
+Each list offers the query's columns once you have run the query on the tab.
+If an event has both a Location and a Location Ref, the Location is used.
 The default query selects `Status` and `Message` as well.
 The map doesn't use them yet.
+The timeline's bars and its **Show All** button come from two more queries, **Histogram Query** and **Show All Query**, on the **Settings** tab.
 
 On the event store's **Settings** tab, **Event Expiry** sets how long an entity stays on the map after its last event.
 The default is 24 hours, and it can't be longer than the store's data retention.
+Turning on **Condense Data** there makes an entity that keeps reporting the same value expire while it is still reporting, because a run of identical values is collapsed to its earliest.
 
 
 ## Drawing the map: the editor tab
@@ -107,9 +114,9 @@ The Editor shows the canvas, a **Layers** panel, the timeline, a list of every f
   Hold Shift, Ctrl or Cmd to add to the selection, or drag with one of them held to select a region.
 * **Move** by dragging.
   Corner handles scale and the round handle rotates (hold Shift to snap to 15°).
-* **Right-click** on empty space to add an object or draw an area.
+* **Right-click** on empty space to add an object, or anywhere to draw an area or set the scale.
   Right-click on an object to edit its properties, add a time version, duplicate it, delete it from the current time, or erase its history.
-* **Set Scale** by drawing a line over something whose length you know and entering that length.
+* **Set Scale** from the right-click menu by drawing a line over something whose length you know and entering that length.
   Sizes and positions are then in real units.
 
 **Delete From This Time** keeps the object's past and hides it from now on.
@@ -121,16 +128,17 @@ Edits are only written to the facts store when you save the document.
 
 There is one layer per type, and the order of the list is the drawing order.
 Each layer can be drawn as a coloured shape, as one of the built-in icons (people, doors, gates, badge readers, cameras, sensors, servers and other things that produce logs), or as an image you upload on the **Assets** tab.
-**Discover** scans the facts store for types that don't have a layer yet.
+**Discover types** scans the facts store for types that don't have a layer yet.
 
 
 ## Viewing and replaying: the map tab
 
-The Map tab is read-only.
+The Map tab doesn't change the layout.
 
 * **Tracking** lists the entities on the map and the area each one is in.
   Select one to follow it.
 * **Groups** let you name a set of entities and highlight them in a colour.
+  Groups are saved with the floor map.
 * Entities that overlap are drawn as a cluster.
   Click the cluster to list its members.
 
@@ -141,7 +149,7 @@ Entities move smoothly between positions and leave a short trail.
 
 ## Current limits
 
-* The map reads at most 20,000 rows of events, and at most 20,000 rows of fact history.
+* The map shows at most 20,000 entities at once, and reads at most 20,000 rows of fact history.
 * A floor map keeps the default queries it was created with.
   If the defaults change later, existing maps don't pick up the change.
 * A Location Ref that points at a fact which doesn't exist is ignored.
@@ -149,6 +157,7 @@ Entities move smoothly between positions and leave a short trail.
 
 ## Related pages
 
+* [Building a floor map]({{< relref "../guides/building-a-floor-map.md" >}}): setting one up from empty stores to a working map.
 * [Plan B]({{< relref "planb.md" >}}): the store that {{< stroom-icon "document/FloorMapEventStore.svg" "FloorMap Event Store" >}} FloorMap Event Stores are built on.
 * [Reference data example]({{< relref "pipeline-reference-data-example.md" >}}): enriching badge-scan events with names, icons and locations.
 * [Floor map problems]({{< relref "../operate/troubleshooting/floor-map-problems.md" >}}): when the map is empty or entities are missing.

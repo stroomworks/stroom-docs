@@ -22,17 +22,20 @@ The following shows the supported syntax for a StroomQL query.
 from <DATA_SOURCE>
 where <FIELD> <CONDITION> <VALUE> [and|or|not]
 [and|or|not]
+[eval...] <FIELD> = <EXPRESSION>
 [window] <TIME_FIELD> by <WINDOW_SIZE> [advance <ADVANCE_WINDOW_SIZE>]
 [filter] <FIELD> <CONDITION> <VALUE> [and|or|not]
 [and|or|not]
-[eval...] <FIELD> = <EXPRESSION>
-[having] <FIELD> <CONDITION> <VALUE> [and|or|not]
 [group by] <FIELD>
 [sort by] <FIELD> [desc|asc] // asc by default
+[having] <FIELD> <CONDITION> <VALUE> [and|or|not]
 [limit] <MAX_ROWS> 
 select <FIELD> [as <COLUMN NAME>], ...
-[show as] <VIS_NAME> (<VIS_CONTROL_ID_1> = <COLUMN_1>, <VIS_CONTROL_ID_2> = <COLUMN_2>)
+[show] <VIS_NAME> (<VIS_CONTROL_ID_1> = <COLUMN_1>, <VIS_CONTROL_ID_2> = <COLUMN_2>)
 ```
+
+The clauses must appear in this order, or the query is rejected with an error such as `Unexpected token LIMIT after SELECT`.
+The only exceptions are that `eval` and `window` can be mixed in any order, as can `group by` and `sort by`.
 
 
 ## Fields
@@ -50,8 +53,8 @@ Fields can added to the query text in one of three ways:
 * Double clicking the field name in the Field picker in the left hand pane.
   Field names with spaces will be pasted in with braces.
 * Using code completion.
-  In the query editor hit `ctrl,space` to bring up a list of context aware completion terms, e.g. field names, then hit tab to insert it.
-  You could also type a few characters from the name before hitting `ctrl,space` to pre-filter the list.
+  In the query editor hit `ctrl+space` to bring up a list of context aware completion terms, e.g. field names, then hit tab to insert it.
+  You could also type a few characters from the name before hitting `ctrl+space` to pre-filter the list.
   Field names with spaces will be pasted in with braces.
 
 
@@ -114,6 +117,8 @@ Supported conditions are:
 * `<=` - Less than or equal to.
 * `is null` - The value is `null`.
 * `is not null` - The value is not `null`.
+* `between` - The value is between two values.  
+  e.g. `EventTime between 2024-01-01T00:00:00.000Z and 2024-02-01T00:00:00.000Z`.
 * `in` - The value is in a list of allowed values.  
   e.g. `StreamId in (1001, 1002, 2009)`  
   or `Feed in ("FEED_X", "FEED_Y")`.
@@ -374,8 +379,8 @@ eval Sl = stringLength(FirstName)
 eval count = count()
 group by StreamId
 sort by Sl desc
-select Sl, StreamId as "Stream Id", EventId as "Event Id", EventTime as "Event Time", UserId as "User Id", FirstName, count
 limit 10
+select Sl, StreamId as "Stream Id", EventId as "Event Id", EventTime as "Event Time", UserId as "User Id", FirstName, count
 ```
 
 ```text
@@ -390,8 +395,8 @@ eval Sl = stringLength(FirstName)
 eval count = count()
 group by StreamId
 sort by Sl desc
-select Sl, StreamId as "Stream Id", EventId as "Event Id", EventTime as "Event Time", UserId as "User Id", FirstName, count
 limit 10
+select Sl, StreamId as "Stream Id", EventId as "Event Id", EventTime as "Event Time", UserId as "User Id", FirstName, count
 ```
 
 ```text
@@ -406,8 +411,8 @@ eval Sl = stringLength(FirstName)
 // eval count = count()
 // group by StreamId
 // sort by Sl desc
-select StreamId as "Stream Id", EventId as "Event Id"
 // limit 10
+select StreamId as "Stream Id", EventId as "Event Id"
 ```
 
 ```text
@@ -422,8 +427,8 @@ eval Sl = stringLength(FirstName)
 eval count = count()
 group by StreamId
 sort by Sl desc
-select Sl, StreamId as "Stream Id", EventId as "Event Id", EventTime as "Event Time", UserId as "User Id", FirstName, count
 limit 10
+select Sl, StreamId as "Stream Id", EventId as "Event Id", EventTime as "Event Time", UserId as "User Id", FirstName, count
 ```
 
 

@@ -14,7 +14,7 @@ aliases:
 ## Overview
 
 Templating is the process of creating a reusable format or layout for presenting data in a consistent manner.
-Templating is currently used in Stroom for creating email templates for [Analytic Rule]({{< relref "../guides/detection/analytic-rules.md" >}}) {{< stroom-icon "document/AnalyticRule.svg" >}}detections.
+Templating is currently used in Stroom for creating email templates for [Analytic Rule]({{< relref "../guides/detection/analytic-rules.md" >}}) {{< stroom-icon "document/AnalyticRule.svg" >}}detections and [Reports]({{< relref "#report-context" >}}).
 
 Stroom's templating uses a sub-set of the template syntax called _jinja_ and specifically the JinJava library.
 The templating syntax includes support for variables, filters, condition blocks, loops, etc.
@@ -90,7 +90,7 @@ An example of a simple value expression is
   ### Template
 
 ```text
-The detection time is {{detectionTime}}.
+The detection time is {{detectTime}}.
 ```
     ### Rendered
 
@@ -229,7 +229,7 @@ Non-rendered Comments can be added to the template.
 
 ```text
 {#- Show the time -#}
-The detection time is {{detectionTime}}.
+The detection time is {{detectTime}}.
 ```
     ### Rendered
 
@@ -295,21 +295,21 @@ fullDescription         | String                       | Recommended detection d
 detectionUniqueId       | String                       | This field does not need to be assigned.<br>  Any assignment should be to a value that is sufficiently unique to identify a specific detection from a specific detector.<br>Typically, but not necessarily, the value of this field is a [UUID]({{< relref "glossary.md#uuid" >}}).<br>It can be useful to assign this field in order to support analytic development / debugging.<br>It is necessary to assign this field if _detectionRevision_ field is assigned a value.
 detectionRevision       | Integer                      | Can be used, in conjunction with _detectionUniqueId_ to allow detectors that run continuously, in a streaming fashion to revise their detections in the light of new information.<br>For example, it might be useful to revise the same detection with additional linked events and a new standard deviation.<br>Where more than one detection has the same _detectionUniqueId_ value, then the one with the highest _detectionRevision_ will be the current one and all previous revisions (lower numbers in _detectionRevision_ field) are superseded / ignored.
 defunct                 | Boolean                      | This field allows a detection to declare that all previous revisions (same _detectionUniqueId_, lower _detectionRevision_ numbers) are now considered invalid.<br>For example, new data might arrive later than expected and invalidate a detection that has already been sent into Stroom.<br>Default value is `false`.
-executionSchedule       | String                       | The name of the schedule that fired this detection, if the detection was fired by a Scheduled Query.
-executionTime           | String                       | This is the actual wall clock time that the rule ran.
-effectiveExecutionTime  | String                       | This is the time used in any relative date expressions [relative data expressions name]({{< relref "dates.md#date-expressions" >}}) in the rule's query or time range, e.g. `day() - 1w`. The effective time is relevant when executing historic time ranges in a scheduled query.
 values                  | Dictionary                   | This a dictionary with all the field/column names from the Query (with the exception of `StreamId` and `EventId`) as keys and their respective cell values as the value.
 linkedEvents            | List of DetectionLinkedEvent | This is a list of the event(s) that are linked to this detection.
 level                   | String                       | The severity of the rule that raised the detection, e.g. `High`, where the rule declares one. See Rule Settings.
 status                  | String                       | How reliable the rule that raised the detection declares itself to be, e.g. `Stable`, where the rule declares it. See Rule Settings.
+
+A field that is not set on the detection is not in the context at all, rather than being empty, and a template that references a missing field will fail to render.
+Guard any field that may not be set, e.g. `{% if level is defined %}{{ level }}{% endif %}` or `{{ level | default('') }}`.
 
 DetectionLinkedEvent fields:
 
 Field Name              | Type                         | Description
 ----------------------- | ---------------------------- | ------------------
 stroom                  | String                       | The Stroom instance within which this event exists, assumed to be this instance of Stroom if not supplied.
-streamId                | String                       | The ID of the [Stream]({{< relref "glossary.md#stream" >}}) that contains the associated event.
-eventId                 | String                       | The ID of the [Event]({{< relref "glossary.md#event" >}}) that is associated with this detection.
+streamId                | Long                         | The ID of the [Stream]({{< relref "glossary.md#stream" >}}) that contains the associated event.
+eventId                 | Long                         | The ID of the [Event]({{< relref "glossary.md#event" >}}) that is associated with this detection.
 
 {{% warning %}}
 When choosing the names of the columns in your rule it may be beneficial to use `snake_case` or `UpperCamelCase` to make it easier to reference those columns in the detection template (see [Accessing Collection Items]({{< relref "#accessing-collection-items" >}}) above).

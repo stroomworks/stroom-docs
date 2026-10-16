@@ -12,7 +12,7 @@ aliases:
 ---
 
 The following example uses a real world Apache log and demonstrates the use of [regular expressions]({{< relref "element-reference/expressions.md" >}}) rather than simple 'split' tokenisers.
-The usage and structure of regular expressions is outside of the scope of this document but Data Splitter uses Java's standard regular expression library that is POSIX compliant and documented in numerous places.
+The usage and structure of regular expressions is outside of the scope of this document but Data Splitter uses Java's standard regular expression library (java.util.regex), which is documented in numerous places.
 
 This example also demonstrates that the names and values that are output can be hard coded in the absence of field name information to make [XSLT conversion]({{< relref "../../../concepts/translation.md" >}}) easier later on.
 Also shown is that any match can be divided into further fields with additional expressions and the ability to [nest data elements]({{< relref "element-reference/output.md" >}}) to provide structure if needed.

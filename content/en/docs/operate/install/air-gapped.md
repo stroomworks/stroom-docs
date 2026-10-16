@@ -24,7 +24,7 @@ The work is in getting the pieces across, and in noticing the few places where s
   Pull each one on a connected machine, export it, carry it over and load it into the local registry or daemon.
   Images are the usual reason an otherwise complete transfer fails, because a stack definition names images by tag and the daemon tries to fetch anything it does not already hold.
 * **Content packs**, if you want the standard content.
-  Stroom can fetch these from a content store over the internet, which is the one part of normal operation that expects a route out.
+  Stroom can fetch these from a content store over the internet, which is the main part of normal operation that expects a route out.
 
 Take exact versions rather than latest of anything.
 A version mismatch found on an isolated network is expensive to fix, because fixing it means another trip across.
@@ -32,13 +32,19 @@ A version mismatch found on an isolated network is expensive to fix, because fix
 
 ## Point the content store inward
 
-One setting looks to the internet by default, and should be settled deliberately rather than left to fail:
+Three things look to the internet by default, and should be settled deliberately rather than left to fail:
 
 * **Content store downloads.**
   `stroom.contentStore.urls` points at the public content store on GitHub.
   On an isolated network, replace it with the URL of a copy you host internally: see [Hosting your own content store]({{< relref "local-content-store.md" >}}).
   Clearing it does not work, because an empty or blank list falls back to the public default.
   Changing it needs a restart.
+* **Help links.**
+  `stroom.ui.helpUrl` points the **Help** menu and the in-app help links at the public documentation, and in 7.14 still defaults to upstream's 7.13 docs, `https://gchq.github.io/stroom-docs/7.13/docs`.
+  On an isolated network, point it at a copy of the documentation you host internally, or every help link fails; on any network, set it if you want help to open these docs.
+* **AI models.**
+  An **OpenAI Model** document with no **Base URL** sends its requests to `https://api.openai.com/v1`.
+  If you use `askAi()` or `ask-ai()`, give each model the base URL of a service on your own network.
 
 Content pack import on start, under `stroom.contentPackImport`, does not reach out: it is off by default, and when on it imports packs from a local directory (`importDirectory`), which is a reasonable way to bring content across.
 

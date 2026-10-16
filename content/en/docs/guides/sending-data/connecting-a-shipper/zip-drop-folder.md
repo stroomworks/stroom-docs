@@ -64,8 +64,8 @@ Compression:NONE
 EffectiveTime:2026-08-28T09:15:00.000Z
 ```
 
-`Compression` here describes the **`.dat` entry's own** encoding inside the ZIP, not the ZIP container, which is compressed by definition.
-Leave it `NONE` unless you deliberately gzipped the payload before packaging it.
+The **`.dat` entry must be uncompressed**: the ZIP container does the compression.
+A `Compression` key here does not make the proxy decompress the entry, so a gzipped `.dat` is stored as gzip bytes whatever the `.meta` says.
 
 
 ## Building a file
@@ -88,6 +88,7 @@ mv batch-20260828-0915.zip /path/to/zip_file_ingest/
 
 The scan is on a timer and has no way to know a file is still being written.
 Build the ZIP elsewhere and move it into the scan directory as the final step: a rename within the same filesystem is atomic.
+Write temporary files outside the scan directory too: anything that is not a `.zip` is moved to the failure directory.
 
 Streaming a growing file directly into the scan path produces truncated ingests, and the part that was not written is simply gone.
 {{< /trap >}}

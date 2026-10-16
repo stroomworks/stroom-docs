@@ -53,7 +53,8 @@ Check for collisions when you choose the template and the values senders put in 
 **Feed cardinality is uncapped.**
 
 Nothing stops you creating thousands of feeds.
-Deriving `Feed` from a pod name or a hostname produces one Feed document, one explorer tree node and one permission group per distinct value, and an estate that nobody can administer.
+With content auto-creation (`autoContentCreation.enabled`) switched on, deriving `Feed` from a pod name or a hostname produces one Feed document and one explorer tree node per distinct value, and an estate that nobody can administer.
+With it off, the default, every new value is rejected until someone creates the feed.
 
 It is not destructive of data, but it is destructive of a manageable system, and undoing it means re-sending or re-filing everything.
 {{< /trap >}}

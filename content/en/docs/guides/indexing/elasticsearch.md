@@ -36,23 +36,24 @@ Stroom talks to Elasticsearch over its REST API.
 
 1. Create an **Elastic Cluster** document where the right people can reach it.
 1. Enter the connection URLs, including protocol, host and port.
-   **Only HTTPS is supported**; plain HTTP fails rather than falling back.
-1. Provide the API key and secret.
+   HTTP and HTTPS both work.
+   For an `https` URL, paste the cluster's CA certificate into **CA certificate (PEM format)**; it is not used for `http` URLs.
+1. Tick **Use authentication** and enter the **API key ID** and **API key secret**.
 1. Use **Test Connection** before saving.
    It is the only step that tells you the details are right while you still have them in front of you.
 1. Save.
 
 {{% warning %}}
 **Set the permissions on this document deliberately.**
-The **Read** privilege allows the holder to retrieve the Elasticsearch API key and secret, which gives them the same access to that cluster as Stroom itself.
+The **View** permission allows the holder to retrieve the Elasticsearch API key and secret, which gives them the same access to that cluster as Stroom itself.
 
-People who only need to search Elasticsearch indexes through Stroom dashboards should be given **Use**, not **Read**.
+People who only need to search Elasticsearch indexes through Stroom dashboards should be given **Use**, not **View**.
 {{% /warning %}}
 
 
 ## Indexing into it
 
-Build the pipeline as for any other index: a parser reading `records:2`, an {{< pipe-elm "XSLTFilter" >}}, then {{< pipe-elm "ElasticIndexingFilter" >}} with its `cluster` property pointing at the Elastic Cluster document.
+Build the pipeline as for any other index: a parser reading the translated events, an {{< pipe-elm "XSLTFilter" >}} that converts them to `records:2`, then {{< pipe-elm "ElasticIndexingFilter" >}} with its `cluster` property pointing at the Elastic Cluster document.
 
 Properties worth setting deliberately:
 
@@ -92,12 +93,12 @@ The Elastic Index document and Stroom permissions sit between the two.
 {{< /verify >}}
 
 {{< trap severity="destructive" >}}
-**Read on the Elastic Cluster document hands over the cluster.**
+**View on the Elastic Cluster document hands over the cluster.**
 
 It is an ordinary-looking permission on an ordinary-looking document, and granting it broadly is an easy mistake.
 Anyone with it can read the API key and secret and then use that cluster with Stroom's own level of access, outside Stroom and outside its auditing.
 
-Grant **Use** for searching, and keep **Read** to the people who administer the connection.
+Grant **Use** for searching, and keep **View** to the people who administer the connection.
 {{< /trap >}}
 
 {{< trap severity="silent" >}}
@@ -110,8 +111,8 @@ Turned off, reprocessing a stream adds a second copy of every document rather th
 {{< diagnose >}}
 1. **Does Test Connection succeed?**
    Settles reachability, protocol and credentials in one click.
-1. **Is it HTTPS?**
-   Plain HTTP fails, and the message does not always make that obvious.
+1. **For an `https` URL, is the CA certificate right?**
+   It must be the certificate that signed the cluster's, in PEM format.
 1. **Did the pipeline produce `records:2` output?**
    Step it.
    A translation producing nothing indexes nothing and reports no error.

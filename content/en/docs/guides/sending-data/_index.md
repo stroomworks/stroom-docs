@@ -20,7 +20,7 @@ Nearly every common log shipper can already do it.
 ## Where to start
 
 * **[How data gets in]({{< relref "how-data-gets-in.md" >}})** if you are choosing an approach.
-  Stroom has three entry points, and which one you want is mostly decided by what the sending system is capable of.
+  Stroom has four entry points, and which one you want is mostly decided by what the sending system is capable of.
 * **[Choosing a feed]({{< relref "choosing-a-feed.md" >}})** before you send anything.
   The feed is a security boundary, not a label, and getting it wrong is expensive to unpick later.
 * **[Connecting a shipper]({{< relref "connecting-a-shipper/_index.md" >}})** if you already run Vector, Fluent Bit, rsyslog, Logstash, NiFi or similar.

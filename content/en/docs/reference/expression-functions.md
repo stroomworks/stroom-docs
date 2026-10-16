@@ -2,7 +2,7 @@
 title: "Expression Functions"
 linkTitle: "Expression Functions"
 weight: 60
-date: 2026-10-14
+date: 2026-10-15
 tags:
 description: >
   Every function available in dashboard expressions and StroomQL, by category.
@@ -24,9 +24,10 @@ aliases:
 
 These are the functions you can use in a dashboard's expression columns and in StroomQL `eval` expressions.
 
-Where a function has an alias, both names do the same thing.
+Where a function has aliases, every name does the same thing.
 
 There are **148** functions in **14** categories.
+A few, such as `average`, have both an aggregate form and one that works across its arguments, so they appear in two categories.
 
 
 ## Aggregate
@@ -34,14 +35,14 @@ There are **148** functions in **14** categories.
 | Function | Does | Returns |
 |---|---|---|
 | `average`, `mean` | Determines the average (mean) value across all grouped records. | The average (mean) of all the values |
-| `count` | *Not described in the source.* | - |
-| `countGroups` | *Not described in the source.* | Number of unique child group keys within the current group. |
+| `count` | Counts the number of records that are passed through it. Doesn't take any notice of the values of any fields. | Number of records |
+| `countGroups` | This is used to count the number of unique group keys where there are multiple group levels. For example if records are grouped by Name then Type then for each Name, countGroups will give you the number of unique Type values for that Name. | Number of unique child group keys within the current group. |
 | `countUnique` | Determines the number of unique values across all grouped records. | The number of unique values |
-| `distinct` | Concatenates the distinct supplied values together with no delimiter. | - |
-| `joining` | Concatenates the supplied values together with no delimiter. | - |
+| `distinct` | Concatenates the distinct supplied values together with no delimiter. | The distinct values concatenated together into one string with no delimiter. Up to a maximum of 10 values. |
+| `joining` | Concatenates the supplied values together with no delimiter. | The values concatenated together into one string with no delimiter. Up to a maximum of 10 values. |
 | `max` | Determines the maximum value across all grouped records. | The largest value of all values. |
 | `min` | Determines the minimum value across all grouped records. | The smallest of all values. |
-| `period` | The window period to apply functions to. | - |
+| `period` | This function provides a way of selectively applying functions to values for a specific period when using the window feature | A value computed by the nested functions for the specified period |
 | `stDev` | Determines the standard deviation across all grouped records. | The standard deviation of all values. |
 | `sum` | Determines the sum of the value of expression across all grouped records | Sum of all values |
 | `variance` | Determines the variance value across all grouped records. | The variance of all the values. |
@@ -51,7 +52,7 @@ There are **148** functions in **14** categories.
 
 | Function | Does | Returns |
 |---|---|---|
-| `askAi` | The name or UUID of the OpenAI Model document to use. | The model's answer. |
+| `askAi` | Ask a chat model a question and return its answer. The model is asked once per value, so prefer to use this on a grouped or otherwise small set of rows. | The model's answer. |
 
 
 ## Cast
@@ -87,7 +88,7 @@ There are **148** functions in **14** categories.
 | `floorTime` | Floors the supplied time to the nearest duration. | The result date and time. |
 | `floorWeek` | Rounds the supplied time down to the start of the current week. | The result date and time. |
 | `floorYear` | Rounds the supplied time down to the start of the current year. | The result date and time. |
-| `formatDate` | The date as milliseconds since the epoch (1 Jan 1970) | - |
+| `formatDate` | Convert the date to a string using the default date format pattern (yyyy-MM-dd'T'HH:mm:ss.SSSXX) and default timezone (UTC). | A date string in the default date format pattern. |
 | `formatDuration` | Formats the supplied duration as a string | A duration formatted as a string. |
 | `formatISODuration` | Formats the supplied duration as an ISO 8601 string | A duration formatted as an ISO 8601 string. |
 | `hour` | Returns the current date and time to the nearest hour. | The current date and time to the nearest hour. |
@@ -95,7 +96,7 @@ There are **148** functions in **14** categories.
 | `minute` | Returns the current date and time to the nearest minute. | The current date and time to the nearest minute. |
 | `month` | Returns the current date and time truncated to the start of the month. | The current date and time truncated to the start of the month. |
 | `now` | Returns the current date and time. | The current date and time. |
-| `parseDate` | The date string, e.g. '2014 02 22' | The date as number of milliseconds since the epoch. |
+| `parseDate` | Parse dateString using the default date format pattern (yyyy-MM-dd'T'HH:mm:ss.SSSXX) and default timezone (UTC). | The date as number of milliseconds since the epoch. |
 | `parseDuration` | Parses the supplied value as a duration | The parsed duration. |
 | `parseISODuration` | Parses the supplied value as an ISO duration, e.g. PTH3 | The parsed ISO duration. |
 | `roundDay` | Rounds the supplied time up or down to the nearest start of a day. | The result date and time. |
@@ -115,10 +116,10 @@ There are **148** functions in **14** categories.
 
 | Function | Does | Returns |
 |---|---|---|
-| `annotation` | Creates a hyperlink that will open the annotation edit screen showing the existing annotation with the supplied annotationId. | - |
-| `createAnnotation` | Creates a hyperlink that will open the annotation edit screen pre-populated with the supplied values ready to create a new annotation. | - |
-| `dashboard` | The text that the hyperlink will display. | A hyperlink that will open a dashboard. |
-| `data` | Produces a hyperlink for showing data within stroom. | - |
+| `annotation` | Creates a hyperlink that will open the annotation edit screen showing the existing annotation with the supplied annotationId. | A hyperlink to open the annotation edit screen for an existing annotation. |
+| `createAnnotation` | Creates a hyperlink that will open the annotation edit screen pre-populated with the supplied values ready to create a new annotation. | Forms a hyperlink to create a new annotation. |
+| `dashboard` | Produces a hyperlink for opening a specific dashboard. | A hyperlink that will open a dashboard. |
+| `data` | Produces a hyperlink for showing data within stroom. | A hyperlink that will open a popup or tab showing the required data. |
 | `link` | Creates a stroom syntax hyperlink string using the supplied URL. | A Stroom syntax hyperlink string. |
 | `stepping` | Produces a hyperlink for opening a stepping tab for the requested stream. | A hyperlink that will open the a stepping tab for the requested source data. |
 
@@ -127,16 +128,16 @@ There are **148** functions in **14** categories.
 
 | Function | Does | Returns |
 |---|---|---|
-| `!=` | Tests the non equality of two values. It will attempt to convert the parameters to the type of the first parameter, e.g. ne(123, "123") returns true. | True if the two values are not equal. |
-| `<` | Tests if arg1 is less than than arg2. It will attempt to convert the type of the second parameter to that of the first. Can be expressed as '${field1}>${field2}. | True if arg1 is less than than arg2. |
-| `<=` | Tests if arg1 is less than or equal to arg2. It will attempt to convert the type of the second parameter to that of the first. Can be expressed as '${field1}>${field2}. | True if arg1 is less than or equal arg2. |
-| `=` | Tests the equality of two values. It will attempt to convert the parameters to the type of the first parameter, e.g. equals(123, "123") returns true. | True if the two values are equal even if the types are not. |
-| `>` | Tests if arg1 is greater than arg2. It will attempt to convert the type of the second parameter to that of the first. Can be expressed as '${field1}>${field2}'. | True if arg1 is greater than arg2. |
-| `>=` | Tests if arg1 is greater than or equal to arg2. It will attempt to convert the type of the second parameter to that of the first. Can be expressed as '${field1}>${field2}. | True if arg1 is greater than or equal to arg2. |
+| `!=`, `notEquals`, `ne` | Tests the non equality of two values. It will attempt to convert the parameters to the type of the first parameter, e.g. ne(123, "123") returns true. | True if the two values are not equal. |
+| `<`, `lessThan`, `lt` | Tests if arg1 is less than than arg2. It will attempt to convert the type of the second parameter to that of the first. Can be expressed as '${field1}>${field2}. | True if arg1 is less than than arg2. |
+| `<=`, `lessThanOrEqualTo`, `lte` | Tests if arg1 is less than or equal to arg2. It will attempt to convert the type of the second parameter to that of the first. Can be expressed as '${field1}>${field2}. | True if arg1 is less than or equal arg2. |
+| `=`, `equals`, `eq` | Tests the equality of two values. It will attempt to convert the parameters to the type of the first parameter, e.g. equals(123, "123") returns true. | True if the two values are equal even if the types are not. |
+| `>`, `greaterThan`, `gt` | Tests if arg1 is greater than arg2. It will attempt to convert the type of the second parameter to that of the first. Can be expressed as '${field1}>${field2}'. | True if arg1 is greater than arg2. |
+| `>=`, `greaterThanOrEqualTo`, `gte` | Tests if arg1 is greater than or equal to arg2. It will attempt to convert the type of the second parameter to that of the first. Can be expressed as '${field1}>${field2}. | True if arg1 is greater than or equal to arg2. |
 | `and` | Logical 'and' operator. | If all supplied arguments evaluate to true then return true, else false. |
 | `case` | Similar to a switch statement. The arguments are split into 3 parts: the input value to compare, pairs of test values with their respective output values and a default result if no matches are found. It must always have an even number of arguments and can have any number of test/result pairs. | One of the result arguments, if matched, or the value of the otherwise argument if no match is found. |
 | `if` | Tests if the 1st parameter is true and if so returns parameter 2 else it returns parameter 3. | If condition is true, the value of the 2nd parameter else the value of the 3rd parameter. The type will match that of the selected parameter. |
-| `inRange` | Returns true if the value is between lower and upper (inclusive). All parameters must be either numbers or ISO date strings. | - |
+| `inRange` | Returns true if the value is between the lower and upper bounds, inclusive. All parameters must be either numbers or ISO date strings. | - |
 | `not` | Inverts boolean values making true, false etc. The value provided will be implicitly cast to a boolean, e.g 'not("true")' returns false | The inverse of the supplied value. |
 | `or` | Logical 'or' operator. | If one or more of the supplied arguments evaluate to true then return true, else false. |
 
@@ -152,17 +153,23 @@ There are **148** functions in **14** categories.
 
 | Function | Does | Returns |
 |---|---|---|
-| `-`, `subtract` | Field, the result of another function or a constant. | The result of subtracting each argument from the last argument or result of the last subtraction. |
-| `*`, `multiply` | Field, the result of another function or a constant. | The value of arg1 multiplied by arg2. |
-| `/`, `divide` | Field, the result of another function or a constant. | The value of arg1 divided by arg2. |
-| `%` | Calculates the modulus after dividing the dividend by the divisor. If more than one divisor is provided then the each subsequent divisor will be used to calculate the modulus using the previous result as the dividend, e.g. modulo(100, 30, 4) returns 2, i.e. (100 % 30) % 4. | - |
-| `^`, `power` | Field, the result of another function or a constant. | The value of arg1 raised to the power of arg2. |
-| `add`, `+` | Field, the result of another function or a constant. | The sum of all values |
+| `-`, `subtract` | Subtracts arg2 from arg1. Minimum of two arguments. If more than two arguments are supplied then each argument is subtracted from the previous result, e.g. subtract(10, 5, 2) returns 3. Can be expressed as '${field1}-${field2}'. | The result of subtracting each argument from the last argument or result of the last subtraction. |
+| `*`, `multiply` | The value of arg1 multiplied by arg2. If more than two arguments are supplied then it will multiply by each argument in turn, e.g. multiply(10, 5, 2) returns 100. Can be expressed as '${field1}*${field2}'. | The value of arg1 multiplied by arg2. |
+| `/`, `divide` | The value of arg1 divided by arg2. If more than two arguments are supplied then it will divide by each argument in turn, e.g. divide(1000, 10, 5, 2) returns 10. Can be expressed as '${field1}/${field2}'. | The value of arg1 divided by arg2. |
+| `%`, `mod`, `modulo` | Calculates the modulus after dividing the dividend by the divisor. If more than one divisor is provided then the each subsequent divisor will be used to calculate the modulus using the previous result as the dividend, e.g. modulo(100, 30, 4) returns 2, i.e. (100 % 30) % 4. | The remainder (modulus) after dividing the dividend by the divisor. |
+| `^`, `power` | The value of arg1 raised to the power of arg2. If more than two arguments are supplied then it will each argument to the power of the next, e.g. power(2, 4, 3) returns 4096. Can be expressed as '${field1}^${field2}'. | The value of arg1 raised to the power of arg2. |
+| `add`, `+` | Adds the value of all arguments together. Minimum of two arguments. Can be expressed as '${field1}+${field2}'. | The sum of all values |
+| `average`, `mean` | Determines the average (mean) value of all arguments. | The average (mean) of all the values |
 | `ceiling` | Rounds the supplied value up to the next whole number. e.g. ceiling(1.2) returns 2. | The rounded value. |
 | `floor` | Rounds the supplied value down to the next whole number. e.g. ceiling(1.8) returns 1. | The rounded value. |
+| `max` | Determines the maximum value from all the arguments. | The largest value of all values. |
+| `min` | Determines the minimum value from all the arguments. | The smallest of all values. |
 | `negate` | Multiplies the supplied value by -1 | The result of multiplying the supplied number by -1 |
 | `random` | Returns a double value with a positive sign, greater than or equal to 0.0 and less than 1.0. Returned values are chosen pseudorandomly with (approximately) uniform distribution from that range. | A random number between 0.0 (inc.) and 1.0 (excl.) |
 | `round` | Rounds the supplied value to the nearest whole number. e.g. ceiling(1.8) returns 2. | The rounded value. |
+| `stDev` | Determines the standard deviation from all the arguments. | The standard deviation of all values. |
+| `sum` | Determines the sum of all the arguments. | Sum of all values |
+| `variance` | Determines the variance value from all the arguments. | The variance of all the values. |
 
 
 ## Param
@@ -180,12 +187,12 @@ There are **148** functions in **14** categories.
 
 | Function | Does | Returns |
 |---|---|---|
-| `any` | Selects the first value found in the group that is not null() or err(). If no explicit ordering is set then the value selected is indeterminate. | - |
-| `bottom` | Selects the bottom N values and returns them as a delimited string in the order they are read. E.g. for values [1, 2, 3, 4, 5], bottom(${field}, ',', 2) returns '4,5'. | - |
-| `first` | Selects the first value found in the group even if it is null() or err(). If no explicit ordering is set then the value selected is indeterminate. | - |
-| `last` | Selects the last value found in the group even if it is null() or err(). If no explicit ordering is set then the value selected is indeterminate. | - |
-| `nth` | Selects the Nth value in a set of grouped values. If there is no explicit ordering on the field selected then the value returned is indeterminate. E.g. for values [20, 40, 10, 30, 50], nth(${field}, 2) returns 40. | - |
-| `top` | Selects the top N values and returns them as a delimited string in the order they are read. E.g. for values [1, 2, 3, 4, 5], top(${field}, ',', 2) returns '1,2'. | - |
+| `any` | Selects the first value found in the group that is not null() or err(). If no explicit ordering is set then the value selected is indeterminate. | The first value of the group. |
+| `bottom` | Selects the bottom N values and returns them as a delimited string in the order they are read. E.g. for values [1, 2, 3, 4, 5], bottom(${field}, ',', 2) returns '4,5'. | The bottom N values as a delimited string. |
+| `first` | Selects the first value found in the group even if it is null() or err(). If no explicit ordering is set then the value selected is indeterminate. | The first value of the group. |
+| `last` | Selects the last value found in the group even if it is null() or err(). If no explicit ordering is set then the value selected is indeterminate. | The last value of the group. |
+| `nth` | Selects the Nth value in a set of grouped values. If there is no explicit ordering on the field selected then the value returned is indeterminate. E.g. for values [20, 40, 10, 30, 50], nth(${field}, 2) returns 40. | The Nth value of the grouped set. |
+| `top` | Selects the top N values and returns them as a delimited string in the order they are read. E.g. for values [1, 2, 3, 4, 5], top(${field}, ',', 2) returns '1,2'. | The top N values as a delimited string. |
 
 
 ## String
@@ -199,16 +206,16 @@ There are **148** functions in **14** categories.
 | `encodeUrl` | Encodes a URL or other string using standard URL encoding, e.g. replacing a space with '%20'. | The input value in URL encoded form. |
 | `exclude` | If the supplied string matches one of the supplied regex patterns then return null, otherwise return the supplied string. | Null if the input matches one of the patterns, otherwise the input value. |
 | `hash` | Generate a SHA-256 hash of the input string. | The hash string. |
-| `hostAddress` | Returns the host address (IP) for the given host string. | - |
-| `hostName` | Returns the host name for the given host string. | - |
+| `hostAddress` | Returns the IP address for the supplied host name or address. | - |
+| `hostName` | Returns the host name for the supplied host name or address. | - |
 | `include` | If the supplied input string matches one of the supplied regex patterns then return the input string, otherwise return null. | The input value if one of the patterns matches it, otherwise null. |
 | `indexOf` | Finds the first position (zero based) of subString in inputString or `-1` if it cannot be found. Uses a simple literal match. | The first position of subString. |
 | `jq` | Extracts values from a JSON string using a JQ expression. Where the expression matches more than one element the string values of all the matched elements are concatenated. | The string value of the matched JSON element(s). |
 | `lastIndexOf` | Finds the last position (zero based) of subString in inputString or `-1` if it cannot be found. Uses a simple literal match. | The last position of subString. |
 | `lowerCase` | Convert the supplied string to lower case. | The string in lower case. |
 | `match` | Tests an input string using a regular expression pattern. | True if pattern matches input |
-| `param` | Fetches the value of named query parameter or null() if the key cannot be found. | - |
-| `params` | Returns all the query parameters for the current query, e.g. 'user=jbloggs site=HQ'. | - |
+| `param` | Fetches the value of named query parameter or null() if the key cannot be found. | The value associated with the supplied parameter key. |
+| `params` | Returns all the query parameters for the current query, e.g. 'user=jbloggs site=HQ'. | All query parameters as a space delimited string. |
 | `replace` | Perform text replacement on an input string using a regular expression to match part (or all) of the input string and a replacement string to insert in place of all matches. | - |
 | `stringLength` | Return the length of the provided string. | The length of the string in characters. |
 | `substring` | Extract a sub-string based on the start/end index values. | The requested sub-string. |
@@ -255,7 +262,7 @@ There are **148** functions in **14** categories.
 |---|---|---|
 | `err` | Returns an error. | An error. |
 | `false` | Returns the boolean false. | The boolean false. |
-| `formatIECByteSize` | The number of bytes | - |
-| `formatMetricByteSize` | The number of bytes | - |
+| `formatIECByteSize` | Convert a number of bytes into a more human readable form. | A more human readable IEC representation of byte size. |
+| `formatMetricByteSize` | Convert a number of bytes into a more human readable form. | A more human readable metric representation of byte size. |
 | `null` | Returns a null value. | A null value. |
 | `true` | Returns the boolean true. | The boolean true. |

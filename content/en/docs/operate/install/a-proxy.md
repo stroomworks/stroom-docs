@@ -71,7 +71,17 @@ It names the Stroom or proxy immediately downstream, and is used for **forwardin
 Getting it wrong therefore breaks more than forwarding, and the symptoms look unrelated to each other.
 
 Its `apiKey` authenticates this proxy to that downstream.
+An HTTP forward destination can carry its own `apiKey`, which overrides this one for that destination.
+With `receive.receiptCheckMode` set to `RECEIPT_POLICY` and no external identity provider, `downstreamHost.apiKey` is required, and the proxy will not start without it.
 See [API keys]({{< relref "../../guides/automation/api-keys.md" >}}).
+
+
+### Durability
+
+A proxy forces data to disk before it acknowledges receipt, and again as data moves between its queues, so a post it has acknowledged survives a power failure.
+The settings are under `proxyConfig.fsync` (`receivingMode`, `zipSplittingInputQueueMode`, `preAggregateInputQueueMode`, `aggregateInputQueueMode` and `forwardingInputQueueMode`), plus `fsyncMode` on each file destination, and each takes `ENABLED` (the default), `FILE_ONLY`, `DIR_ONLY` or `DISABLED`.
+The queue settings cost little.
+`receivingMode` is the expensive one: turning it down buys back throughput on a slow disk, at the cost of an acknowledgement that no longer means the data is on disk.
 
 
 ## Where data goes next
@@ -85,9 +95,11 @@ A proxy forwards to any number of destinations, configured separately:
 | `forwardS3Destinations` | An S3 bucket |
 
 More than one may be enabled, and each keeps its own queue and retries independently.
+The exception is a forwarder set to `instant`, which must be the only one enabled.
 
 {{% note %}}
-Forwarding to S3 is in the 7.14 betas only, and is not in a stable release.
+Forwarding to S3 is new in Stroom 7.14.
+Stroom picks the data up from the bucket itself; see [Stroom Proxy and Data Receipt]({{< relref "../../concepts/data-receipt.md" >}}) and [Volumes]({{< relref "../../concepts/volumes.md" >}}).
 {{% /note %}}
 
 

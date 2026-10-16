@@ -181,7 +181,8 @@ See [Nodes and jobs]({{< relref "../../operate/nodes-and-jobs.md" >}}).
 
 {{< timing mode="async" >}}
 A **streaming** rule runs as processor tasks over the streams its processor filter matches.
-A new filter starts from the oldest matching stream, so unless you set a **Min Create Time** on it, a new rule first works through everything already stored, and detections for old data can arrive alongside new ones.
+The **Add Filter** dialog sets **Min Create Time** to now, so a new rule sees only streams created from then on.
+To have it work through data already stored, clear **Min Create Time** or set it earlier, and expect detections for old data to arrive alongside new ones.
 After that, it sees each stream once, as it is processed.
 
 A **scheduled** rule runs when its schedule is next due, which may be hours away.

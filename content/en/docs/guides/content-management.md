@@ -214,6 +214,7 @@ Its **Settings** tab holds:
 | **Git commit** | Optional. Pins the content to one commit. |
 | **Automatically push** | Pushes local changes every minute through the **Git Repo Push** job. |
 | **Credentials** | A stored credential: username and password, access token or SSH key. |
+| **Set Http Client Config** | HTTP and TLS settings for reaching the Git server, such as a custom trust store. |
 
 The buttons on the same tab do the work:
 

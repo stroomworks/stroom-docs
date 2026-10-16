@@ -17,6 +17,11 @@ Clients can post straight to Stroom, or to Stroom Proxy, which sits at the edge 
 Both present the same `/datafeed` API, so a client sends data the same way to either.
 To set up a sender, see [How data gets in]({{< relref "../guides/sending-data/how-data-gets-in.md" >}}) and [Connecting a shipper]({{< relref "../guides/sending-data/connecting-a-shipper/_index.md" >}}).
 
+From Stroom 7.14, data can also reach Stroom without a post to Stroom itself.
+Proxy forwards it to an S3 bucket, and Stroom picks it up by polling an AWS SQS queue for the bucket's S3 create events (the **S3 Event Notifications Poll** job), or from a notification posted to its `/s3event/v1/notify` endpoint, which is intended mainly for testing.
+Stroom then records a stream that points at the S3 object, and reads it through an `S3 v1 (Read only)` volume.
+See [Volumes]({{< relref "volumes.md" >}}) and [Running a Proxy]({{< relref "../operate/install/a-proxy.md" >}}).
+
 
 ## Sending data
 
@@ -26,7 +31,8 @@ A minimal post with `curl` looks like this:
 curl --data-binary @events.log "https://<stroom-host>/stroom/datafeed" \
   -H "Feed:MY_SYSTEM-EVENTS" \
   -H "System:MY_SYSTEM" \
-  -H "Environment:OPS"
+  -H "Environment:OPS" \
+  -H "Authorization: Bearer ${STROOM_TOKEN}"
 ```
 
 The payload must be text once it is uncompressed.
@@ -133,12 +139,15 @@ Proxy can:
 * **Filter** incoming data on its headers, and receive, drop or reject it.
 * **Split** ZIPs that hold data for more than one feed or stream type.
 * **Aggregate** data by feed and stream type into larger batches.
-* **Forward** data to one or more destinations: Stroom, another proxy over HTTP, or a directory on disk.
-* **Instantly forward** data to a single HTTP destination as it arrives, with no aggregation.
+* **Forward** data to one or more destinations: Stroom, another proxy over HTTP, a directory on disk, or, from Stroom 7.14, an S3 bucket.
+* **Instantly forward** data to a single HTTP or file destination (not S3) as it arrives, with no aggregation.
 * **Scan directories** for ZIP files in Stroom's ZIP format and send them on (see [ZIP drop folder]({{< relref "../guides/sending-data/connecting-a-shipper/zip-drop-folder.md" >}})).
 
 Proxy is store-and-forward.
 It writes each post to its local disk before it answers the client, and works through a series of directory queues from there.
+From Stroom 7.14, by default it also forces each post to durable storage (fsync) before it answers, and does the same as data moves between queues.
+These settings are under `proxyConfig.fsync` (see [Durability]({{< relref "../operate/install/a-proxy.md#durability" >}})), and turning off `receivingMode` speeds up receipt at the cost of that guarantee.
+Stroom itself does the same for its stream store with `data.store.fsyncMode` (see [Configuration properties]({{< relref "../reference/configuration-properties.md#data" >}})).
 Data that fails to forward is kept and retried.
 
 
@@ -153,11 +162,6 @@ With aggregation on (the default), Proxy closes an aggregate and forwards it whe
 | `aggregationFrequency` | 10 minutes |
 
 An aggregated batch arrives in Stroom as a single multi-part stream.
-
-{{% note %}}
-Forwarding from Proxy to S3 is in the Stroom 7.14 betas only.
-It is not in a stable release.
-{{% /note %}}
 
 
 ## Deciding what to accept

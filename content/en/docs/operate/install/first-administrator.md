@@ -48,6 +48,8 @@ java -jar /path/to/stroom-app-all.jar create_account \
   /path/to/config.yml
 ```
 
+The password must pass the internal identity provider's strength policy (`minimumPasswordLength` and `minimumPasswordStrength` under `stroom.security.identity.passwordPolicy`), or `create_account` rejects it.
+
 By default Stroom requires this password to be changed at first sign-in.
 Two things govern that, and both have to allow it for the change to be skipped:
 

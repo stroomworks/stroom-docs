@@ -253,8 +253,9 @@ These settings are configured per Plan B document in the Stroom UI.
   It counts occurrences within specified buckets, facilitating statistical analysis of data spread.
 * **Metric**: Designed for high-speed statistical counters and gauges.
   It maintains running aggregates such as `min`, `max`, `sum`, `count`, and `average` over time for a given key.
-* **Trace**: An OpenTelemetry-compatible store for distributed tracing data.
-  It stores Spans and Trace information, enabling the analysis of complex, cross-system call chains.
+
+From Stroom 7.14, trace data is no longer a Plan B state type.
+It is held in a separate **Traces** document (see [Documents]({{< relref "../reference/documents.md" >}})), which lives on a shared file store and is served by the Plan B Shared FS jobs.
 
 
 #### Max store size
@@ -286,7 +287,8 @@ Determines whether incoming data should replace existing records with the same k
 
 Controls the automatic deletion of old data to manage disk space.
 
-* **Considerations**: Retention is evaluated based on the time associated with the record (e.g., the `effectiveTime`).
+* **Considerations**: By default, retention is based on when the data was inserted.
+  Tick **Use State Time** to base it on the record's own time (e.g., the `effectiveTime`) instead.
   Ensure your retention period is longer than any lookups you intend to perform.
 * **Choosing a value**:
   * **Session tracking**: 30 to 90 Days.
@@ -325,7 +327,7 @@ Changing settings on a Plan B store that already contains data can have signific
 * **Requires reset**:
   * **State type**: You cannot change the `State Type` of an existing store.
     If you need to change the type (e.g., from `State` to `Temporal State`), you must delete the Plan B document and recreate it, which will clear all existing data.
-  * **Schema configuration**: For complex types like `Metric` or `Histogram`, changing the underlying key or value schemas will cause a "Schema version mismatch" error when Stroom attempts to open the existing LMDB file.
+  * **Schema configuration**: For any type with key or value schema settings, changing the store's key or value schema will cause a "Key schema mismatch" or "Value schema mismatch" error when Stroom attempts to open the existing LMDB file.
     In these cases, you must reset the store contents.
 
 
@@ -356,7 +358,7 @@ These are the names as they appear on the Jobs screen (see [Nodes, jobs and prop
   Without it, shards keep growing.
 * **Plan B Snapshot Creator** and **Plan B Snapshot Cleanup**: publish the snapshots other nodes read, and remove those nothing is reading.
 
-On a shared file store, **Plan B Shared FS Merge** and **Plan B Shared FS Housekeeping** do the equivalent work.
+For **Traces** documents, which live on a shared file store, **Plan B Shared FS Merge** and **Plan B Shared FS Housekeeping** do the equivalent work.
 
 
 ### Log analysis
@@ -382,7 +384,7 @@ Common issues include:
 * **Disk full**: LMDB cannot expand the store if the disk is full.
 * **Network failures**: Processing nodes cannot upload to storage nodes.
 * **Permission denied**: Stroom user does not have write access to the Plan B path.
-* **Schema version mismatch**: Occurs if you change the schema of a Metric or Histogram store without resetting it.
+* **Key schema mismatch** or **Value schema mismatch**: Occurs if you change the key or value schema of a store without resetting it.
 
 
 ## Resetting contents

@@ -22,10 +22,13 @@ Stroom's application jar carries a `reset_password` command.
 It runs against the same configuration file the application uses, so run it on a node, as the user Stroom runs as.
 
 ```bash
-java -jar stroom-app.jar reset_password /path/to/config.yml -u admin -p 'new-password'
+java -jar stroom-app-all.jar reset_password /path/to/config.yml -u admin -p 'new-password'
 ```
 
 The arguments are the account's user id and the new password.
+
+The command refuses a disabled account, with an error saying so: enable the account first.
+On an enabled account it also clears any lock and the inactive flag, so the account it resets is ready to sign in.
 
 {{< timing mode="immediate" >}}
 The change takes effect as soon as the command completes.
@@ -44,7 +47,7 @@ The command succeeding proves the command ran.
 
 {{< not-proof >}}
 **The command exiting zero is not proof you can sign in.**
-The password may now be correct while the account is locked, disabled, or has no permissions.
+The account is unlocked and active, but may still have no permissions.
 
 **An existing browser session still working proves nothing**, because it was already authenticated.
 Use a private window.
@@ -68,7 +71,7 @@ Prefix the command with a space where your shell is configured to skip such line
 1. **Is the user id right?**
    It is the account's user id, not an email address or a display name, unless those happen to be the same.
 1. **Is the account enabled?**
-   A correct password on a disabled or locked account fails to sign in with no indication that the password was the part that worked.
+   The command refuses a disabled account and says so; enable it first, then run the command again.
 1. **Is internal authentication actually in use?**
    If the deployment uses an external identity provider, resetting a Stroom password changes something nothing consults.
 1. **Can the database be reached from this node?**

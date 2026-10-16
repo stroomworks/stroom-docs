@@ -13,3 +13,8 @@ aliases:
 
 There are various elements used in a Data Splitter configuration to control behaviour.
 Each of these elements can be categorised as one of the following:
+
+* [Content Providers]({{< relref "content-providers.md" >}})
+* [Expressions]({{< relref "expressions.md" >}})
+* [Variables]({{< relref "variables.md" >}})
+* [Output]({{< relref "output.md" >}})

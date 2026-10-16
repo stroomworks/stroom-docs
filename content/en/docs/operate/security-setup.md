@@ -40,7 +40,8 @@ What they are then allowed to do is [Users and permissions]({{< relref "users-an
 | `INTERNAL_IDP` | In Stroom | A standalone system, evaluation, or anywhere with no existing provider |
 | `EXTERNAL_IDP` | In your provider | Any estate that already has one |
 
-**Stroom defaults to `INTERNAL_IDP`**, and will not start with any other value.
+**Stroom defaults to `INTERNAL_IDP`**, and accepts only `INTERNAL_IDP` or `EXTERNAL_IDP`.
+Any other value, such as `NO_IDP` or the removed `TEST_CREDENTIALS`, stops it starting.
 
 Stroom Proxy has the same setting with a different choice.
 It defaults to `NO_IDP`, meaning it authenticates nobody itself, which suits a remote proxy that only forwards onward; set `EXTERNAL_IDP` to have it check tokens from your provider.
@@ -61,14 +62,29 @@ Its cost is that account recovery, password policy and any second factor are Str
 An existing provider holds the accounts, and Stroom redirects the browser to it.
 Password policy, recovery and multi-factor authentication all become that provider's business, which is usually the reason to choose it.
 
-Register Stroom as a client with your provider, then set:
+Register Stroom as a client with your provider.
+The client's valid redirect URIs must include `https://<stroom-host>/api/auth/flow/v1/signin-oidc`, exactly, or the provider rejects every sign-in with an "invalid redirect_uri" error.
+If you use the provider's own logout, also add `https://<stroom-host>/` as a valid post-logout redirect URI.
+
+Then set:
 
 * `openIdConfigurationEndpoint`: the provider's `.well-known/openid-configuration` URL.
-  Setting this is much the easiest route, because Stroom reads the issuer, the authorisation, token and JWKS endpoints from it rather than you setting each one.
+  This is required for `EXTERNAL_IDP`, and Stroom will not start without it.
+  Stroom reads the issuer, the authorisation, token and JWKS endpoints from it rather than you setting each one.
 * `clientId` and `clientSecret`, as issued by the provider.
+* `requestScopes`, only if you change it: it must include `openid`, which the default (`openid`, `email`) does.
 
-The individual endpoints can be set by hand instead, which is what the discovery document would have supplied.
-Prefer discovery unless something prevents it: endpoints copied by hand are a standing opportunity for one of them to be wrong or to drift.
+The individual endpoints can also be set by hand, but only to override what the discovery document supplies.
+Avoid it unless something prevents discovery working: endpoints copied by hand are a standing opportunity for one of them to be wrong or to drift.
+
+Stroom also checks the audience (`aud`) claim of every token from the provider, and by default rejects a token that has none.
+With `allowedAudiences` empty, `aud` must match `clientId`, and Stroom will not start if neither is set.
+If your provider puts something else in `aud`, such as an API identifier, list the expected values under `allowedAudiences`.
+If its access tokens carry no `aud` at all, as some Cognito and Okta tokens do not, set `audienceClaimRequired: false`.
+Turning audience checks off altogether, with `validateAudience: false`, lets a token issued to another application at the same provider be used against Stroom.
+
+As optional hardening, set `requiredAccessTokenType` to the `typ` header your provider puts on its access tokens, for example `at+jwt` for an RFC 9068 provider or `Bearer` for Keycloak's default, and Stroom refuses an ID token presented in place of one.
+Leave it unset if your provider uses the same `typ` for both, as Cognito does.
 
 
 ### Getting the claim mapping right
@@ -100,6 +116,11 @@ Changing it later, or choosing a claim whose value can change, means existing us
 Trust is established at the transport, by certificates.
 
 It is not a way to switch authentication off on a Stroom instance.
+
+Nor is there a test-credentials provider any more.
+`TEST_CREDENTIALS`, which let Stroom and Stroom Proxy authenticate to each other with a fixed, publicly known key, has been removed, and a configuration that still sets it fails validation at start-up.
+For a test or demonstration stack that needs the same shortcut, setting both `STROOM_ALLOW_INSECURE_TEST_CREDENTIALS=true` and `STROOM_INSECURE_TEST_CREDENTIAL=<a secret of your choosing>`, as environment variables or system properties, makes Stroom accept that secret as a bearer token for the processing user.
+Never set them in production.
 
 
 ## Behind an authenticating proxy
@@ -165,7 +186,7 @@ It is tempting to use the same friendly claim for both, which quietly turns a co
 1. **Do the client ID and secret match the provider's registration?**
    A wrong secret fails at the token exchange, after the provider has already shown a login page, which makes it look like a Stroom fault rather than a configuration one.
 1. **Is the redirect URI registered with the provider?**
-   It must match what Stroom sends, exactly, including the scheme and any port.
+   It must be `https://<stroom-host>/api/auth/flow/v1/signin-oidc`, matching what Stroom sends exactly, including the scheme and any port.
 1. **Is the user enabled in Stroom?**
    A disabled user is refused after authenticating successfully, so the provider's logs show success and Stroom shows a failure.
 1. **Is it a proxy?**

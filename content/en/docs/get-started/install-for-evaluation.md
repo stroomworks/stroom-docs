@@ -29,7 +29,7 @@ The other stacks create no accounts at all, and need an administrator to be crea
 
 ```bash
 bash <(curl -s https://gchq.github.io/stroom-resources/v7.14/get_stroom.sh)
-cd stroom_core_test/stroom_core_test*
+cd stroom_core_test*
 ./start.sh
 ```
 
@@ -86,7 +86,7 @@ Do not put real data in it, and do not expose it beyond your own machine.
    `docker ps` should show several.
    One that keeps restarting is the one to look at, with `docker logs`.
 1. **Is there enough disk and memory?**
-   The stack runs Stroom, a proxy, a log sender, nginx and MySQL together, and MySQL in particular fails in confusing ways when it cannot write.
+   The stack runs Stroom, two proxies (local and remote), a log sender, nginx and MySQL together, and MySQL in particular fails in confusing ways when it cannot write.
 1. **Does the browser refuse the certificate outright?**
    Some browsers will not let you past a self-signed certificate on `localhost` without an explicit exception.
    Try another browser before assuming Stroom is down.

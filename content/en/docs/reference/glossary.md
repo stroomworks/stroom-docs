@@ -172,9 +172,12 @@ A Dashboard is a configurable entity for querying one or more _Data Sources_ and
 
 The source of data for a _Query_, e.g. a _Lucene_ based _Index_, a SQL Statistics Data source, etc.
 
-There are three types of Data source:
+Data sources include:
 
 * {{< stroom-icon "document/Index.svg" "Index" >}} Lucene based search index data sources.
+* {{< stroom-icon "document/ElasticIndex.svg" "Elastic Index" >}} Elasticsearch index data sources.
+* {{< stroom-icon "document/SolrIndex.svg" "Solr Index" >}} Solr index data sources.
+* {{< stroom-icon "document/PlanB.svg" "Plan B" >}} Plan B state store data sources.
 * {{< stroom-icon "document/StatisticStore.svg" "SQL Statistics" >}} Stroom's SQL Statistics data sources.
 * {{< stroom-icon "document/searchable.svg" "Searchable" >}} Searchable data sources for searching the internals of Stroom.
 
@@ -738,12 +741,12 @@ Additional Stream Types can be added however the list of Stream Types must inclu
 * Context
 * Error
 * [Events]({{< relref "#events" >}})
-* Meta
+* Meta Data
 * [Raw Events]({{< relref "#raw-events" >}})
 * Raw Reference
 * Reference
 
-Some Stream Types, such as `Meta` and `Context` only exist as child streams within another Stream.
+Some Stream Types, such as `Meta Data` and `Context` only exist as child streams within another Stream.
 
 **See also:**
 
@@ -800,7 +803,7 @@ A Tracker is associated with a _Processor Filter_ and keeps track of the _Stream
 
 _Transport Layer Security (TLS)_ is the evolution of _Secure Sockets Layer (SSL)_ and refers to the encryption of traffic between client and server.
 
-_TLS_ is typically used in Stroom for communications between Stroom-Proxy and Stroom, between Stroom nodes and when communicating with external systems (e.g. an Elasticsearch cluster of a {{< pipe-elm "HttpPostFilter" >}} destination).
+_TLS_ is typically used in Stroom for communications between Stroom-Proxy and Stroom, between Stroom nodes and when communicating with external systems (e.g. an Elasticsearch cluster or an {{< pipe-elm "HTTPAppender" >}} destination).
 
 
 ## Unix Epoch
@@ -846,6 +849,7 @@ A document comprising some Javascript code for visualising data, e.g. pie charts
 
 In Stroom a Volume is a logical storage area that Stroom can write data to.
 Volumes are associated with a path on a file system that can either be local to the Stroom node or on a shared file system.
+A Data Volume can instead be an S3 bucket, see [Volumes and storage]({{< relref "../concepts/volumes.md#s3-storage" >}}).
 
 Stroom has two types of Volume; Index Volumes and Data Volumes.
 

@@ -23,7 +23,7 @@ Building it that way is much faster than writing the whole pipeline and asking w
    You cannot translate what you cannot read, and real data is reliably stranger than a sample someone described to you.
 1. **Parse it into XML.**
    A {{< pipe-elm "DSParser" >}} with a Text Converter for text formats, or a parser that reads XML or JSON directly.
-   The output is `records:2`.
+   With a Data Splitter, the output is `records:2`.
 1. **Reshape it with XSLT.**
    An {{< pipe-elm "XSLTFilter" >}} turns those records into the schema you are standardising on.
 1. **Validate it.**
@@ -101,7 +101,7 @@ Nine times out of ten the input is not the shape the templates were written for,
 {{< trap severity="silent" >}}
 **Namespaces are the usual reason a template does not match.**
 
-Parser output is in the `records:2` namespace, and a template matching a bare element name does not match a namespaced one.
+Data Splitter output is in the `records:2` namespace, and a template matching a bare element name does not match a namespaced one.
 The stylesheet looks correct, matches nothing, and reports nothing.
 
 Declare the namespace and match on the prefix, or set `xpath-default-namespace`.

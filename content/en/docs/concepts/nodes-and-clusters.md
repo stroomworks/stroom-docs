@@ -47,6 +47,9 @@ The database always knows which volume a stream is on; whether another node can 
 One node is the master.
 In the default configuration it holds the processor task queue in memory and hands work to the others, which is why the Nodes screen marks it and why losing it briefly pauses task distribution rather than processing already under way.
 
+From Stroom 7.14, in either mode, each node's **Processor Task Heartbeat** job renews the tasks it is working on, and the cluster-locked **Processor Task Reaper** job returns any task whose heartbeat has not been renewed within `stroom.processor.taskLeaseTimeout` (10 minutes by default) so another node can process it, even when there is no master.
+These replace the master-only Disown Dead Tasks job, and `taskLeaseTimeout` replaces `stroom.processor.disownDeadTasksAfter`.
+
 Its role is narrowing.
 With `stroom.processor.claimTasksOnWorker` turned on, each worker finds and claims its own tasks straight from the database and the master leaves the processing path entirely.
 That setting is experimental, off by default, and **must be identical on every node**: the two modes use different task states and cannot see each other's work in flight, so changing it means stopping the whole cluster, changing it everywhere, and starting again.

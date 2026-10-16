@@ -79,7 +79,7 @@ This is line 3
     xmlns="records:2"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="records:2 file://records-v2.0.xsd"
-    version="3.0">
+    version="2.0">
   <record>
     <data value="This is line 1" />
   </record>
@@ -117,7 +117,7 @@ ip=3.3.3.3 user=user3
   <regex pattern="ip=([^ ]+) user=([^ ]+)\s*">
     <data name="ip" value="$1"/>
     <data name="user" value="$2"/>
-  </split>
+  </regex>
 </dataSplitter>
 ```
 
@@ -129,7 +129,7 @@ ip=3.3.3.3 user=user3
     xmlns="records:2"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="records:2 file://records-v2.0.xsd"
-    version="3.0">
+    version="2.0">
   <record>
     <data name="ip" value="1.1.1.1" />
     <data name="user" value="user1" />
@@ -188,7 +188,7 @@ ip=3.3.3.3 user=user3
     xmlns="records:2"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="records:2 file://records-v2.0.xsd"
-    version="3.0">
+    version="2.0">
   <record>
     <data name="line" value="ip=1.1.1.1 user=user1" />
     <data name="ip" value="1.1.1.1" />
@@ -237,7 +237,7 @@ ip=3.3.3.3 user=user3
       <data name="ip" value="$1"/>
       <data name="user" value="$2"/>
     </data>
-  </split>
+  </regex>
 </dataSplitter>
 ```
 
@@ -245,11 +245,11 @@ ip=3.3.3.3 user=user3
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<record
+<records
     xmlns="records:2"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="records:2 file://records-v2.0.xsd"
-    version="3.0">
+    version="2.0">
   <record>
     <data name="line" value="ip=1.1.1.1 user=user1">
       <data name="ip" value="1.1.1.1" />
@@ -312,7 +312,7 @@ ip=3.3.3.3 user=user3
     xmlns="records:2"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="records:2 file://records-v2.0.xsd"
-    version="3.0">
+    version="2.0">
   <record>
     <data name="line" value="ip=1.1.1.1 user=user1">
       <data name="ip" value="1.1.1.1" />

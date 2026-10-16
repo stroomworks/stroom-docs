@@ -22,26 +22,26 @@ Here's a section of the event data:
   <record>
     <data name="type" value="badge-scan" />
     <data name="timestamp" value="2026-04-11T13:04:43.000000Z" />
-    <data name="thing-idref" value="dev.lead@example.com" />
-    <data name="location-idref" value="C-office-2" />
+    <data name="thing-idref" value="joe.blogs@example.org" />
+    <data name="location-idref" value="G-EAST-04" />
     <data name="status" value="WARN" />
     <data name="message" value="Expired credentials" />
   </record>
   <record>
     <data name="type" value="gate-event" />
     <data name="timestamp" value="2026-04-21T19:39:29.000000Z" />
-    <data name="thing-idref" value="guest.user.742@outside.com" />
+    <data name="thing-idref" value="jane.doe@stroomworks.io" />
     <data name="location-idref" value="G-SOUTH-22" />
     <data name="status" value="OK" />
-    <data name="message" value="Guest User 742 has safely exited building" />
+    <data name="message" value="Jane Doe has safely exited building" />
   </record>
   <record>
     <data name="type" value="gate-event" />
     <data name="timestamp" value="2026-04-14T19:46:13.000000Z" />
-    <data name="thing-idref" value="admin.one@corp.local" />
+    <data name="thing-idref" value="joe.blogs@example.org" />
     <data name="location-idref" value="G-NORTH-01" />
     <data name="status" value="OK" />
-    <data name="message" value="Admin One has safely exited building" />
+    <data name="message" value="Joe Blogs has safely exited building" />
   </record>
 </records>
 ```
@@ -465,7 +465,7 @@ The XSLT tab within this document should contain this text:
 Breaking this down, the root template section matches the root `<records>` and creates a matching `<records>` element in the output document.
 Note that this element contains schema information for the [Schema Filter]({{< relref "pipeline-schema-filter.md" >}}) later in the pipeline.
 
-The second template matches the `<reference>` element.
+The second template matches the `<record>` element.
 It pulls all the data we're interested in from the input document into variables using XPath expressions.
 It also uses the [`stroom:lookup()`]({{< relref "../reference/xslt-functions/reference-data.md" >}}) function to pull data from the reference data pipeline.
 
@@ -482,3 +482,17 @@ Note that there are two ways to get the data out:
     When pulling the data out, we can add an XPATH selector to get the value we want: `<data name="nameXml" value="{$nameXml/ref:fact/ref:name}"/>`.
     Note that the namespace for this selector is the reference-data:2 namespace from the stored data.
     If this isn't correct then the selector won't return anything.
+
+Once this XSLT is complete, we can save it and link both it and the reference data to the events pipeline.
+
+* Save the XSLT using the Save icon at the top-left of the page;
+* Open the `Refdata events pipeline`, `Structure` tab:
+  1. Select the `XSLT Filter`.
+     In the middle of the page the properties are listed.
+  1. Double-click the `xslt` property to open the `Edit Property` dialogue box.
+  1. Click on the `Value` and set this to the `Refdata events xslt`.
+  1. In the `Pipeline References` table below the properties, add a pipeline reference.
+     Set the `Pipeline` to `Refdata ref pipeline`, the `Feed` to `REFDATA_REF` and the `Type` to `Raw Reference`.
+  1. Save the pipeline.
+
+`stroom:lookup()` only searches the pipeline references on its own XSLT Filter, so without this reference every lookup returns nothing.

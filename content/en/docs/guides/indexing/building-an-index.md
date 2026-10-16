@@ -28,7 +28,7 @@ An index needs three things before anything is searchable: the index document an
    See [Choosing fields]({{< relref "choosing-fields.md" >}}).
    Get as close as you can now, because fields already written into shards keep the definition they were written with.
 1. **Build the indexing pipeline.**
-   It reads the translated output, so it begins with a parser reading `records:2` and ends with {{< pipe-elm "IndexingFilter" >}}, whose `index` property points at the Index document.
+   It reads the translated output, so it begins with a parser reading the translated events, then an {{< pipe-elm "XSLTFilter" >}} that converts them to `records:2`, and ends with {{< pipe-elm "IndexingFilter" >}}, whose `index` property points at the Index document.
 1. **Create a processor filter** on that pipeline for the feeds and stream types you want indexed, exactly as for any other processing.
 
 {{< timing mode="async" >}}
@@ -51,7 +51,7 @@ A search that returns "some" results is consistent with most of the data being m
 
 {{< not-proof >}}
 **Streams marked processed is not proof they were indexed.**
-A pipeline whose translation produced no `records:2` output processes to completion and indexes nothing.
+A pipeline whose XSLT produced no `records:2` output processes to completion and indexes nothing.
 
 **A search returning results is not proof the index is current.**
 It shows what has been indexed so far, and indexing follows processing, so streams still waiting for tasks are missing without anything saying so.
@@ -75,8 +75,8 @@ Set the volume group when you create the index.
 1. **Did the processor filter match anything?**
    Look at its task count.
    A filter whose criteria match no streams sits at zero and reports no error.
-1. **Did the translation produce `records:2` output?**
-   Step the indexing pipeline and look at the parser output.
+1. **Did the indexing XSLT produce `records:2` output?**
+   Step the indexing pipeline and look at the XSLT output.
    This is the usual cause of processed-but-not-indexed.
 1. **Is the Doc Count zero while searches return results?**
    The shard has not been committed yet; searches see uncommitted documents, the **Doc Count** does not.

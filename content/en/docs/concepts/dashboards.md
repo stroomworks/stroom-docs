@@ -67,7 +67,8 @@ If you want to display only a visualisation without the corresponding data grid,
 
 1. Add both a **Table** and a **Visualisation** to your dashboard.
 1. Configure the visualisation to use the table as its data source.
-1. In the table's settings, uncheck the **Visible** property (found in the tab or layout settings).
+1. Open the table's tab menu (click the table's tab when it is already selected) and choose **Hide**.
+   To bring it back, choose **Show** from the menu of another tab in the same panel.
 
 This configuration allows the table to continue acting as the data aggregator in the background while the UI only displays the resulting chart.
 

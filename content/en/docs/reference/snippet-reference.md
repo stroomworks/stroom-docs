@@ -43,7 +43,7 @@ To insert a snippet do one of the following:
 * Type the whole Tab Trigger (e.g. `first`) then hit `tab`.
   The snippet will be inserted into the editor.
 
-* Type some characters from the Name of the snippet (e.g. `evalfval`), then hit `ctrl,space` to see a filtered list of matches.
+* Type some characters from the Name of the snippet (e.g. `evalfval`), then hit `ctrl+space` to see a filtered list of matches.
   Use the cursor keys to select the desired item or type more characters to narrow down the filter.
   Hit `enter` or `tab` to insert the snippet.
 

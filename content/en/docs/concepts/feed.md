@@ -154,7 +154,8 @@ However, it can still be used as a filter criterion in search expressions.
 Data can be posted directly to the Stroom `datafeed` endpoint using standard HTTP tools like `curl`.
 The headers, responses and rules are set out in [the datafeed contract]({{< relref "../reference/the-datafeed-contract.md" >}}).
 
-* **Endpoint**: `https://<stroom-host>/stroom/noauth/datafeed` (or `/stroom/datafeed` for authenticated requests).
+* **Endpoint**: `https://<stroom-host>/stroom/datafeed`.
+  `/stroom/noauth/datafeed` is a legacy alias that behaves the same way, including requiring authentication by default.
 * **Method**: `POST`
 * **Body**: The raw bytes of the data.
 
@@ -187,7 +188,7 @@ Common headers include:
 Example:
 
 ```bash
-curl -X POST -H "Feed: MY_FEED" -H "System: FIREWALL" --data-binary @logs.txt https://stroom/stroom/noauth/datafeed
+curl -X POST -H "Authorization: Bearer ${STROOM_TOKEN}" -H "Feed: MY_FEED" -H "System: FIREWALL" --data-binary @logs.txt https://stroom/stroom/datafeed
 ```
 
 

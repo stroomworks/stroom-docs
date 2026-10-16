@@ -35,7 +35,7 @@ Parsers convert raw input data (bytes) into XML events (SAX events).
 * {{< pipe-elm "DSParser" >}}: The Data Splitter parser.
   It uses a {{< stroom-icon "document/TextConverter.svg" "Text Converter" >}} Text Converter (defined in a separate document, see [Data Splitter]({{< relref "../guides/translating/data-splitter/_index.md" >}})) to parse structured text like CSV, TSV, or fixed-width logs into XML.
 * {{< pipe-elm "XMLParser" >}}: Used when the input data is already XML.
-  It validates and parses the input into SAX events.
+  It checks that the input is well formed and parses it into SAX events.
 * {{< pipe-elm "JSONParser" >}}: Converts input JSON into XML events conforming to the standard XSLT-JSON XML schema.
 * {{< pipe-elm "XMLFragmentParser" >}}: Wraps non-well-formed XML fragments with a root element to make them processable.
 
@@ -52,9 +52,9 @@ They can modify, split, or supplement the data.
   It ensures that the XML produced by a parser or XSLT conforms to a defined schema.
 * {{< pipe-elm "ReferenceDataFilter" >}}: A specialised filter used to load [reference data]({{< relref "pipeline-reference-data.md" >}}) into an internal map for high-speed lookups in other pipelines.
 * {{< pipe-elm "RecordCountFilter" >}}: Simply counts the number of records passing through and can provide statistics.
-* {{< pipe-elm "SplitFilter" >}}: Used to split a single large XML stream into multiple smaller streams based on specific criteria.
+* {{< pipe-elm "SplitFilter" >}}: Splits multi-record source data into smaller groups of records before they are delivered to an XSLT, so the XSLT does not have to load a potentially huge input stream into memory.
 * {{< pipe-elm "IdEnrichmentFilter" >}}: Adds unique IDs to records.
-* {{< pipe-elm "RecordOutputFilter" >}}: Used during stepping to capture and display the state of the data at a specific point in the pipeline.
+* {{< pipe-elm "RecordOutputFilter" >}}: Drops records that raised an error during processing, so only clean records are output.
 
 
 ### Writers
@@ -77,12 +77,12 @@ See [Pipeline data destinations]({{< relref "pipelines-destination.md" >}}).
 * {{< pipe-elm "HDFSFileAppender" >}}: Writes the output to a Hadoop Distributed File System (HDFS).
 * {{< pipe-elm "HTTPAppender" >}}: Posts the output to a remote HTTP(S) endpoint.
 * {{< pipe-elm "RollingStreamAppender" >}}: Similar to StreamAppender but "rolls" the stream based on size or time thresholds.
-* {{< pipe-elm "IndexingFilter" >}}: Technically a filter, but often acts as a destination by sending data directly into a [Lucene]({{< relref "lucene-index.md" >}}) or Elasticsearch index.
+* {{< pipe-elm "IndexingFilter" >}}: Technically a filter, but often acts as a destination by sending data directly into a [Lucene]({{< relref "lucene-index.md" >}}) index (use {{< pipe-elm "ElasticIndexingFilter" >}} for Elasticsearch).
 
 
 ## Schema validation
 
-Using the {{< pipe-elm "SchemaFilter" >}} (see [Schema filter]({{< relref "pipeline-schema-filter.md" >}})) or enabling validation on parsers allows Stroom to ensure the structural integrity of the XML data as it flows through the pipeline.
+Using the {{< pipe-elm "SchemaFilter" >}} (see [Schema filter]({{< relref "pipeline-schema-filter.md" >}})) allows Stroom to ensure the structural integrity of the XML data as it flows through the pipeline.
 Schemas are typically provided by the `core-xml-schemas` and `event-logging-xml-schemas` content packs.
 
 

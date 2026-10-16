@@ -33,7 +33,7 @@ Cancel | `esc` | Closes/cancels an open popup or dialog discarding any changes. 
 Select / toggle | `space` | Selects a row/item in a table, list, selection box or tab bar. Toggles a focused checkbox. Selects a radio button.
 Execute | `enter` | Selects a row/item in a table, list, selection box or tab bar. Opens a Document/Date picker dialog on a Document/Date field.
 OK | `ctrl+enter` | Equivalent to clicking **OK** on a dialog, closes the dialog accepting any changes.
-Context Menu | `menu` | Shows the context menu for the selected item, e.g. the selected item in the explorer tree.
+Context Menu | `alt+menu` | Shows the context menu for the selected item, e.g. the selected item in the explorer tree.
 Select all | `ctrl+a` |
 Save | `ctrl+s` | Save the current tab.
 Save all | `shift+ctrl+s` | Saves all open and un-saved tabs.
@@ -83,9 +83,11 @@ These shortcuts may not do anything if you do not have the required permissions 
 Action                       | Shortcut                 | Notes
 -------                      | -------------            | -------
 Goto Application Permissions | `g+a` |
+Goto Annotations             | `g+b` |
 Goto Caches                  | `g+c` |
 Goto Dependencies            | `g+d` |
 Goto Explorer Tree           | `g+e` | Changes focus to the Explorer Tree so the user can use the [Movement]({{< relref "#movement" >}}) shortcuts to move around the tree to select different documents.
+Goto User Groups             | `g+g` |
 Goto Index Volumes           | `g+i` |
 Goto Jobs                    | `g+j` |
 Goto API Keys                | `g+k` |
@@ -96,7 +98,9 @@ Goto Search Results          | `g+s` |
 Goto Server Tasks            | `g+t` |
 Goto User Preferences        | `g+u` |
 Goto Data Volumes            | `g+v` |
+Goto User Access             | `g+w` |
 Goto User Accounts           | `g+x` |
+Goto Signing Keys            | `g+y` |
 
 
 ### Creating new documents
@@ -107,6 +111,7 @@ If nothing is selected or multiple items are selected then these key sequences h
 
 Action                                                                | Shortcut
 -------                                                               | -------------
+Create Annotation                                                     | `c+a`
 Create Elastic Index {{< stroom-icon "document/ElasticIndex.svg" >}}   | `c+c`
 Create Dashboard {{< stroom-icon "document/Dashboard.svg" >}}          | `c+d`
 Create Feed {{< stroom-icon "document/Feed.svg" >}}                    | `c+e`
@@ -148,7 +153,7 @@ The following shortcuts are available when editing a [Query]({{< relref "../conc
 
 Action        | Shortcut                      | Notes
 -------       | -------------                 | -------
-Execute query | `ctrl,enter` | Execute the current query. This is the same as clicking {{< stroom-icon "play.svg" >}}.
+Execute query | `ctrl+enter` | Execute the current query. This is the same as clicking {{< stroom-icon "play.svg" >}}.
 
 
 ### Text editor

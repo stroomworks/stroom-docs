@@ -55,7 +55,11 @@ The match groups are as follows:
 
 `"This is some text, that we wish to match"`
 
-In addition to this behaviour match groups 1 and 2 will omit outermost whitespace and container characters if specified, e.g. with the following content:
+* $3: The content up to the specified delimiter at the end and filtered to remove only the escape characters that precede a delimiter; other escape characters are kept
+
+`"This is some text, that we wish to match"`
+
+In addition to this behaviour match groups 1, 2 and 3 will omit outermost whitespace and container characters if specified, e.g. with the following content:
 
 ```text
 "  This is some text\, that we wish to match  "  , "This is the next text"
@@ -64,7 +68,7 @@ In addition to this behaviour match groups 1 and 2 will omit outermost whitespac
 And the following `<split>` element:
 
 ```xml
-<split delimiter="," escape="\" containerStart="&quot" containerEnd="&quot">
+<split delimiter="," escape="\" containerStart="&quot;" containerEnd="&quot;">
 ```
 
 The match groups are as follows:
@@ -116,6 +120,6 @@ The match groups are as follows:
 Match group numbers in regular expressions are determined by the order that their open bracket appears in the expression.
 
 
-## References to `<any>` match groups
+## References to `<all>` match groups
 
-The `<any>` element does not have any match groups and always returns the entire content that was passed to it when referenced with $.
+The `<all>` element does not have any match groups and always returns the entire content that was passed to it when referenced with $.

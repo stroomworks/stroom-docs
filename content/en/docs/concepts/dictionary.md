@@ -22,7 +22,7 @@ Data can be added to a Dictionary in several ways:
 
 ### 1. Manual entry via UI
 
-Users can directly type or paste a list of words into the **Data** tab of a Dictionary document.
+Users can directly type or paste a list of words into the **Words** tab of a Dictionary document.
 Each word must be on a new line.
 
 
@@ -87,7 +87,7 @@ Dictionaries are best used when:
 A Dictionary document has the following main configuration areas:
 
 
-### Data tab
+### Words tab
 
 This is where the actual list of words is stored.
 Each line is treated as a separate entry.
@@ -97,6 +97,12 @@ Each line is treated as a separate entry.
 
 A list of other Dictionary documents that this dictionary should inherit data from.
 The order of imports is typically not significant as the result is a combined set of unique lines.
+
+
+### Effective Words tab
+
+A read-only list of the combined words from this dictionary and all of its imports, recursively.
+Use it to check what `IN DICTIONARY` will match.
 
 
 ## Considerations

@@ -209,8 +209,9 @@ They fall into these groups:
 | String and encoding | Hash, URL-encode and convert hex. | `hash`, `encode-url`, `hex-to-dec` |
 | HTTP and JSON | Call a web service or convert JSON to XML. | `http-call`, `fetch-json`, `json-to-xml` |
 | Output and logging | Log a message at a chosen severity, add metadata to the output, build links for dashboard tables. | `log`, `add-meta`, `link` |
-| Values and context | Hold values while processing a stream, and read the user and pipeline. | `put`, `get`, `pipeline-name` |
+| Values and context | Hold values while processing a stream, read the user and pipeline, and generate random values. | `put`, `get`, `pipeline-name`, `random-integer` |
 | Maths and vectors | Geometry and vector comparison. | `pointIsInsideXYPolygon`, `cosine-similarity` |
+| AI | Ask a named OpenAI Model a question and return its answer. | `ask-ai` |
 
 Lookups need the reference data loaded first.
 [Reference data]({{< relref "pipeline-reference-data.md" >}}) explains how.

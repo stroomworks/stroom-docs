@@ -99,6 +99,6 @@ When a result looks short, compare it with someone who has broader access before
    Nothing there means the problem is indexing, not the query.
 1. **Can you read the feeds?**
    Ask someone with wider permission to run the same search.
-1. **Has the index been flushed?**
-   Recent data not yet flushed is invisible to search.
+1. **Is indexing still behind?**
+   Check the indexing processor filter has caught up.
 {{< /diagnose >}}

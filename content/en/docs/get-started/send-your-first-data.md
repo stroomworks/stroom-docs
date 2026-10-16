@@ -40,7 +40,8 @@ The new key is shown once, in the dialog that creates it.
 Copy it then: you cannot view it again afterwards.
 See [API keys]({{< relref "../guides/automation/api-keys.md" >}}).
 
-If your stack has been configured with `receive.authenticationRequired` set to `false`, you do not need a key and can leave out the `Authorization` header below.
+The `stroom_core_test` stack has receipt authentication turned off (`receive.authenticationRequired` set to `false`), so on it the key is optional and you can leave out the `Authorization` header below.
+On a default Stroom you need it.
 
 
 ## Send it something
@@ -59,7 +60,7 @@ EOF
 Post it:
 
 ```bash
-curl -k -v -X POST "https://localhost/stroom/datafeed" \
+curl -k -v -X POST "https://localhost/stroom/datafeeddirect" \
   -H "Authorization: Bearer <your API key>" \
   -H "Feed: TEST-EVENTS" \
   -H "Type: Raw Events" \
@@ -70,6 +71,8 @@ curl -k -v -X POST "https://localhost/stroom/datafeed" \
 `-k` accepts the stack's self-signed certificate.
 `-v` shows you the response headers, which is the point of this step as much as the data is.
 Replace `<your API key>` with the key you copied.
+`/stroom/datafeeddirect` is the stack's route straight into Stroom.
+Its `/stroom/datafeed` goes to [Stroom Proxy]({{< relref "../concepts/data-receipt.md#stroom-proxy" >}}) first, which batches data for up to ten minutes before passing it on.
 
 {{< timing mode="immediate" >}}
 Receipt is synchronous.
@@ -100,7 +103,7 @@ A `200` on its own does not, as the trap below explains.
 A feed set to [`Drop`]({{< relref "../concepts/data-receipt.md#feed-status" >}}) returns `200` and discards what you sent.
 
 **An empty Data tab may be the filter, not the data.**
-The tab defaults to a time range; widen it before concluding the stream is absent.
+The tab only lists unlocked streams, so a stream still being written, or one that has been deleted, is not shown.
 {{< /not-proof >}}
 
 {{< /verify >}}
@@ -130,8 +133,9 @@ See [The datafeed contract]({{< relref "../reference/the-datafeed-contract.md" >
 1. **Is the feed set to receive?**
    Check Feed Status on the Settings tab.
    A feed set to `Reject` gives the same `406` and `110` as a feed that does not exist.
-1. **Is the time filter hiding it?**
-   Widen the range on the Data tab.
+1. **Did it go through the proxy?**
+   A receipt id with `_P_` in it, rather than `_S_`, came from Stroom Proxy, which can take up to ten minutes to pass data on.
+   Post to `/stroom/datafeeddirect` as above.
 {{< /diagnose >}}
 
 

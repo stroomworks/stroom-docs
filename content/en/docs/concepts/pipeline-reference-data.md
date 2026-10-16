@@ -45,8 +45,8 @@ A reference pipeline must contain the following elements:
    It "listens" for the XML produced by the XSLT and writes the keys, maps, and values into the Store.
 
 {{% note %}}
-The **ReferenceDataFilter** is a **terminal element**.
-It writes data directly to the internal store and does not produce output for further elements.
+The **ReferenceDataFilter** loads the data into the store.
+It passes XML through, but reference pipelines normally attach nothing after it.
 Consequently, reference pipelines do not require (and typically do not have) a **StreamAppender**.
 {{% /note %}}
 
@@ -145,7 +145,7 @@ stroom:lookup(mapName, key, [time], [ignoreWarnings], [trace])
 
 * **mapName**: The name of the map defined in the reference pipeline (e.g., 'UserToDepartment').
 * **key**: The key to look up.
-* **time** (Optional): The ISO 8601 string or epoch ms.
+* **time** (Optional): An ISO 8601 date-time string with a zone offset, e.g. `2026-05-20T10:00:00.000Z`.
   Defaults to the received time of the stream being processed, not the event's own time.
   Pass the event's time here when the value in effect when the event happened matters.
 * **ignoreWarnings** (Optional): Boolean.
@@ -160,8 +160,11 @@ For `stroom:lookup` to find data, you must link the event pipeline to the refere
 
 1. Open the **Event Pipeline**.
 1. Select the {{< pipe-elm "XSLTFilter" >}} that performs the lookup.
-1. Go to the **Pipeline References** tab.
-1. Add a reference to the **Reference Feed** and specify the **Reference Pipeline**.
+1. In the **Pipeline References** table on the **Structure** tab, add a reference.
+1. Set **Pipeline** to the **Reference Pipeline** and **Feed** to the **Reference Feed**.
+
+The **Pipeline** of a reference can also be a [Plan B]({{< relref "planb.md" >}}) store or, from Stroom 7.14, a [SQL Temporal Store]({{< relref "sql-temporal-store.md" >}}).
+`stroom:lookup` then reads that store directly, with no feed or loader pipeline, when the map name matches the store's name.
 
 
 ## Configuration
@@ -319,7 +322,7 @@ This is the XML produced by the parser in your **Event Pipeline**.
     <xsl:apply-templates select="@*|node()"/>
 
     <!-- Perform the lookup -->
-    <xsl:variable name="siteData" select="stroom:lookup('SITEID_TO_LOCATION', siteId)"/>
+    <xsl:variable name="siteData" select="stroom:lookup('SITEID_TO_LOCATION_MAP', siteId)"/>
 
     <!-- Add enriched fields from the XML fragment in the reference value -->
     <siteName><xsl:value-of select="$siteData/site/name"/></siteName>

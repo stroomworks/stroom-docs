@@ -46,6 +46,9 @@ Type can be one of:
 * `tab` : Display the content of the link URL within a stroom tab.
 * `browser` : Display the content of the link URL within a new browser tab.
 * `dashboard` : Used to launch a stroom dashboard internally with parameters in the URL.
+* `stepping` : Open the stepper using the parameters in the URL.
+* `data` : Open the data viewer using the parameters in the URL.
+* `annotation` : Open or create an annotation using the parameters in the URL.
 
 If you wish to override the default title or URL of the target link in either a tab or dialog you can.
 Both `dialog` and `tab` types allow titles to be specified after a `|`, e.g. `dialog|My Title`.

@@ -108,8 +108,7 @@ Effective for identifying patterns and hotspots over time.
 
 | Parameter | Table Column / Mapping |
 | :--- | :--- |
-| **x** | `hourOfDay(${Timestamp})` (see [Expression functions]({{< relref "../reference/expression-functions.md" >}})) |
-| **y** | `dayOfWeek(${Timestamp})` |
+| **hours** | `Timestamp`, floored with `floorHour(${Timestamp})` (see [Expression functions]({{< relref "../reference/expression-functions.md" >}})); the visualisation does the hour and day bucketing itself |
 | **values** | `max(${Usage})` |
 
 **Use Case**: Identifying at what time of day and day of the week resource usage typically peaks.
@@ -138,7 +137,7 @@ Displays a single aggregated value as large text.
 
 | Parameter | Table Column / Mapping |
 | :--- | :--- |
-| **field** | `count(${Host})` |
+| **field** | `countUnique(${Host})` |
 
 **Use Case**: Displaying a "Total Active Servers" count at the top of a dashboard.
 

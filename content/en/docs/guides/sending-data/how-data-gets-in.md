@@ -5,12 +5,12 @@ weight: 10
 date: 2026-10-14
 tags:
 description: >
-  Stroom's three entry points, what each one needs of the sender, and how to choose.
+  Stroom's four entry points, what each one needs of the sender, and how to choose.
 pageKind: guide
 verification: required
 ---
 
-Stroom has three ways in.
+Stroom has four ways in.
 Which you want is mostly decided by what the sending system can already do, rather than by preference.
 
 | Entry point | Available on | What the sender must do |
@@ -18,6 +18,7 @@ Which you want is mostly decided by what the sending system can already do, rath
 | **The datafeed endpoint** | Stroom **and** Proxy | HTTP POST with custom headers |
 | **The event endpoint** | Proxy only | HTTP POST of a single JSON event |
 | **The drop folder** | Proxy only | Write a file to a directory |
+| **S3** (from Stroom 7.14) | Proxy forwards, Stroom picks up | Send to a proxy that forwards to an S3 bucket |
 
 
 ## The datafeed endpoint
@@ -48,6 +49,14 @@ There is no HTTP, no authentication to configure in the sender, and no library: 
 The trade-offs are granularity and latency.
 It works at file level, and the scan is on an interval, so it is minutes rather than seconds.
 For overnight exports from a system that has no other way out, that is usually fine.
+
+
+## S3
+
+From Stroom 7.14, a proxy can forward to an S3 bucket instead of posting to Stroom.
+Stroom picks the data up by polling an AWS SQS queue for the bucket's S3 create events (the **S3 Event Notifications Poll** job), or from a notification posted to its `/s3event/v1/notify` endpoint, and reads it through an `S3 v1 (Read only)` volume.
+The sender still sends to the proxy in one of the ways above: S3 replaces the hop from the proxy to Stroom.
+See [Stroom Proxy and Data Receipt]({{< relref "../../concepts/data-receipt.md" >}}) and [Running a Proxy]({{< relref "../../operate/install/a-proxy.md" >}}).
 
 {{< timing mode="async" >}}
 The datafeed and event endpoints answer synchronously: by the time you get a `200` from **Stroom**, the data is stored.

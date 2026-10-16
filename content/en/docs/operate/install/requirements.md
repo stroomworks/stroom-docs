@@ -51,6 +51,9 @@ Three kinds of storage, with different characteristics:
 
 Plan B state stores and the reference data store are local to each node and use memory mapped files, so they want fast local storage rather than anything networked.
 
+Stroom forces each stream's files and directories to disk before it unlocks the stream, under `stroom.data.store.fsyncMode`.
+It defaults to `ENABLED`; `FILE_ONLY`, `DIR_ONLY` and `DISABLED` trade some of that guarantee for throughput on slow disks.
+
 
 ## Sizing a cluster
 

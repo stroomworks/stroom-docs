@@ -37,10 +37,6 @@ aliases:
   - /docs/install-guide/setup/processing-user-setup/
   - /docs/install-guide/single-node-docker/
   - /docs/install-guide/stroom-6-installation/
-  - /docs/install-guide/upgrades/
-  - /docs/install-guide/upgrades/upgrade-patch/
-  - /docs/install-guide/upgrades/v5-to-v7/
-  - /docs/install-guide/upgrades/v6-to-v7/
 ---
 
 {{% note %}}
@@ -92,3 +88,4 @@ How you deliver it, whether that is a container stack, a package on a virtual ma
 
 [Running a proxy]({{< relref "a-proxy.md" >}}) covers standing up a Stroom Proxy, which needs a JVM and a disk and no database at all.
 [Air-gapped installation]({{< relref "air-gapped.md" >}}) covers the part that differs on an isolated network, and [Hosting your own content store]({{< relref "local-content-store.md" >}}) covers mirroring the content packs into a Git server you control.
+[Upgrading]({{< relref "upgrading.md" >}}) covers what to change before moving an existing installation to 7.14, and why the whole cluster has to stop.

@@ -81,7 +81,8 @@ Worth knowing before the person who created it has moved on and something stops 
 
 Nothing warns the thing using it.
 The automation simply starts getting authentication errors, often in the middle of the night, and often in something that does not report failures loudly.
-Record expiry dates somewhere that is watched, and rotate before them.
+Stroom itself shows the expiry date in red on the API Keys screen once a key is within 30 days of expiring, and logs a warning, with the key's prefix and expiry, when such a key is used.
+Watch the application log for those warnings, record expiry dates somewhere that is watched, and rotate before them.
 {{< /trap >}}
 
 {{< diagnose >}}

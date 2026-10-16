@@ -25,7 +25,7 @@ The dashboard's time range, at the top right, defaults to **All time**, which co
 Add an expression term, or leave it unfiltered for now.
 
 **Choose the table's columns.**
-On the table's toolbar, click {{< stroom-icon "add.svg" "Add" >}} and choose **Columns**, then the data source, then a field.
+On the table's toolbar, click {{< stroom-icon "add.svg" "Add" >}} and choose **Data Source**, then a field.
 Add `EventTime`, `User`, `Action` and `IP`.
 The same menu also offers **Annotations**, **Counts** and **Custom** columns.
 It reopens at the submenu you used last, so check which field you are clicking.

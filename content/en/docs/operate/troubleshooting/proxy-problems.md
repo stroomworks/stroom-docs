@@ -23,7 +23,7 @@ The proxy's repository is a sequence of numbered directories, and data moves thr
 
 | Stage | Directories |
 |---|---|
-| Receiving | `01_receiving_simple`, `01_receiving_zip`, `03_received_zip` |
+| Receiving | `01_receiving_simple`, `01_receiving_zip` |
 | Splitting | `02_split_zip_input_queue`, `03_split_zip_splits`, `22_splitting`, `23_split_output` |
 | Aggregating | `20_pre_aggregate_input_queue`, `21_pre_aggregates`, `30_aggregate_input_queue`, `31_aggregates` |
 | Forwarding | `40_forwarding_input_queue`, `50_forwarding`, `01_forward`, `02_retry` |

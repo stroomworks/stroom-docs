@@ -123,6 +123,10 @@ For example:
 The main data and its Context and Meta Data child streams are compressed with block gzip (`.bgz`), which lets Stroom read from the middle of a large stream without decompressing all of it.
 Small uncompressed `.dat` files sit beside them: a manifest (`.mf.dat`), and for segmented or multi-part streams, indexes of where each record or part begins.
 
+From Stroom 7.14, Stroom forces a stream's files and directories to durable storage (fsync) before it unlocks the stream.
+The property `data.store.fsyncMode` controls this; it takes `DISABLED`, `FILE_ONLY`, `DIR_ONLY` or `ENABLED`, and defaults to `ENABLED`.
+Forcing writes to disk can reduce write throughput on a volume.
+
 You shouldn't need to work with these files directly.
 Use the **Data** tab to view streams and **Download** to get a copy.
 Never delete files from a volume by hand: the database would still list the streams.
@@ -139,9 +143,9 @@ Capacity figures (total, used, free, limit and full) are not supported for S3 vo
 Index volumes are always on a file system.
 
 {{% warning %}}
-The Stroom 7.14 betas extend S3 storage.
-The existing type is renamed **S3 v1**, and two types are added: **S3 v1 (Read only)**, for reading data that Stroom Proxy has forwarded to S3, and **S3 v2 (Experimental)**, which uses a different compression format.
-These are not in a stable release, and S3 v2 is not for production use.
+From Stroom 7.14, the existing type is called **S3 v1**, and two types are added: **S3 v1 (Read only)**, for reading data that Stroom Proxy has forwarded to S3, and **S3 v2 (Experimental)**, which uses a different compression format.
+S3 v1 (Read only) relies on Stroom consuming the bucket's S3 create events from an AWS SQS queue (see [Stroom Proxy and Data Receipt]({{< relref "data-receipt.md" >}})).
+S3 v2 is experimental and not for production use.
 {{% /warning %}}
 
 

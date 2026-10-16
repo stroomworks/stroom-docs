@@ -93,6 +93,7 @@ Health endpoints report whether components are up, not whether jobs that are up 
 
 Neither runs, and neither reports anything.
 The difference is visible only on the Jobs screen, as an enabled flag, which is why it is worth monitoring the enabled state as well as the last-run time after a cluster change or an upgrade.
+It matters most for **Processor Task Heartbeat** and **Processor Task Reaper**, which recover the tasks of a failed node and should never be off while processing runs; see [Nodes, jobs and properties]({{< relref "nodes-and-jobs.md#key-jobs" >}}).
 {{< /trap >}}
 
 {{< diagnose >}}

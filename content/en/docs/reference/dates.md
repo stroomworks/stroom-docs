@@ -259,7 +259,8 @@ They can be used in the following places in Stroom:
 
 Date expressions consist of a mixture of:
 
-* [StroomDuration]({{< relref "#stroom-duration" >}}).
+* Durations, written as a number followed by one of the units `s` (seconds), `m` (minutes), `h` (hours), `d` (days), `w` (weeks), `M` (months) or `y` (years), e.g. `12h` or `24y`.
+  These are not the same as the [Stroom Duration]({{< relref "#stroom-duration" >}}) units; `ms` is not supported.
 * Relative date functions like `minute()`.
 * Absolute date/times in the [Standard Format]({{< relref "#standard-format" >}})
 
