@@ -37,8 +37,7 @@ See [Floor mapping]({{< relref "floor-mapping.md" >}}).
 | **Plan B** | Very high lookup rates, or large state written by many nodes. Node-local and built for speed |
 | **SQL Temporal Store** | The facts are maintained rather than fed, and being able to correct a single entry matters more than throughput |
 
-The last row is the deciding one.
-If nobody will ever hand-correct an entry, one of the other two is usually a better fit.
+If nobody will ever hand-correct an entry, use Reference data or Plan B.
 
 {{< image src="concepts/sql-temporal-store/three-stores.svg" alt="Three panels comparing the stores. Reference data is loaded by a reference feed, lives in an off-heap store on each node, and is corrected by fixing the feed and reloading. Plan B is loaded by a pipeline per node, lives in local shards read as snapshots, and is corrected by rewriting the source and re-merging. The SQL Temporal Store is loaded by a pipeline or by hand, lives in the shared database, and is corrected by editing the entry in place." >}}The first two are derived and have to be rebuilt from their source. The third holds the data itself, which is why an entry can be corrected on its own.{{< /image >}}
 
