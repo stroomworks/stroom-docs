@@ -16,6 +16,9 @@ Each feeds the next.
 
 ## Build it
 
+This page builds a dashboard by hand, so you see each part.
+Once you know them, the index's **Data** tab and its **Create Dashboard** button are quicker: see [A dashboard from a store]({{< relref "../guides/dashboard-from-a-store.md#the-quick-route-the-stores-data-tab" >}}).
+
 Create a **Dashboard**, from **New > Search > Dashboard**.
 It starts with a query and a table already linked.
 

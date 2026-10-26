@@ -66,6 +66,19 @@ The `DynamicIndexingFilter` consumes XML using a `<document>` structure rather t
 ```
 
 
+## Seeing what an index holds
+
+Two tabs on the Lucene Index document show its contents rather than its configuration:
+
+* **Data** runs a [StroomQL]({{< relref "query-language.md" >}}) query against the index, filled in for you with the main time field and every other field.
+  Click **Run** to see the documents; **Create Dashboard** turns the query into a dashboard.
+  See [A dashboard from a store]({{< relref "../guides/dashboard-from-a-store.md#the-quick-route-the-stores-data-tab" >}}).
+* **Shards** lists the index's shards with each one's **Doc Count**, after you click refresh.
+  The count only changes when a shard is committed by the **Index Writer Flush** job, so it can trail what a search already returns.
+
+The **Fields** tab, by contrast, shows what the index *can* hold, and looks the same whether or not anything has been indexed.
+
+
 ## Shards and partitions
 
 Lucene indexes are physically divided into smaller units called **Shards**.

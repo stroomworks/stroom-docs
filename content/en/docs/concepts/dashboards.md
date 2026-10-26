@@ -26,7 +26,8 @@ Dashboards can query several types of data sources:
 * **Plan B**: A high-speed data store used for specific types of analytic data.
   See [Plan B]({{< relref "planb.md" >}}).
 
-For the steps from a populated index or Plan B store to a working dashboard, see [A dashboard from a store]({{< relref "../guides/dashboard-from-a-store.md" >}}).
+Index, Plan B and SQL Temporal Store documents also have a **Data** tab that queries the store directly, with a **Create Dashboard** button that turns the query into a dashboard.
+For the steps from a populated store to a working dashboard, see [A dashboard from a store]({{< relref "../guides/dashboard-from-a-store.md" >}}).
 
 
 ## Data flow and processing

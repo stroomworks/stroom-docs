@@ -55,7 +55,7 @@ The store's own screens show and query its contents, and can reset it, but do no
 
 **Out**: `stroom:lookup()` from XSLT, exactly as for reference data and Plan B, resolving against the event's effective time.
 The store's **Data** tab also queries it directly, and has a **Create Dashboard** button that turns the query you are looking at into a dashboard.
-See [Building a dashboard]({{< relref "../guides/searching/building-a-dashboard.md" >}}).
+See [A dashboard from a store]({{< relref "../guides/dashboard-from-a-store.md#the-quick-route-the-stores-data-tab" >}}).
 
 
 ## The temporal part

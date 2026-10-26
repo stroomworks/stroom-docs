@@ -5,7 +5,7 @@ weight: 50
 date: 2026-10-14
 tags:
 description: >
-  Put data you already hold in a Lucene index or a Plan B store onto a dashboard, with a query, a table and a visualisation, and know what each store can and cannot answer.
+  Put data you already hold in a Lucene index or a Plan B store onto a dashboard, starting from the store's Data tab, and know what each store can and cannot answer.
 pageKind: guide
 verification: required
 ---
@@ -15,13 +15,11 @@ This guide covers the two stores most dashboards read: a **Lucene index**, which
 The dashboard side is the same for both: a **Query** component reads the store, a **Table** shows and aggregates what it returns, and a **Visualisation** draws the table.
 What differs is what has to be in place first, and what each store can answer.
 
-If you have not built a dashboard before, [Your first dashboard]({{< relref "../get-started/your-first-dashboard.md" >}}) walks through the components once.
-For how the parts fit together, see [Dashboards]({{< relref "../concepts/dashboards.md" >}}), and for the text form of the same search, see [StroomQL and data sources]({{< relref "../concepts/query-language.md" >}}).
+The quickest way to get there is not to build the dashboard at all: explore the store on its own **Data** tab, then let **Create Dashboard** build the query and table for you.
+[The quick route](#the-quick-route-the-stores-data-tab) below covers that, and the sections for each store say what to check first and what to expect back.
 
-{{% note %}}
-If the query you want is already running on the store's **Data** tab, the **Create Dashboard** button there builds a dashboard from it, carrying over the query and the table's columns.
-See [Building a dashboard]({{< relref "searching/building-a-dashboard.md#the-quickest-route" >}}).
-{{% /note %}}
+If you have not built a dashboard before, [Your first dashboard]({{< relref "../get-started/your-first-dashboard.md" >}}) walks through the components by hand once.
+For how the parts fit together, see [Dashboards]({{< relref "../concepts/dashboards.md" >}}), and for the text form of the same search, see [StroomQL and data sources]({{< relref "../concepts/query-language.md" >}}).
 
 
 ## Before you start
@@ -33,6 +31,45 @@ Whichever store you use:
 * **The store must already hold data.**
   A dashboard reads what is there; it does not trigger processing.
   Getting data in is covered by [Index and search it]({{< relref "../get-started/index-and-search.md" >}}) for an index, and by [Plan B]({{< relref "../concepts/planb.md" >}}) for a state store.
+
+
+## The quick route: the store's Data tab
+
+Lucene Index, Plan B and [SQL Temporal Store]({{< relref "../concepts/sql-temporal-store.md" >}}) documents each have a **Data** tab that queries the store directly, as does the FloorMap Event Store of [Enterprise Floor Mapping]({{< relref "../concepts/floor-mapping.md" >}}).
+The steps are the same for each.
+
+1. **Open the store and go to its Data tab.**
+   It fills in a [StroomQL]({{< relref "../concepts/query-language.md" >}}) query for you: for an index, its main time field and then every other field; for a Plan B store, the fields its state type has.
+   Both start with `limit 100`.
+1. **Click Run** (the play button) and check the rows are what you expect.
+   This is also the quickest check that the store holds data at all.
+1. **Narrow it with `where`**, and run it again.
+   **Reset to Default** puts the generated query back.
+1. **Arrange the table**, using the menus on its column headers.
+1. **Click Create Dashboard.**
+   Give the dashboard a name, which defaults to the store's name followed by `Dashboard`, and choose its folder.
+   The new dashboard opens in design mode with a **Query** component and a **Table** component, linked and ready to run.
+
+What the dashboard gets from the tab:
+
+| From the Data tab | On the dashboard |
+|---|---|
+| The store | The Query component's **Data Source** |
+| The query's `where` conditions | The Query component's expression |
+| The table's columns, including changes made with the column menus | The Table component's columns |
+
+{{< trap severity="silent" >}}
+**Only the `where` conditions and the table's own columns are carried over.**
+
+The table's columns are the store's default columns plus whatever you changed through the column menus.
+Columns you only created in the query text, with `select`, `eval`, `group by` or `limit`, are not on the new dashboard, and neither is a `show` chart.
+The dashboard's time range is its default, **All time**, not anything in the query.
+
+So a grouped count you wrote in StroomQL arrives as a plain table of the default columns.
+Rebuild the grouping and expressions in the dashboard's table, as described for each store below, and add a visualisation as in [Add a visualisation](#add-a-visualisation).
+{{< /trap >}}
+
+You can also start from a blank dashboard, as in [Building a dashboard]({{< relref "searching/building-a-dashboard.md#building-one-from-scratch" >}}); the store sections below say how to set each part by hand.
 
 
 ## From a Lucene index
@@ -65,7 +102,10 @@ See [Stored and extracted fields]({{< relref "../concepts/query-language.md#stor
 
 ### Query it
 
-On a new dashboard, which opens in design mode with a Query and a Table already linked:
+The index's **Data** tab starts with a query selecting the main time field and every field in the index's field list.
+Add a `where` to narrow it, then use **Create Dashboard**, as in [The quick route](#the-quick-route-the-stores-data-tab).
+
+To set the query up by hand instead, on a new dashboard, which opens in design mode with a Query and a Table already linked:
 
 1. Open the Query component's **Settings** from its tab menu, and set **Data Source** to the index.
 1. Use **Add Term** to add conditions, and **Add Operator** to combine them.
@@ -73,7 +113,7 @@ On a new dashboard, which opens in design mode with a Query and a Table already 
 1. Set the dashboard's time range to cover the event times you expect.
    It is applied to the index's main time field, not to when the data arrived.
 
-The same search written in StroomQL, in a **Query** document:
+The same search written in StroomQL, on the **Data** tab or in a **Query** document:
 
 ```text
 from "Authentication Events"
@@ -147,14 +187,22 @@ The dashboard's query pane offers the key and time fields as terms.
 
 ### Query it
 
-Set the Query component's **Data Source** to the Plan B document and add terms as for an index.
-In StroomQL, using the `user_locations` Temporal State store from the [Plan B example]({{< relref "../concepts/planb.md#example-setup-user-location-tracking" >}}):
+The Plan B document's **Data** tab starts with a query selecting its state type's fields.
+For the `user_locations` Temporal State store from the [Plan B example]({{< relref "../concepts/planb.md#example-setup-user-location-tracking" >}}), it is:
 
 ```text
-from user_locations
+from "user_locations" limit 100 select EffectiveTime as "Effective Time", Key, Value
+```
+
+Narrow it to one key with a `where`, then use **Create Dashboard**, as in [The quick route](#the-quick-route-the-stores-data-tab):
+
+```text
+from "user_locations"
 where Key = "jbloggs"
 select Key, EffectiveTime, Value
 ```
+
+To set it up by hand instead, set the Query component's **Data Source** to the Plan B document and add terms as for an index.
 
 This returns every location recorded for that user, one row per change.
 
@@ -237,7 +285,10 @@ An empty table straight after processing usually means not yet, not failed.
 {{< /timing >}}
 
 {{< verify >}}
-Count what the store holds, with no conditions and no time range:
+First run the store's own **Data** tab with its default query.
+Rows there prove the store holds data and is readable, independently of the dashboard.
+
+For a count of everything in the store, with no conditions and no time range, run this on the same tab:
 
 ```text
 from "Authentication Events"
@@ -245,7 +296,7 @@ eval n = count()
 select n
 ```
 
-or `from user_locations` for a Plan B store.
+or `from "user_locations"` for a Plan B store.
 Then run the dashboard and compare.
 
 {{< golden >}}
@@ -267,7 +318,7 @@ A column over a field that is neither stored nor extracted comes back empty with
 {{< /verify >}}
 
 {{< diagnose >}}
-1. **Does the unfiltered count return rows?**
+1. **Does the store's Data tab return rows with its default query?**
    If not, the problem is getting data into the store, not the dashboard.
    For an index see [Index and search it]({{< relref "../get-started/index-and-search.md" >}}); for Plan B, check the pipeline's output and the merge job.
 1. **Does it still return nothing with the time range removed?**
@@ -277,6 +328,8 @@ A column over a field that is neither stored nor extracted comes back empty with
 1. **Does every condition use a field that is indexed?**
    A `where` on anything else matches nothing.
    For Plan B, conditions on `Value` belong in a filter.
+1. **Did you build the dashboard with Create Dashboard, and expect columns from your query?**
+   Only the `where` conditions and the Data tab table's own columns carry over; see [The quick route](#the-quick-route-the-stores-data-tab).
 1. **Are some columns empty while others fill?**
    For an index, the field is not stored, and either **Extract Values** is off or the extraction pipeline does not produce it.
    For `getState()`, check the map name.
@@ -288,6 +341,7 @@ A column over a field that is neither stored nor extracted comes back empty with
 ## Related pages
 
 * [Dashboards]({{< relref "../concepts/dashboards.md" >}}): components, tables and visualisations.
+* [Building a dashboard]({{< relref "searching/building-a-dashboard.md" >}}): building one from scratch, and the rest of the dashboard features.
 * [StroomQL and data sources]({{< relref "../concepts/query-language.md" >}}): the query language and the data sources it reads.
 * [Lucene Index]({{< relref "../concepts/lucene-index.md" >}}): fields, storage and extraction pipelines.
 * [Plan B]({{< relref "../concepts/planb.md" >}}): state types, ingestion and lookups.

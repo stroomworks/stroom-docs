@@ -164,7 +164,9 @@ If your Plan B store contains nested XML in the `<value>` field (e.g., `<value><
 ### Dashboard and StroomQL lookups (analysis)
 
 Dashboards can perform lookups on-the-fly when displaying data, which is useful for showing the "current" state of an entity.
-A Plan B store can also be queried directly as a dashboard data source; [A dashboard from a store]({{< relref "../guides/dashboard-from-a-store.md" >}}) covers both uses.
+A Plan B store can also be queried directly as a dashboard data source.
+The Plan B document's own **Data** tab is the quickest way to see what a store holds, and its **Create Dashboard** button turns that query into a dashboard.
+[A dashboard from a store]({{< relref "../guides/dashboard-from-a-store.md" >}}) covers both uses.
 
 
 #### In a dashboard table

@@ -117,6 +117,18 @@ Afterwards the content is in Stroom and the Git Repo document remains, which is 
 See [Content management]({{< relref "../../guides/content-management.md" >}}).
 {{< /timing >}}
 
+An install is a Git pull, so it follows the [import matching rules]({{< relref "../../guides/content-management.md#how-imported-content-is-matched" >}}): content is matched by UUID, and any pipelines' [processor filters]({{< relref "../../guides/content-management.md#processor-filters" >}}) arrive disabled.
+
+{{< trap severity="silent" >}}
+**A mirrored pack takes over content already installed from the public store.**
+
+A mirror holds the same content with the same UUIDs.
+On a system that already has a pack installed from the public store, or imported from a zip, installing the mirrored pack does not add a second copy: it updates the existing documents and moves them below the mirrored pack's Git Repo, at its `stroomPath`.
+From then on that Git Repo decides where they live, and the old Git Repo, if it still exists, is left managing documents that are no longer below it; the next pull of either moves them again.
+
+When switching an existing system to your mirror, delete the old pack's Git Repo document first, and do not keep the same pack installed from two stores.
+{{< /trap >}}
+
 {{< verify >}}
 Open the content store screen in Stroom, confirm your packs are listed with their icons, then install one and find its content in the explorer tree at the `stroomPath` you set.
 

@@ -24,8 +24,10 @@ It holds a query, and components that display what the query returns.
 If you already have a query that returns what you want, you do not have to build the dashboard by hand.
 The **Data** tab of an Index, a Plan B store, a SQL Temporal Store and a FloorMap Event Store each has a **Create Dashboard** button, which makes a dashboard from the query currently in the tab.
 
-It carries over both the query and the table's column setup, so the dashboard opens showing what you were already looking at.
+The new dashboard has the store as its data source, the query's `where` conditions as its expression, and the Data tab table's columns, including any changes you made with the column menus.
+Columns that exist only in the query text, from `select`, `eval` or `group by`, are not carried over, and the time range starts at **All time**.
 From there you add visualisations and the rest as normal.
+[A dashboard from a store]({{< relref "../dashboard-from-a-store.md#the-quick-route-the-stores-data-tab" >}}) walks through it step by step.
 
 This is worth knowing before building one from scratch, because exploring in a Data tab and then promoting the result is usually faster than configuring a dashboard and then working out the query inside it.
 

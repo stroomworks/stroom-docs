@@ -28,7 +28,7 @@ Each word must be on a new line.
 
 ### 2. Import/export
 
-Dictionaries are standard Stroom documents and can be imported or exported as part of a content pack (ZIP file).
+Dictionaries are standard Stroom documents, so they can be exported and imported, kept in a [Git Repo]({{< relref "../guides/content-management.md#git-backed-content" >}}), or shipped in a content pack.
 See [Content management]({{< relref "../guides/content-management.md" >}}).
 
 

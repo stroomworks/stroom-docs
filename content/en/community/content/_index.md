@@ -44,6 +44,10 @@ In summary:
 * Remove the audit elements (`createUser`, `createTime`, `updateUser` and `updateTime`) that Stroom adds on export; the `removeAuditElements.py` script does this.
 * Keep the UUIDs of existing entities and dependencies unchanged, because Stroom links content by UUID.
   Folders shared between packs must have the same UUID in each.
+  An install or upgrade matches existing content by UUID too, so a changed UUID arrives as a new document alongside the old one rather than updating it.
+* Processor filters go into the pack only if **Include in Export** is ticked on them, and they always arrive disabled when the pack is installed.
+  A later upgrade never changes a filter that is already there.
+  See [Import and export]({{< relref "/docs/guides/content-management.md#processor-filters" >}}).
 * Run `./gradlew validate` to check the UUID references, then offer the change as a pull request to the repository.
 
 For bugs or suggestions, raise an [issue](https://github.com/gchq/stroom-content/issues) on the repository.
