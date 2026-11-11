@@ -16,6 +16,7 @@ That third option is deliberate and useful, and it is also the reason this part 
 A sender whose data is being dropped is told the send succeeded, so nothing on either side reports a problem while the data goes nowhere.
 
 * [Controlling what is accepted]({{< relref "controlling-what-is-accepted.md" >}}) covers setting it up and, more importantly, proving which of the three is happening.
+* [Content templates]({{< relref "content-templates.md" >}}) covers having Stroom create the feed and its processing automatically when data first arrives for a new feed.
 
 [Data receipt]({{< relref "../../concepts/data-receipt.md" >}}) in Concepts explains the mechanism: the receipt check modes, feed status, and how receipt rules are evaluated.
 

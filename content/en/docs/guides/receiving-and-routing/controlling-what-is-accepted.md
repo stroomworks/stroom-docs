@@ -38,7 +38,7 @@ A rule set that covers only the cases you thought about refuses everything else.
 If you want to accept anything not otherwise matched, finish with a rule that has no terms and a Receive action.
 {{% /warning %}}
 
-Data that passes the rules must still be for a feed that exists, unless automatic feed creation is switched on.
+Data that passes the rules must still be for a feed that exists, unless [content templates]({{< relref "content-templates.md" >}}) are switched on.
 
 {{< timing mode="async" >}}
 Proxies fetch feed status and receipt rules from Stroom and cache them, so a change takes a short time to reach every hop rather than applying at once.

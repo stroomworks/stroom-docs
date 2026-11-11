@@ -214,7 +214,7 @@ Both are off by default.
   The default template is `${accountid}-${component}-${format}-${schema}`, and those four headers then become mandatory.
   Configure it the same way on Stroom and on Proxy.
 * **Content templates** (`autoContentCreation.enabled`) create the feed, and a pipeline or processor filter to process it, when the first data for a new feed arrives.
-  Manage them from **Administration** > **Content Templates**.
+  Manage them from **Administration** > **Content Templates**; see [Content templates]({{< relref "../guides/receiving-and-routing/content-templates.md" >}}).
 
 
 ## Related pages

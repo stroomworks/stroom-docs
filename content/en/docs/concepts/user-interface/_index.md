@@ -116,7 +116,7 @@ System-wide configuration.
 * **Data Volumes** and **Index Volumes**: Where the stream store and index shards are written; see [Volumes]({{< relref "../volumes.md" >}}).
 * **Data Retention**: The rules that decide how long streams are kept; see [Streams]({{< relref "../streams/_index.md#data-retention" >}}).
 * **Data Receipt Rules**: The rules that decide whether received data is accepted; see [Data receipt]({{< relref "../data-receipt.md" >}}).
-* **Content Templates**: Templates for creating content automatically when data arrives for a new feed.
+* **Content Templates**: Templates for creating content automatically when data arrives for a new feed; see [Content templates]({{< relref "../../guides/receiving-and-routing/content-templates.md" >}}).
 * **Properties**: The configuration properties of the cluster; see [Nodes, jobs and properties]({{< relref "../../operate/nodes-and-jobs.md" >}}).
 
 
